@@ -1,4 +1,4 @@
-# Projeto MOCUTI 🚀
+# Projeto MOCUTI TECH 🚀
 
 Este repositório é dedicado ao projeto de **modernização de processos** da ONG **MOCUTI**. 🌱
 
