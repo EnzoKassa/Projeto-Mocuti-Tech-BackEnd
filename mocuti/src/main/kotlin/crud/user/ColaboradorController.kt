@@ -9,27 +9,32 @@ import java.time.LocalDate
 class ColaboradorController {
 
     val colabs = mutableListOf<Colaborador>(
-        Colaborador("Ana", "12345678920", "ana@email.com", "11997845188",
-            LocalDate.parse("1972-02-02"),"dona", "Rua das Rosas, 123",
-            "", "Pintor")
+        Colaborador(
+            "Ana", "12345678920", "ana@email.com", "11997845188",
+            LocalDate.parse("1972-02-02"), "dona", "02678-455", "Avenida Paulista",
+            574, "", "", "Pintor"
+        )
     )
 
     //Listar todos os colaboradores
     @GetMapping
     fun lista(
-        @RequestParam(required = false) nome: String?,
-        @RequestParam(required = false) cpf: String?,
-        @RequestParam(required = false) email: String?,
-        @RequestParam(required = false) telefone: String?,
-        @RequestParam(required = false) dtNasc: LocalDate?,
-        @RequestParam(required = false) cargo: String?,
-        @RequestParam(required = false) endereco: String?,
+        @RequestParam (required = false) nome: String?,
+        @RequestParam (required = false) cpf: String?,
+        @RequestParam (required = false) email: String?,
+        @RequestParam (required = false) telefone: String?,
+        @RequestParam (required = false) dtNasc: LocalDate?,
+        @RequestParam (required = false) cargo: String?,
+
+        @RequestParam (required = false) cep: String?,
+        @RequestParam (required = false) rua: String?,
+        @RequestParam (required = false) numero: Int?,
+        @RequestParam(required = false) complemento: String?,
+
         @RequestParam(required = false) areaAtuacaoVoluntario: String?,
         @RequestParam(required = false) necessidadeBeneficiario: String?
     ): ResponseEntity<List<Colaborador>> {
-        if (nome == null && cpf == null && email == null && telefone == null
-            && dtNasc == null && cargo == null && endereco == null
-            && areaAtuacaoVoluntario == null && necessidadeBeneficiario == null) {
+        if (complemento == null && areaAtuacaoVoluntario == null && necessidadeBeneficiario == null) {
             if (colabs.isEmpty()) {
                 return ResponseEntity.status(204).build()
             }
@@ -42,28 +47,35 @@ class ColaboradorController {
         val filtraTelefone = telefone != null
         val filtraDtNasc = dtNasc != null
         val filtraCargo = cargo != null
-        val filtraEndereco = endereco != null
+        val filtraCep = cep != null
+        val filtraRua = rua != null
+        val filtraNumero = numero != null
+
+        val filtraComplemento = complemento != null
+        val filtraVoluntario = areaAtuacaoVoluntario != null
+        val filtraBeneficiario = necessidadeBeneficiario != null
 
         val listaFiltrada = mutableListOf<Colaborador>()
 
-        if (filtraNome && filtraCpf && filtraDtNasc && filtraCargo
-            && filtraEmail && filtraTelefone && filtraEndereco) {
+        if (filtraNome && filtraCpf && filtraEmail && filtraTelefone
+            && filtraDtNasc && filtraCargo && filtraCep && filtraRua
+            && filtraNumero && filtraVoluntario && filtraBeneficiario
+            && filtraComplemento
+        ) {
             listaFiltrada.addAll(colabs.filter {
-                it.nome == nome && it.cpf == cpf && it.dtNasc == dtNasc && it.cargo == cargo })
-        } else if (filtraNome) {
-            listaFiltrada.addAll(colabs.filter { it.nome == nome })
-        } else if (filtraCpf) {
-            listaFiltrada.addAll(colabs.filter { it.cpf == cpf })
-        } else if (filtraDtNasc) {
-            listaFiltrada.addAll(colabs.filter { it.dtNasc == dtNasc })
-        } else if (filtraEmail) {
-            listaFiltrada.addAll(colabs.filter { it.email == email })
-        }  else if (filtraTelefone) {
-            listaFiltrada.addAll(colabs.filter { it.telefone == telefone })
-        }  else if (filtraEndereco) {
-            listaFiltrada.addAll(colabs.filter { it.endereco == endereco })
-        } else {
-            listaFiltrada.addAll(colabs.filter { it.cargo == cargo })
+                it.nome == nome &&
+                        it.cpf == cpf &&
+                        it.email == email &&
+                        it.telefone == telefone &&
+                        it.dtNasc == dtNasc &&
+                        it.cargo == cargo &&
+                        it.cep == cep &&
+                        it.rua == rua &&
+                        it.numero == numero &&
+                        it.complemento == complemento &&
+                        it.areaAtuacaoVoluntario == areaAtuacaoVoluntario &&
+                        it.necessidadeBeneficiario == necessidadeBeneficiario
+            })
         }
         if (listaFiltrada.isEmpty()) {
             return ResponseEntity.status(204).build()
@@ -101,9 +113,14 @@ class ColaboradorController {
     }
 
     //Atualizando apenas um dado (endereco) do Colaborador
-    @PatchMapping("/{id}/endereco/{novoEndereco}")
-    fun mudarEndereco(@PathVariable id: Int, @PathVariable novoEndereco: String): String {
-        colabs[id].endereco = novoEndereco
+    @PatchMapping("/{id}/endereco/{novoCep}/{novoRua}/{novoNumero}")
+    fun alterarEndereco(
+        @PathVariable id: Int, @PathVariable novoCep: String,
+        @PathVariable novoRua: String, @PathVariable novoNumero: Int
+    ): String {
+        colabs[id].cep = novoCep
+        colabs[id].rua = novoRua
+        colabs[id].numero = novoNumero
         return "Endereço atualizado com sucesso"
     }
 
@@ -120,6 +137,7 @@ class ColaboradorController {
         colabs[id].necessidadeBeneficiario = novaNecessidade
         return "Necessidade do beneficiário atualizada com sucesso"
     }
+
     //Atualizando apenas um dado (Area de atuação do beneficiario) do Colaborador
     @PatchMapping("/{id}/atuacao/{novaAtuacao}")
     fun mudarAtuacao(@PathVariable id: Int, @PathVariable novaAtuacao: String): String {
@@ -129,7 +147,7 @@ class ColaboradorController {
 
     @GetMapping("/{id}")
     fun buscar(@PathVariable id: Int): ResponseEntity<Colaborador> {
-        if (id in 0..colabs.size-1){
+        if (id in 0..colabs.size - 1) {
             return ResponseEntity.status(200).body(colabs[id])
         }
         return ResponseEntity.status(404).build()

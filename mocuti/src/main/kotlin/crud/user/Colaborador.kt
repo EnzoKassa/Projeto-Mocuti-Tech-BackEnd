@@ -1,17 +1,21 @@
 package crud.user
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 data class Colaborador(
-    var nome: String? = null,
-    var cpf: String? = null,
-    var email: String? = null,
-    var telefone: String? = null,
-    var dtNasc: LocalDate? = null,
-    var cargo: String? = null,
-    var endereco: String? = null,
+    var nome: String,
+    var cpf: String,
+    var email: String,
+    var telefone: String,
+    var dtNasc: LocalDate,
+    var cargo: String,
+
+    //Endereço
+    var cep: String,
+    var rua: String,
+    var numero: Int,
+    var complemento: String? = null,
+
     var areaAtuacaoVoluntario: String? = null,
     var necessidadeBeneficiario: String? = null
 )
