@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4173e7ba-8ff9-4387-9ac3-5698bb15aff0" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/api_categoria/main/kotlin/sptech/projeto05/Projeto05Application.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api_categoria/main/kotlin/sptech/projeto05/controller/CategoriaController.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api_categoria/main/kotlin/sptech/projeto05/controller/CategoriaJpaController.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api_categoria/main/kotlin/sptech/projeto05/entity/Categoria.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api_categoria/main/kotlin/sptech/projeto05/repository/CategoriaRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api_categoria/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api_categoria/main/resources/data.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mocuti/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mocuti/.idea/vcs.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="2vy8gmwYr5vqOCxnx5aettFQcWp" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ryane/Desktop/back end/Projeto-Mocuti-Tech/backEnd/api_categoria"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\ryane\Desktop\back end\Projeto-Mocuti-Tech\backEnd\api_categoria" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4173e7ba-8ff9-4387-9ac3-5698bb15aff0" name="Changes" comment="" />
+      <created>1745106066405</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1745106066405</updated>
+    </task>
+    <servers />
+  </component>
+</project>
