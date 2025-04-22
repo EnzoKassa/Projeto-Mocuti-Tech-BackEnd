@@ -50,7 +50,7 @@ collection:
     meta:
       id: req_40d2ef3b6aa542a3b7cc230d4048aadb
       created: 1745103238592
-      modified: 1745103275336
+      modified: 1745339387264
       isPrivate: false
       sortKey: -1745103238592
     method: POST
@@ -58,18 +58,18 @@ collection:
       mimeType: application/json
       text: |-
         {
-        		"nome_evento": "TESSSTE",
+        		"nomeEvento": "dfdgdg",
         		"descricao": "Terdrgkmxfhjf gmsokm ormrk mgkms ´kdrt.",
         		"dia": "2025-05-20",
-        		"hora_inicio": "14:00:00",
-        		"hora_fim": "18:00:00",
-        		"is_aberto": true,
-        		"qtd_vaga": null,
-        		"qtd_interessado": 200,
-        		"fk_endereco_evento": 1,
-        		"fk_status_evento": 2,
-        		"fk_publico_alvo_evento": 3,
-        		"fk_categoria_evento": 4
+        		"horaInicio": "14:00:00",
+        		"horaFim": "18:00:00",
+        		"isAberto": true,
+        		"qtdVaga": null,
+        		"qtdInteressado": 200,
+        		"fkEnderecoEvento": 1,
+        		"fkStatusEvento": 2,
+        		"fkPublicoAlvoEvento": 3,
+        		"fkCategoriaEvento": 4
         	}
     headers:
       - name: Content-Type
@@ -109,11 +109,30 @@ collection:
     meta:
       id: req_1645cf39f542488fad579d5a0541761e
       created: 1745103318618
-      modified: 1745103334733
+      modified: 1745339510732
       isPrivate: false
       sortKey: -1745103318618
     method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        		"nomeEvento": "dfdgdg",
+        		"descricao": "Terdrgkmxfhjf gmsokm ormrk mgkms ´kdrt.",
+        		"dia": "2025-05-20",
+        		"horaInicio": "14:00:00",
+        		"horaFim": "18:00:00",
+        		"isAberto": false,
+        		"qtdVaga": 200,
+        		"qtdInteressado": null,
+        		"fkEnderecoEvento": 1,
+        		"fkStatusEvento": 2,
+        		"fkPublicoAlvoEvento": 3,
+        		"fkCategoriaEvento": 4
+        }
     headers:
+      - name: Content-Type
+        value: application/json
       - name: User-Agent
         value: insomnia/11.0.2
     settings:
@@ -124,12 +143,12 @@ collection:
         send: true
         store: true
       rebuildPath: true
-  - url: http://localhost:8080/eventos/1?dia=2026-08-30&hora_inicio=00:00:00&hora_fim=12:00:00
+  - url: http://localhost:8080/eventos/1?dia=2026-08-30&horaInicio=00:00:00&horaFim=12:00:00
     name: Atualizar dia, hora de inicio e fim de um evento
     meta:
       id: req_ec4a645a03704eb88f42841df8ca73fb
       created: 1745103351705
-      modified: 1745103369945
+      modified: 1745339411694
       isPrivate: false
       sortKey: -1745103351705
     method: PATCH

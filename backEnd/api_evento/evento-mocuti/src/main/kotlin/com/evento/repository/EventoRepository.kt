@@ -11,6 +11,6 @@ import java.time.LocalDate
 interface EventoRepository : JpaRepository<Evento, Int> {
     @Transactional
     @Modifying
-    @Query("update Evento e set e.dia = ?2, e.hora_inicio = ?3, e.hora_fim = ?4 where e.id_evento = ?1")
-    fun atualizarDiaHora(id: Int, dia: LocalDate, hora_inicio: Time, hora_fim: Time): Int
+    @Query("update Evento e set e.dia = ?2, e.hora_inicio = ?3, e.hora_fim = ?4 where e.id_evento = ?1", nativeQuery = true)
+    fun atualizarDiaHora(id: Int, dia: LocalDate, horaInicio: Time, horaFim: Time): Int
 }

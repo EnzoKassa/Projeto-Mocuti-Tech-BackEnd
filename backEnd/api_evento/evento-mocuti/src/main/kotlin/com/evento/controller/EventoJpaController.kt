@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.sql.Time
 import java.time.LocalDate
-import java.util.Date
-import java.util.Locale
 
 @RestController
 @RequestMapping("/eventos")
@@ -53,7 +51,7 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         if (!repositorioEvento.existsById(id)) {
             return ResponseEntity.status(404).build()
         }
-        eventoAtualizado.id_evento = id
+        eventoAtualizado.idEvento = id
         val evento = repositorioEvento.save(eventoAtualizado)
         return ResponseEntity.status(200).body(evento)
     }
@@ -62,13 +60,13 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
     fun patchDiaHora(
         @PathVariable id: Int,
         @RequestParam dia: LocalDate,
-        @RequestParam hora_inicio: Time,
-        @RequestParam hora_fim: Time
+        @RequestParam horaInicio: Time,
+        @RequestParam horaFim: Time
     ): ResponseEntity<Evento> {
         if (!repositorioEvento.existsById(id)) {
             return ResponseEntity.status(404).build()
         }
-        repositorioEvento.atualizarDiaHora(id, dia, hora_inicio, hora_fim)
+        repositorioEvento.atualizarDiaHora(id, dia, horaInicio, horaFim)
 
         val eventoEncontrado = repositorioEvento.findById(id).get()
 
