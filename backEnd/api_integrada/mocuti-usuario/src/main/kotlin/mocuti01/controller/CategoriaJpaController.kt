@@ -8,7 +8,7 @@ import mocuti01.repository.CategoriaRepository
 
 @RestController
 @RequestMapping("/categorias")
-class CategoriaJpaControllerJpaController(val repositorio: CategoriaRepository) {
+class CategoriaJpaController(val repositorio: CategoriaRepository) {
     /*
     Definimos um construtor que recebe um objeto do tipo CategoriaRepository
     Assim, o Spring vai INJETAR um objeto desse tipo pronto para uso.
