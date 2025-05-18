@@ -11,29 +11,50 @@ import java.time.LocalDate
 
 @Entity
 data class Evento(
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var idEvento: Int,
-    @field:NotBlank @field:Size(min = 2, max = 45) var nomeEvento: String,
-    @field:Size(min = 2, max = 255) var descricao: String,
+
+    @field:NotBlank @field:Size(min = 2, max = 45)
+    var nomeEvento: String,
+
+    @field:Size(min = 2, max = 255)
+    var descricao: String,
+
     var dia: LocalDate,
+
     var horaInicio: Time,
+
     var horaFim: Time,
+
     var isAberto: Boolean,
-    @field:PositiveOrZero var qtdVaga: Int? = null,
-    @field:PositiveOrZero var qtdInteressado: Int? = null,
-    @Column(length = 100 * 1024 * 1024)
+
+    @field:PositiveOrZero
+    var qtdVaga: Int? = null,
+
+    @field:PositiveOrZero
+    var qtdInteressado: Int? = null,
+
     @JsonIgnore
+    @Column(length = 100 * 1024 * 1024)
     var foto: ByteArray? = null,
-    var fkEnderecoEvento: Int,
-    var fkStatusEvento: Int,
-    var fkPublicoAlvoEvento: Int,
-    var fkCategoriaEvento: Int
+
+    @ManyToOne
+    @JoinColumn(name = "endereco_evento")
+    var endereco: Endereco? = null,
+
+    var statusEvento: Int? = null,
+
+    var publicoAlvoEvento: Int? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "categoria_evento")
+    var categoria: Categoria? = null
 ) {
     constructor() : this(
         0, "", "", LocalDate.now(), Time(0), Time(0),
-        false, null, null, null, 0, 0,
-        0, 0
+        false, null, null, null, null, 0,
+        0, null
     )
 }

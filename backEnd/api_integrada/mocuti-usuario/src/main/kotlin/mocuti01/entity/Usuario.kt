@@ -8,7 +8,8 @@ import java.time.LocalDate
 
 @Entity
 data class Usuario(
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY) @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var idUsuario: Int? = null,
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY) @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var idUsuario: Int? = null,
 
     @field:NotBlank @field:Size(max = 45) var nomeCompleto: String,
 
@@ -30,16 +31,21 @@ data class Usuario(
 
     @JsonIgnore var dtDesativacao: LocalDate? = null,
 
-    @Column(name = "cargo_int", nullable = false) var cargoInt: Int? = null,
+//    @ManyToOne
+    var fkCargo: Int? = null,
 
-    @field:PositiveOrZero @Column(name = "fk_endereco_usuario", nullable = true)
-    var fkEnderecoUsuario: Int? = null,
+    @ManyToOne
+    @JoinColumn(name = "endereco_usuario")
+    @field:PositiveOrZero
+    var EnderecoUsuario: Endereco? = null,
 
-    @field:PositiveOrZero @Column(name = "fk_canal_comunicacao_usuario", nullable = true)
+//    @ManyToOne
+    @field:PositiveOrZero
     var fkCanalComunicacaoUsuario: Int? = null,
 
     ) {
-    constructor() : this(null, "", "", null, "", null, null, "", false, true, null, null) {
+    constructor() : this(null, "", "", null, "", null,
+        null, "", false, true, null, null) {
         this.dtDesativacao = null
     }
 }

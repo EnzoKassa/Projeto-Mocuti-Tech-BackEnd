@@ -22,7 +22,7 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
 
     @GetMapping("/listar-por-cargo/{cargoInt}")
     fun listarPorCargo(@PathVariable cargoInt: Int): ResponseEntity<List<Usuario>> {
-        val usuarios = repositorio.findByCargoInt(cargoInt)
+        val usuarios = repositorio.findByfkCargo(cargoInt)
         return if (usuarios!!.isNotEmpty()) {
             ResponseEntity.ok(usuarios)
         } else {
@@ -64,7 +64,7 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
             genero = request.genero,
             email = request.email,
             senha = request.senha,
-            cargoInt = request.cargoInt
+            fkCargo = request.cargoInt
         )
 
         val usuarioSalvo = repositorio.save(novoUsuario)

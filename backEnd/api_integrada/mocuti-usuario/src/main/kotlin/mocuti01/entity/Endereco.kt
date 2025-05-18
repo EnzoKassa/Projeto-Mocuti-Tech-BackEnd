@@ -14,14 +14,14 @@ data class Endereco(
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id // do pacote jakarta.persistence
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id_endereco:Int?, @field:NotNull
+    var idEndereco: Int?, @field:NotNull
     @field:Size(max = 8) var CEP: String? = null,
     @field:NotBlank var logradouro: String? = null,
     @field:NotNull var numero: Int = 0,
-    @field:Size(max = 45) var complemento:String? = null,
+    @field:Size(max = 45) var complemento: String? = null,
     @field:Size(max = 2) var UF: String? = null,
-    @field:Size(max = 45)var estado:String? = null,
-    @field:Size(max = 125) var bairro:String? = null
+    @field:Size(max = 45) var estado: String? = null,
+    @field:Size(max = 125) var bairro: String? = null
 ) {
-constructor(): this(null, null)
+    constructor() : this(null, null)
 }

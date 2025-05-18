@@ -22,8 +22,8 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
     @Query("select count(u) from Usuario u where u.isAtivo = ?1")
     fun countByIsAtivo(isAtivo: Boolean): Long
 
-    @Query("select u from Usuario u where u.cargoInt = ?1")
-    abstract fun findByCargoInt(cargoInt: Int): List<Usuario>?
+    @Query("select u from Usuario u where u.fkCargo = ?1")
+    abstract fun findByfkCargo(cargoInt: Int): List<Usuario>?
 
     @Query("select count(u) > 0 from Usuario u where u.cpf = ?1")
     fun existsByCpf(cpf: String): Boolean

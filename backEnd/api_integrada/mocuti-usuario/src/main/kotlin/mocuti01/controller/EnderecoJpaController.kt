@@ -35,7 +35,7 @@ class EnderecoJpaController(val repositorio: EnderecoRepository) {
         if (!repositorio.existsById(id_endereco)) {
             return ResponseEntity.status(404).build()
         }
-        enderecoAtualizado.id_endereco = id_endereco
+        enderecoAtualizado.idEndereco = id_endereco
         val profissao = repositorio.save(enderecoAtualizado)
         return ResponseEntity.status(200).body(profissao)
     }
