@@ -28,10 +28,6 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
     fun get(@PathVariable id: Int): ResponseEntity<Evento> {
         val evento = repositorioEvento.findById(id)
 
-
-
-
-
         return ResponseEntity.of(evento)
     }
 
