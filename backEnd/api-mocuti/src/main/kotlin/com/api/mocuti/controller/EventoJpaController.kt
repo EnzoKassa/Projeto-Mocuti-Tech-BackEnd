@@ -1,7 +1,7 @@
-package mocuti01.controller
+package com.api.mocuti.controller
 
-import mocuti01.entity.Evento
-import mocuti01.repository.EventoRepository
+import com.api.mocuti.entity.Evento
+import com.api.mocuti.repository.EventoRepository
 import jakarta.validation.Valid
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity

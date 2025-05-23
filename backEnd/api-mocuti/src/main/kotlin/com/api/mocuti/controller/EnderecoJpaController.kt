@@ -1,10 +1,10 @@
-package mocuti01.controller
+package com.api.mocuti.controller
 
+import com.api.mocuti.entity.Endereco
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import mocuti01.entity.Endereco
-import mocuti01.repository.EnderecoRepository
+import com.api.mocuti.repository.EnderecoRepository
 
 @RestController
 @RequestMapping("/endereco")
@@ -26,7 +26,7 @@ class EnderecoJpaController(val repositorio: EnderecoRepository) {
         }
     }
 
-    @PutMapping("/{id_endereco}")
+    @PutMapping("/{idEndereco}")
     fun putEndereco(
         @PathVariable idEndereco: Int,
         @RequestBody enderecoAtualizado: Endereco
