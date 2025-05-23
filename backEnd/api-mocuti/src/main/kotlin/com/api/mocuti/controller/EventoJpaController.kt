@@ -21,6 +21,8 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
             ResponseEntity.status(204).build()
         } else {
             ResponseEntity.status(200).body(eventos)
+
+            
         }
     }
 
