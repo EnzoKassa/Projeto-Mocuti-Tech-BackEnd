@@ -21,8 +21,6 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
             ResponseEntity.status(204).build()
         } else {
             ResponseEntity.status(200).body(eventos)
-
-            
         }
     }
 
@@ -30,6 +28,8 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
     fun get(@PathVariable id: Int): ResponseEntity<Evento> {
         val evento = repositorioEvento.findById(id)
 
+        // Uso do .of para retornar um Optional
+        // retorna um ResponseEntity com o evento encontrado ou 404 se não encontrado
         return ResponseEntity.of(evento)
     }
 
@@ -45,7 +45,7 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
             repositorioEvento.deleteById(id)
             return ResponseEntity.status(204).build()
         }
-        return ResponseEntity.status(204).build()
+        return ResponseEntity.status(404).build()
     }
 
     @PutMapping("/{id}")
@@ -75,19 +75,6 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         return ResponseEntity.status(200).body(eventoEncontrado)
     }
 
-    @PatchMapping("/foto/{id}")
-    fun patchFoto(@PathVariable id: Int, @RequestBody foto: ByteArray): ResponseEntity<Evento> {
-        if (!repositorioEvento.existsById(id)) {
-            return ResponseEntity.status(404).build()
-        }
-
-        val fotoEvento = repositorioEvento.findByIdOrNull(id)
-        fotoEvento!!.foto = foto
-        repositorioEvento.save(fotoEvento)
-
-        return ResponseEntity.status(200).body(fotoEvento)
-    }
-
     @GetMapping(
         value = ["/foto/{id}"],
         produces = ["image/png", "image/jpeg", "image/jpg"]
@@ -101,5 +88,19 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
 
         val foto = fotoEvento!!.foto
         return ResponseEntity.status(200).body(foto)
+    }
+
+    // ENDPOINT de foto
+    @PatchMapping("/foto/{id}")
+    fun patchFoto(@PathVariable id: Int, @RequestBody foto: ByteArray): ResponseEntity<Evento> {
+        if (!repositorioEvento.existsById(id)) {
+            return ResponseEntity.status(404).build()
+        }
+
+        val fotoEvento = repositorioEvento.findByIdOrNull(id)
+        fotoEvento!!.foto = foto
+        repositorioEvento.save(fotoEvento)
+
+        return ResponseEntity.status(200).body(fotoEvento)
     }
 }
