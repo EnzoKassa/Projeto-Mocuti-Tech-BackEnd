@@ -9,12 +9,14 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
 @Entity
-data class CanalComunicacao (
+data class CanalComunicacao(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var id: Int? = null,
+
     @field:NotBlank
     @field:Size(min = 2, max = 45)
-    var tipoCanalComunicacao: String? = null) {
+    var tipoCanalComunicacao: String? = null
+) {
 }

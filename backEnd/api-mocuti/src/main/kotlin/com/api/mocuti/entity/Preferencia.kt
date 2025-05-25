@@ -1,16 +1,21 @@
 package com.api.mocuti.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
+@Entity
 data class Preferencia (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     var id: Int? = null,
-    var usuario: Int? = null,
-    var categoria: Int? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "preferencia_usuario")
+    var usuario: Usuario? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "preferencia_categoria")
+    var categoria: Categoria? = null,
 ) {
 }

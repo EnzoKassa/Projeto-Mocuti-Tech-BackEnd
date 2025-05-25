@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
-class StatusEventoControllerTest {
+class StatusEventoJpaControllerTest {
     val repository = mock(StatusEventoRepository::class.java)
 
-    val controller = StatusEventoController(repository)
+    val controller = StatusEventoJpaController(repository)
 
     @Test
     fun `A consulta de todos os status de eventos com dados deve retornar status 200 com a lista correta`() {

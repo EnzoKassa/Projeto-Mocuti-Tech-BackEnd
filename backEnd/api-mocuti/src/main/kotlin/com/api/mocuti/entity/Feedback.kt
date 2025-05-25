@@ -9,16 +9,22 @@ data class Feedback(
     @Id // do pacote jakarta.persistence
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?,
-    var nota: Boolean? = false,
+
     @Lob
     @Column(nullable = false)
     val comentario: String?,
 
     @ManyToOne
-    var FkEventoFeedback: Evento? = null,
+    @JoinColumn(name = "feedback_nota")
+    var nota: NotaFeedback? = null,
 
     @ManyToOne
-    var FkUsuarioFeedback: Usuario? = null,
+    @JoinColumn(name = "feedback_evento")
+    var evento: Evento? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "feedback_usuario")
+    var usuario: Usuario? = null,
 
     ) {
     // O JPA exige que exista um construtor vazio nas Entidades

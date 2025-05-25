@@ -1,5 +1,6 @@
 package com.api.mocuti.repository
 
+import com.api.mocuti.entity.Cargo
 import com.api.mocuti.entity.Usuario
 import jakarta.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
@@ -22,8 +23,8 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
     @Query("select count(u) from Usuario u where u.isAtivo = ?1")
     fun countByIsAtivo(isAtivo: Boolean): Long
 
-    @Query("select u from Usuario u where u.fkCargo = ?1")
-    abstract fun findByfkCargo(cargoInt: Int): List<Usuario>?
+    @Query("select u from Usuario u where u.cargo = ?1")
+    fun findByCargo(cargo: Cargo): List<Usuario>
 
     @Query("select count(u) > 0 from Usuario u where u.cpf = ?1")
     fun existsByCpf(cpf: String): Boolean

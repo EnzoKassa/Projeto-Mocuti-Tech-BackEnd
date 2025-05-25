@@ -3,28 +3,25 @@ package com.api.mocuti.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "participacao", schema = "mocuti")
-data class Participacao(
-    @EmbeddedId
+data class Participacao (
+    @EmbeddedId   // Indica que `id` é uma chave composta, baseada em uma classe `@Embeddable`
     val id: ParticipacaoId,
 
-//    @Column(name = "is_inscrito")
     val isInscrito: Boolean? = null,
 
-//    @Column(name = "is_presente")
     val isPresente: Boolean? = null,
 
-//    @ManyToOne
-//    @JoinColumn(name = "fk_inscricao_participacao", referencedColumnName = "id_inscricao")
+    @ManyToOne
+    @JoinColumn(name = "inscricao_participacao")
     val statusInscricao: StatusInscricao? = null,
 
-//    @ManyToOne
-//    @MapsId("usuarioId") // liga ao campo do ID composto
-//    @JoinColumn(name = "fk_usuario_participacao", referencedColumnName = "id_usuario")
+    @MapsId("usuarioId")
+    @ManyToOne
+    @JoinColumn(name = "usuario_participacao")
     val usuario: Usuario? = null,
 
-//    @ManyToOne
-//    @MapsId("eventoId")
-//    @JoinColumn(name = "fk_evento_participacao", referencedColumnName = "id_evento")
+    @MapsId("eventoId")
+    @ManyToOne
+    @JoinColumn(name = "evento_participacao")
     val evento: Evento? = null
 )

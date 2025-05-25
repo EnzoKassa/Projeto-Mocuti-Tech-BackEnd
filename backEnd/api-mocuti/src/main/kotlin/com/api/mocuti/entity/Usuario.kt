@@ -31,17 +31,17 @@ data class Usuario(
 
     @JsonIgnore var dtDesativacao: LocalDate? = null,
 
-//    @ManyToOne
-    var fkCargo: Int? = null,
+    @ManyToOne
+    @JoinColumn(name = "cargo_usuario")
+    var cargo: Cargo? = null,
 
     @ManyToOne
     @JoinColumn(name = "endereco_usuario")
-    @field:PositiveOrZero
     var EnderecoUsuario: Endereco? = null,
 
-//    @ManyToOne
-    @field:PositiveOrZero
-    var fkCanalComunicacaoUsuario: Int? = null,
+    @ManyToOne
+    @JoinColumn(name = "comunicacao_usuario")
+    var CanalComunicacao: CanalComunicacao? = null,
 
     ) {
     constructor() : this(null, "", "", null, "", null,

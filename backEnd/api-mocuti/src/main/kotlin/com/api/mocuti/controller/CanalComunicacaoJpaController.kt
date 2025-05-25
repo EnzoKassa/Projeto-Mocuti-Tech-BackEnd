@@ -1,9 +1,7 @@
 package com.api.mocuti.controller
 
 import com.api.mocuti.entity.CanalComunicacao
-import com.api.mocuti.entity.Cargo
 import com.api.mocuti.repository.CanalComunicacaoRepository
-import com.api.mocuti.repository.CargoRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
