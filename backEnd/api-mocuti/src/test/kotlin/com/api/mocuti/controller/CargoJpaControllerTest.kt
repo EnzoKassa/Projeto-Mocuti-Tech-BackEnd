@@ -13,7 +13,7 @@ class CargoJpaControllerTest{
     val controller = CargoJpaController(repository)
 
     @Test
-    fun `A consulta de todos os eventos com dados deve retornar status 200 com a lista correta`() {
+    fun `A consulta de todos os cargos com dados deve retornar status 200 com a lista correta`() {
         `when`(repository.findAll()).thenReturn(mutableListOf(mock(Cargo::class.java)))
 
         val retorno = controller.get()
@@ -23,9 +23,9 @@ class CargoJpaControllerTest{
     }
 
 
-    //    Testes de GRT pro Id
+    //    Testes de GET pro Id
     @Test
-    fun `A consulta de todos os eventos sem dados deve retornar status 204 com a lista vazia`() {
+    fun `A consulta de todos os cargos sem dados deve retornar status 204 com a lista vazia`() {
         `when`(repository.findAll()).thenReturn(emptyList())
 
         val retorno = controller.get()
@@ -33,5 +33,4 @@ class CargoJpaControllerTest{
         assertEquals(204, retorno.statusCode.value())
         assertNull(retorno.body)
     }
-
 }
