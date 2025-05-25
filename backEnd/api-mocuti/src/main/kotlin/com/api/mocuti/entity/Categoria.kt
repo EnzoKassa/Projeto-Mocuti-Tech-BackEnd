@@ -6,8 +6,8 @@ import jakarta.validation.constraints.*
 
 @Entity // do pacote jakarta.persistence
 data class Categoria(
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?,
     @field:NotBlank @field:Size(min = 2, max = 20) var nome: String?,
