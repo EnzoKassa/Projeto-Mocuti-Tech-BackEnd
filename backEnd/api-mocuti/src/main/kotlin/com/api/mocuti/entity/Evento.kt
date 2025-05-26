@@ -44,9 +44,13 @@ data class Evento(
     @JoinColumn(name = "endereco_evento")
     var endereco: Endereco? = null,
 
-    var statusEvento: Int? = null,
+    @ManyToOne
+    @JoinColumn(name = "status_evento")
+    var statusEvento: StatusEvento? = null,
 
-    var publicoAlvoEvento: Int? = null,
+    @ManyToOne
+    @JoinColumn(name = "publico_evento")
+    var publicoAlvoEvento: PublicoAlvo? = null,
 
     @ManyToOne
     @JoinColumn(name = "categoria_evento")
@@ -54,7 +58,7 @@ data class Evento(
 ) {
     constructor() : this(
         0, "", "", LocalDate.now(), Time(0), Time(0),
-        false, null, null, null, null, 0,
-        0, null
+        false, null, null, null, null, null,
+        null, null
     )
 }

@@ -5,6 +5,7 @@ import com.api.mocuti.dto.CadastroUsuarioRequest
 import com.api.mocuti.dto.LoginRequest
 import com.api.mocuti.dto.RelatorioUsuarios
 import com.api.mocuti.entity.Usuario
+import com.api.mocuti.repository.CargoRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.api.mocuti.repository.UsuarioRepository
@@ -12,7 +13,7 @@ import org.springframework.http.HttpStatus
 
 @RestController
 @RequestMapping("/usuarios")
-class UsuarioJpaController(val repositorio: UsuarioRepository) {
+class UsuarioJpaController(val repositorio: UsuarioRepository, val cargoRepository: CargoRepository) {
 
     @GetMapping("/listar")
     fun listarTodos(): ResponseEntity<List<Usuario>> {
@@ -20,10 +21,15 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
         return ResponseEntity.ok(usuarios)
     }
 
-    @GetMapping("/listar-por-cargo/{cargoInt}")
-    fun listarPorCargo(@PathVariable cargoInt: Int): ResponseEntity<List<Usuario>> {
-        val usuarios = repositorio.findByfkCargo(cargoInt)
-        return if (usuarios!!.isNotEmpty()) {
+    @GetMapping("/listar-por-cargo/{cargo}")
+    fun listarPorCargo(@PathVariable cargo: Int): ResponseEntity<List<Usuario>> {
+        val cargoOptional = cargoRepository.findById(cargo)
+        if (cargoOptional.isEmpty) {
+            return ResponseEntity.status(404).body(emptyList())
+        }
+
+        val usuarios = repositorio.findByCargo(cargoOptional.get())
+        return if (usuarios.isNotEmpty()) {
             ResponseEntity.ok(usuarios)
         } else {
             ResponseEntity.status(404).body(emptyList())
@@ -61,9 +67,16 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
             return ResponseEntity.status(400).body("CPF e E-mail já cadastrados")
         }
 
-        if (request.cargoInt !in 1..3) {
+        if (request.cargo !in 1..3) {
             return ResponseEntity.status(400).body("Cargo inválido. Deve ser 1, 2 ou 3.")
         }
+
+        val cargoOptional = cargoRepository.findById(request.cargo)
+        if (cargoOptional.isEmpty) {
+            return ResponseEntity.status(400).body("Cargo não encontrado")
+        }
+
+        val cargo = cargoOptional.get()
 
         val novoUsuario = Usuario(
             nomeCompleto = request.nomeCompleto,
@@ -73,7 +86,7 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
             genero = request.genero,
             email = request.email,
             senha = request.senha,
-            fkCargo = request.cargoInt
+            cargo = cargo
         )
 
         val usuarioSalvo = repositorio.save(novoUsuario)
@@ -117,7 +130,7 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
         return ResponseEntity.ok(relatorio)
     }
 
-    @GetMapping ("/relatorioGenero")
+    @GetMapping("/relatorioGenero")
     fun relatorioGenero(): ResponseEntity<Map<String, Long>> {
         val usuarios = repositorio.findAll()
         val totalHomens = usuarios.count { it.genero == "Masculino" }.toLong()
@@ -129,12 +142,14 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
         )
         return ResponseEntity.ok(resultado)
     }
+
     @PatchMapping("/redefinirSenha/{idUsuario}")
     fun redefinirSenha(@PathVariable idUsuario: Int, @RequestBody novaSenha: Map<String, String>): ResponseEntity<Any> {
         val usuario = repositorio.findById(idUsuario)
         return if (usuario.isPresent) {
             val usuarioAtualizado = usuario.get()
-            usuarioAtualizado.senha = novaSenha["senha"] ?: return ResponseEntity.status(400).body("Senha não fornecida")
+            usuarioAtualizado.senha =
+                novaSenha["senha"] ?: return ResponseEntity.status(400).body("Senha não fornecida")
             repositorio.save(usuarioAtualizado)
             ResponseEntity.status(200).body("Senha redefinida com sucesso")
         } else {

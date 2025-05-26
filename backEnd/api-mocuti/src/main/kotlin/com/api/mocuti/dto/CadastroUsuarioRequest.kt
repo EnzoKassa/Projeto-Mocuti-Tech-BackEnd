@@ -1,5 +1,6 @@
 package com.api.mocuti.dto
 
+import com.api.mocuti.entity.Cargo
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDate
 
@@ -13,5 +14,5 @@ data class CadastroUsuarioRequest(
     val genero: String?,
     val email: String,
     val senha: String,
-    val cargoInt: Int
+    val cargo: Int
 )
