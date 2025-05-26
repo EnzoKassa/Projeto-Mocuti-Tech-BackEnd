@@ -8,6 +8,7 @@ import com.api.mocuti.entity.Usuario
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.api.mocuti.repository.UsuarioRepository
+import org.springframework.http.HttpStatus
 
 @RestController
 @RequestMapping("/usuarios")
@@ -30,12 +31,21 @@ class UsuarioJpaController(val repositorio: UsuarioRepository) {
     }
 
     @PostMapping("/cadastrar")
-    fun cadastrar(@RequestBody @Valid novoUsuario: Usuario): ResponseEntity<Any> {
-        if (repositorio.existsByEmail(novoUsuario.email)) {
-            return ResponseEntity.status(400).body("E-mail já cadastrado")
+    fun cadastrar(usuario: Usuario): ResponseEntity<Any> {
+        if (!usuario.email.contains("@")) {
+            throw IllegalArgumentException("E-mail inválido")
         }
-        val usuarioSalvo = repositorio.save(novoUsuario)
-        return ResponseEntity.status(201).body(usuarioSalvo)
+
+        if (repositorio.existsByEmail(usuario.email)) {
+            return ResponseEntity("E-mail já cadastrado", HttpStatus.BAD_REQUEST)
+        }
+
+        if (repositorio.existsByCpf(usuario.cpf)) {
+            return ResponseEntity("CPF já cadastrado", HttpStatus.BAD_REQUEST)
+        }
+
+        val usuarioSalvo = repositorio.save(usuario)
+        return ResponseEntity(usuarioSalvo, HttpStatus.CREATED)
     }
 
     @PostMapping("/cadastrar-usuario")
