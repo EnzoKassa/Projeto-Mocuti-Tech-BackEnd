@@ -1,14 +1,20 @@
 package com.api.mocuti.entity
 
-import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.validation.constraints.NotBlank
 
-@Entity // do pacote jakarta.persistence
+@Entity
 data class Feedback(
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Id // do pacote jakarta.persistence
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?,
+
+  @field:NotBlank(message = "O comentário não pode estar vazio")
+    val comentario: String
 
     @Lob
     @Column(nullable = false)
@@ -33,6 +39,4 @@ data class Feedback(
     Aqui dizemos que sempre que o construtor vazio for invocado,
     será criado uma Musica com id, nome e interprete nulos
      */
-
-
 }
