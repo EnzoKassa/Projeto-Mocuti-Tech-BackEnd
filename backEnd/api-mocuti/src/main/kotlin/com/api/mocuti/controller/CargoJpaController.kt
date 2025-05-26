@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/cargos")
-class CargoJpaController(var repositorioCargo: CargoRepository) {
+class CargoJpaController (var repositorioCargo: CargoRepository) {
 
     @GetMapping
     fun get(): ResponseEntity<List<Cargo>> {
