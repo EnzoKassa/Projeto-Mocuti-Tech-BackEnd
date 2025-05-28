@@ -1,29 +1,15 @@
 package com.api.mocuti.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.api.mocuti.entity.Feedback
 import com.api.mocuti.repository.FeedbackRepository
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
-@WebMvcTest(FeedbackJpaController::class)
 class FeedbackJpaControllerTest {
 
-    @Autowired
-    private lateinit var mockMvc: MockMvc
-
-    @MockBean
-    private lateinit var repositorio: FeedbackRepository
-
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
+    private val repositorio: FeedbackRepository = mock(FeedbackRepository::class.java)
+    private val controller = FeedbackJpaController(repositorio)
 
     @Test
     fun `deve retornar 200 e lista de feedbacks quando existirem feedbacks`() {
@@ -33,17 +19,20 @@ class FeedbackJpaControllerTest {
         )
         `when`(repositorio.findAll()).thenReturn(feedbacks)
 
-        mockMvc.perform(get("/feedback").contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.size()").value(feedbacks.size))
+        val response = controller.get()
+
+        assertEquals(200, response.statusCode.value())
+        assertEquals(feedbacks, response.body)
     }
 
     @Test
     fun `deve retornar 204 quando nao houver nenhum feedback`() {
         `when`(repositorio.findAll()).thenReturn(emptyList())
 
-        mockMvc.perform(get("/feedback"))
-            .andExpect(status().isNoContent)
+        val response = controller.get()
+
+        assertEquals(204, response.statusCode.value())
+        assertNull(response.body)
     }
 
     @Test
@@ -51,26 +40,30 @@ class FeedbackJpaControllerTest {
         val feedback = Feedback(id = 1, comentario = "Ótimo serviço")
         `when`(repositorio.findById(1)).thenReturn(java.util.Optional.of(feedback))
 
-        mockMvc.perform(get("/feedback/1"))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.comentario").value("Ótimo serviço"))
+        val response = controller.get(1)
+
+        assertEquals(200, response.statusCode.value())
+        assertEquals(feedback, response.body)
     }
 
     @Test
     fun `deve retornar 404 quando o ID nao existir`() {
         `when`(repositorio.findById(1)).thenReturn(java.util.Optional.empty())
 
-        mockMvc.perform(get("/feedback/1"))
-            .andExpect(status().isNotFound)
+        val response = controller.get(1)
+
+        assertEquals(404, response.statusCode.value())
+        assertNull(response.body)
     }
 
     @Test
     fun `deve retornar 204 e deletar o feedback quando o ID existir`() {
         `when`(repositorio.existsById(1)).thenReturn(true)
 
-        mockMvc.perform(delete("/feedback/1"))
-            .andExpect(status().isNoContent)
+        val response = controller.delete(1)
 
+        assertEquals(204, response.statusCode.value())
+        assertNull(response.body)
         verify(repositorio, times(1)).deleteById(1)
     }
 
@@ -78,8 +71,10 @@ class FeedbackJpaControllerTest {
     fun `deve retornar 404 quando o ID nao existir ao deletar`() {
         `when`(repositorio.existsById(1)).thenReturn(false)
 
-        mockMvc.perform(delete("/feedback/1"))
-            .andExpect(status().isNotFound)
+        val response = controller.delete(1)
+
+        assertEquals(404, response.statusCode.value())
+        assertNull(response.body)
     }
 
     @Test
@@ -87,24 +82,24 @@ class FeedbackJpaControllerTest {
         val feedback = Feedback(id = 1, comentario = "Ótimo serviço")
         `when`(repositorio.save(any(Feedback::class.java))).thenReturn(feedback)
 
-        mockMvc.perform(
-            post("/feedback")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(feedback))
-        )
-            .andExpect(status().isCreated)
-            .andExpect(jsonPath("$.comentario").value("Ótimo serviço"))
+        val response = controller.post(feedback)
+
+        assertEquals(201, response.statusCode.value())
+        assertEquals(feedback, response.body)
     }
 
     @Test
-    fun `deve retornar 400 quando os dados forem invalidos`() {
-        val feedback = Feedback(id = 1, comentario = "") // Comentário inválido
+    fun `deve retornar 400 ao criar feedback com dados invalidos`() {
+        val feedbackInvalido = Feedback(id = 1, comentario = "")
 
-        mockMvc.perform(
-            post("/feedback")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(feedback))
-        ).andExpect(status().isBadRequest)
+        // Configura o mock para não salvar feedbacks inválidos
+        `when`(repositorio.save(any(Feedback::class.java))).thenThrow(IllegalArgumentException("Dados inválidos"))
+
+        val response = controller.post(feedbackInvalido)
+
+        assertEquals(400, response.statusCode.value())
+        assertNull(response.body)
+        verify(repositorio, times(0)).save(any(Feedback::class.java))
     }
 
     @Test
@@ -113,39 +108,31 @@ class FeedbackJpaControllerTest {
         `when`(repositorio.existsById(1)).thenReturn(true)
         `when`(repositorio.save(any(Feedback::class.java))).thenReturn(feedbackAtualizado)
 
-        mockMvc.perform(
-            put("/feedback/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(feedbackAtualizado))
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.comentario").value("Serviço atualizado"))
+        val response = controller.put(1, feedbackAtualizado)
+
+        assertEquals(200, response.statusCode.value())
+        assertEquals(feedbackAtualizado, response.body)
     }
 
     @Test
-    fun `deve retornar 404 quando tentar atualizar um ID inexistente`() {
+    fun `deve retornar 404 ao tentar atualizar um ID inexistente`() {
         val feedbackAtualizado = Feedback(id = 1, comentario = "Serviço atualizado")
         `when`(repositorio.existsById(1)).thenReturn(false)
 
-        mockMvc.perform(
-            put("/feedback/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(feedbackAtualizado))
-        )
-            .andExpect(status().isNotFound)
+        val response = controller.put(1, feedbackAtualizado)
+
+        assertEquals(404, response.statusCode.value())
+        assertNull(response.body)
     }
 
     @Test
-    fun `deve retornar 400 quando os dados enviados forem invalidos`() {
-        val feedback = Feedback(id = 1, comentario = "") // Comentário inválido
+    fun `deve retornar 404 ao atualizar feedback com dados invalidos`() {
+        val feedbackInvalido = Feedback(id = 1, comentario = "")
 
-        mockMvc.perform(
-            put("/feedback/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(feedback))
-        )
-            .andExpect(status().isNotFound)
+        val response = controller.put(1, feedbackInvalido)
 
+        assertEquals(404, response.statusCode.value())
+        assertNull(response.body)
         verify(repositorio, times(0)).save(any(Feedback::class.java))
     }
 }
