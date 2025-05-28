@@ -104,8 +104,7 @@ class FeedbackJpaControllerTest {
             post("/feedback")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(feedback))
-        )
-            .andExpect(status().isBadRequest)
+        ).andExpect(status().isBadRequest)
     }
 
     @Test
@@ -145,7 +144,7 @@ class FeedbackJpaControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(feedback))
         )
-            .andExpect(status().isBadRequest)
+            .andExpect(status().isNotFound)
 
         verify(repositorio, times(0)).save(any(Feedback::class.java))
     }

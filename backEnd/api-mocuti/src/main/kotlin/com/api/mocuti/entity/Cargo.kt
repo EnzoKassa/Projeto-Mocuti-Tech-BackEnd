@@ -13,7 +13,7 @@ data class Cargo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    var id: Int? = null,
+    var id: Int,
 
     @field:NotBlank @field:Size(min = 2, max = 45)
     var tipoCargo: String? = null

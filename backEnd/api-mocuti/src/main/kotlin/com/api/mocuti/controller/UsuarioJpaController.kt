@@ -5,7 +5,9 @@ import com.api.mocuti.dto.CadastroUsuarioRequest
 import com.api.mocuti.dto.LoginRequest
 import com.api.mocuti.dto.RelatorioUsuarios
 import com.api.mocuti.entity.Usuario
+import com.api.mocuti.repository.CanalComunicacaoRepository
 import com.api.mocuti.repository.CargoRepository
+import com.api.mocuti.repository.EnderecoRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.api.mocuti.repository.UsuarioRepository
@@ -13,11 +15,17 @@ import org.springframework.http.HttpStatus
 
 @RestController
 @RequestMapping("/usuarios")
-class UsuarioJpaController(val repositorio: UsuarioRepository, val cargoRepository: CargoRepository) {
+class UsuarioJpaController(
+    val repositorio: UsuarioRepository,
+    val cargoRepository: CargoRepository,
+    val enderecoRepository: EnderecoRepository,
+    val canalComunicacaoRepository: CanalComunicacaoRepository
+) {
 
     @GetMapping("/listar")
     fun listarTodos(): ResponseEntity<List<Usuario>> {
         val usuarios = repositorio.findAll()
+
         return ResponseEntity.ok(usuarios)
     }
 
@@ -78,7 +86,20 @@ class UsuarioJpaController(val repositorio: UsuarioRepository, val cargoReposito
 
         val cargo = cargoOptional.get()
 
+        val enderecoOptional = enderecoRepository.findById(request.endereco)
+        if (enderecoOptional.isEmpty) {
+            return ResponseEntity.status(400).body("Endereço não encontrado")
+        }
+        val endereco = enderecoOptional.get()
+
+        val canalComunicacaoOptional = canalComunicacaoRepository.findById(request.canalComunicacao)
+        if (canalComunicacaoOptional.isEmpty) {
+            return ResponseEntity.status(400).body("Canal de comunicação não encontrado")
+        }
+        val canalComunicacao = canalComunicacaoOptional.get()
+
         val novoUsuario = Usuario(
+            idUsuario = 0, // precisa passar, já que é obrigatório e será gerado pelo BD
             nomeCompleto = request.nomeCompleto,
             cpf = request.cpf,
             telefone = request.telefone,
@@ -86,7 +107,9 @@ class UsuarioJpaController(val repositorio: UsuarioRepository, val cargoReposito
             genero = request.genero,
             email = request.email,
             senha = request.senha,
-            cargo = cargo
+            cargo = cargo,
+            endereco = endereco,
+            canalComunicacao = canalComunicacao
         )
 
         val usuarioSalvo = repositorio.save(novoUsuario)

@@ -1,20 +1,14 @@
 package com.api.mocuti.entity
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.validation.constraints.NotBlank
+import com.fasterxml.jackson.annotation.JsonProperty
+import jakarta.persistence.*
 
 @Entity
-data class Feedback(
+data class Feedback (
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int?,
-
-  @field:NotBlank(message = "O comentário não pode estar vazio")
-    val comentario: String
 
     @Lob
     @Column(nullable = false)

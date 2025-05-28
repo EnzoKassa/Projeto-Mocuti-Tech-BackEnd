@@ -9,27 +9,37 @@ import java.time.LocalDate
 @Entity
 data class Usuario(
     @JsonProperty(access = JsonProperty.Access.READ_ONLY) @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var idUsuario: Int? = null,
+    var idUsuario: Int,
 
-    @field:NotBlank @field:Size(max = 45) var nomeCompleto: String,
+    @field:NotBlank @field:Size(max = 45)
+    var nomeCompleto: String,
 
-    @field:NotBlank @field:Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}") var cpf: String,
+    @field:NotBlank @field:Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}")
+    var cpf: String,
 
-    @field:Size(max = 20) @Column(length = 20) var telefone: String? = null,
+    @field:Size(max = 20) @Column(length = 20)
+    var telefone: String? = null,
 
-    @field:NotBlank @field:Email @field:Size(max = 45) var email: String,
+    @field:NotBlank @field:Email @field:Size(max = 45)
+    var email: String,
 
-    @field:Past var dataNascimento: LocalDate?,
+    @field:Past var
+    dataNascimento: LocalDate?,
 
-    @field:Size(max = 45) var genero: String? = null,
+    @field:Size(max = 45)
+    var genero: String? = null,
 
-    @field:NotBlank @field:Size(max = 14) var senha: String,
+    @field:NotBlank @field:Size(max = 14)
+    var senha: String,
 
-    @JsonIgnore var isAutenticado: Boolean = false,
+    @JsonIgnore
+    var isAutenticado: Boolean = false,
 
-    @JsonIgnore var isAtivo: Boolean = true,
+    @JsonIgnore
+    var isAtivo: Boolean = true,
 
-    @JsonIgnore var dtDesativacao: LocalDate? = null,
+    @JsonIgnore
+    var dtDesativacao: LocalDate? = null,
 
     @ManyToOne
     @JoinColumn(name = "cargo_usuario")
@@ -37,14 +47,14 @@ data class Usuario(
 
     @ManyToOne
     @JoinColumn(name = "endereco_usuario")
-    var EnderecoUsuario: Endereco? = null,
+    var endereco: Endereco? = null,
 
     @ManyToOne
     @JoinColumn(name = "comunicacao_usuario")
-    var CanalComunicacao: CanalComunicacao? = null,
+    var canalComunicacao: CanalComunicacao? = null,
 
     ) {
-    constructor() : this(null, "", "", null, "", null,
+    constructor() : this(0, "", "", null, "", null,
         null, "", false, true, null, null) {
         this.dtDesativacao = null
     }

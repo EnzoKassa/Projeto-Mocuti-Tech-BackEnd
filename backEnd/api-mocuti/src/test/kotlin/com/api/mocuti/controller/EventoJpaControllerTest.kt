@@ -1,8 +1,6 @@
 package com.api.mocuti.controller
 
-import com.api.mocuti.entity.Categoria
-import com.api.mocuti.entity.Endereco
-import com.api.mocuti.entity.Evento
+import com.api.mocuti.entity.*
 import com.api.mocuti.repository.EventoRepository
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertArrayEquals
@@ -19,6 +17,8 @@ class EventoJpaControllerTest {
     private val controller = EventoJpaController(repository)
 
     private lateinit var eventoTeste: Evento
+    private lateinit var publicoAlvoTeste: PublicoAlvo
+    private lateinit var statusEventoTeste: StatusEvento
     private lateinit var enderecoTeste: Endereco
     private lateinit var categoriaTeste: Categoria
 
@@ -41,6 +41,16 @@ class EventoJpaControllerTest {
             descricao = "Eventos voltados para inovação e tecnologia"
         )
 
+        statusEventoTeste = StatusEvento(
+            id = 1,
+            situacao = "Confirmado"
+        )
+
+        publicoAlvoTeste = PublicoAlvo(
+            id = 2,
+            tipoPublico = "Estudantes"
+        )
+
         eventoTeste = Evento(
             idEvento = 1,
             nomeEvento = "Feira de Tecnologia",
@@ -51,10 +61,10 @@ class EventoJpaControllerTest {
             isAberto = true,
             qtdVaga = 100,
             qtdInteressado = 25,
-            foto = null, // ou ByteArray(0) se quiser evitar null
+            foto = null,
             endereco = enderecoTeste,
-            statusEvento = 1,
-            publicoAlvoEvento = 2,
+            statusEvento = statusEventoTeste,
+            publicoAlvoEvento = publicoAlvoTeste,
             categoria = categoriaTeste
         )
 
@@ -73,7 +83,6 @@ class EventoJpaControllerTest {
         assertEquals(200, retorno.statusCode.value())
         assertEquals(1, retorno.body?.size)
     }
-
 
     //    Testes de GRT pro Id
     @Test
@@ -119,10 +128,11 @@ class EventoJpaControllerTest {
             qtdInteressado = 20,
             foto = null,
             endereco = mock(Endereco::class.java),
-            statusEvento = 1,
-            publicoAlvoEvento = 2,
+            statusEvento = mock(StatusEvento::class.java),      // CORRETO
+            publicoAlvoEvento = mock(PublicoAlvo::class.java),  // CORRETO
             categoria = mock(Categoria::class.java)
         )
+
         `when`(repository.save(any(Evento::class.java))).thenReturn(evento)
 
         val retorno = controller.post(evento)

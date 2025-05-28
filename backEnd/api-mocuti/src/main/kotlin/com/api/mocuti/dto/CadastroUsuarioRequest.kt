@@ -14,5 +14,7 @@ data class CadastroUsuarioRequest(
     val genero: String?,
     val email: String,
     val senha: String,
-    val cargo: Int
+    val cargo: Int,
+    val endereco: Int,
+    val canalComunicacao: Int,
 )
