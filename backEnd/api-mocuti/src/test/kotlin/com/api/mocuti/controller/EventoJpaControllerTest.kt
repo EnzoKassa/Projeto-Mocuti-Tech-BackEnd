@@ -9,6 +9,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import java.sql.Time
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 class EventoJpaControllerTest {
@@ -56,8 +57,8 @@ class EventoJpaControllerTest {
             nomeEvento = "Feira de Tecnologia",
             descricao = "Evento com foco em inovação e startups",
             dia = LocalDate.of(2025, 6, 15),
-            horaInicio = Time.valueOf("09:00:00"),
-            horaFim = Time.valueOf("17:00:00"),
+            horaInicio = LocalDateTime.now(),
+            horaFim = LocalDateTime.now(),
             isAberto = true,
             qtdVaga = 100,
             qtdInteressado = 25,
@@ -84,7 +85,6 @@ class EventoJpaControllerTest {
         assertEquals(1, retorno.body?.size)
     }
 
-    //    Testes de GRT pro Id
     @Test
     fun `A consulta de todos os eventos sem dados deve retornar status 204 com a lista vazia`() {
         `when`(repository.findAll()).thenReturn(emptyList())
@@ -95,19 +95,20 @@ class EventoJpaControllerTest {
         assertNull(retorno.body)
     }
 
+    // Testes de GET com id
     @Test
-    fun `A consulta de um evento com dados deve retornar status 200 com o evento correto`() {
-        val retorno = controller.get(eventoTeste.idEvento)
+    fun `A consulta de um evento por id deve retornar status 200 com o evento correto`() {
+        val retorno = controller.getPorId(eventoTeste.idEvento)
 
         assertEquals(200, retorno.statusCode.value())
         assertEquals(eventoTeste, retorno.body)
     }
 
     @Test
-    fun `A consulta de um evento com dados deve retornar status 404 com nenhum evento`() {
+    fun `A consulta de um evento por id deve retornar status 404 com nenhum evento`() {
         `when`(repository.findById(2)).thenReturn(Optional.empty())
 
-        val retorno = controller.get(2)
+        val retorno = controller.getPorId(2)
 
         assertEquals(404, retorno.statusCode.value())
         assertNull(retorno.body)
@@ -121,8 +122,8 @@ class EventoJpaControllerTest {
             nomeEvento = "Hackathon 2025",
             descricao = "Maratona de programação",
             dia = LocalDate.of(2025, 9, 12),
-            horaInicio = Time.valueOf("08:00:00"),
-            horaFim = Time.valueOf("20:00:00"),
+            horaInicio = LocalDateTime.now(),
+            horaFim = LocalDateTime.now(),
             isAberto = true,
             qtdVaga = 150,
             qtdInteressado = 20,
@@ -143,7 +144,7 @@ class EventoJpaControllerTest {
         verify(repository, times(1)).save(evento)
     }
 
-    // Deste teste de DELETE
+    // teste de DELETE
     @Test
     fun `A exclusão por id que existe deve chamar a exclusão do banco e retornar status 204 com o corpo vazio`() {
         val retorno = controller.delete(1)

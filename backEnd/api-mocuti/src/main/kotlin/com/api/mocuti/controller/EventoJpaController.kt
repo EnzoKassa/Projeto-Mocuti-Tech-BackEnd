@@ -17,20 +17,19 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
     fun get(): ResponseEntity<List<Evento>> {
         val eventos = repositorioEvento.findAll()
 
-        return if (eventos.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(eventos)
+        if (eventos.isEmpty()) {
+            return ResponseEntity.status(204).build()
         }
+        return ResponseEntity.status(200).body(eventos)
     }
 
     @GetMapping("/{id}")
-    fun get(@PathVariable id: Int): ResponseEntity<Evento> {
-        val evento = repositorioEvento.findById(id)
+    fun getPorId(@PathVariable id: Int): ResponseEntity<Evento> {
+        if (!repositorioEvento.existsById(id)) {
+            return ResponseEntity.status(404).build()
+        }
 
-        // Uso do .of para retornar um Optional
-        // retorna um ResponseEntity com o evento encontrado ou 404 se não encontrado
-        return ResponseEntity.of(evento)
+        return ResponseEntity.status(200).body(repositorioEvento.findById(id).get())
     }
 
     @PostMapping
