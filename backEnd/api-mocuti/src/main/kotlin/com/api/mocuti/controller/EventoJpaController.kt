@@ -20,6 +20,7 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         if (eventos.isEmpty()) {
             return ResponseEntity.status(204).build()
         }
+
         return ResponseEntity.status(200).body(eventos)
     }
 
@@ -44,6 +45,7 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
             repositorioEvento.deleteById(id)
             return ResponseEntity.status(204).build()
         }
+
         return ResponseEntity.status(404).build()
     }
 
@@ -52,8 +54,10 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         if (!repositorioEvento.existsById(id)) {
             return ResponseEntity.status(404).build()
         }
+
         eventoAtualizado.idEvento = id
         val evento = repositorioEvento.save(eventoAtualizado)
+
         return ResponseEntity.status(200).body(evento)
     }
 
@@ -67,8 +71,8 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         if (!repositorioEvento.existsById(id)) {
             return ResponseEntity.status(404).build()
         }
-        repositorioEvento.atualizarDiaHora(id, dia, horaInicio, horaFim)
 
+        repositorioEvento.atualizarDiaHora(id, dia, horaInicio, horaFim)
         val eventoEncontrado = repositorioEvento.findById(id).get()
 
         return ResponseEntity.status(200).body(eventoEncontrado)
@@ -84,8 +88,8 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         }
 
         val fotoEvento = repositorioEvento.findByIdOrNull(id)
-
         val foto = fotoEvento!!.foto
+
         return ResponseEntity.status(200).body(foto)
     }
 
