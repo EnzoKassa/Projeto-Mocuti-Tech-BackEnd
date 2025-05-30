@@ -8,6 +8,7 @@ import jakarta.validation.constraints.PositiveOrZero
 import jakarta.validation.constraints.Size
 import java.sql.Time
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity
 data class Evento(
@@ -24,9 +25,9 @@ data class Evento(
 
     var dia: LocalDate,
 
-    var horaInicio: Time,
+    var horaInicio: LocalDateTime,
 
-    var horaFim: Time,
+    var horaFim: LocalDateTime,
 
     var isAberto: Boolean,
 
@@ -57,7 +58,7 @@ data class Evento(
     var categoria: Categoria? = null
 ) {
     constructor() : this(
-        0, "", "", LocalDate.now(), Time(0), Time(0),
+        0, "", "", LocalDate.now(), LocalDateTime.now(), LocalDateTime.now(),
         false, null, null, null, null, null,
         null, null
     )

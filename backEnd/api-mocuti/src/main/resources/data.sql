@@ -56,8 +56,8 @@ INSERT INTO categoria (nome, descricao) VALUES
 INSERT INTO evento (
 nome_evento, descricao, dia, hora_inicio, hora_fim, is_aberto, qtd_vaga, qtd_interessado,
 foto, endereco_evento, status_evento, publico_evento, categoria_evento) VALUES
-('Palestra de Tecnologia', 'Evento sobre inovações em TI', '2025-06-15', '10:00:00', '12:00:00', TRUE, 100, 75, NULL, 1, 1, 1, 1),
-('Workshop de Carreira', 'Orientações profissionais e networking', '2025-07-10', '14:00:00', '17:00:00', TRUE, 80, 60, NULL, 2, 2, 2, 2);
+('Palestra de Tecnologia', 'Evento sobre inovações em TI', '2025-06-15','2025-07-10T14:00:00', '2025-07-10T14:00:00', TRUE, 100, 75, NULL, 1, 1, 1, 1),
+('Workshop de Carreira', 'Orientações profissionais e networking', '2025-07-10', '2025-07-10T14:00:00', '2025-07-10T14:00:00', TRUE, 80, 60, NULL, 2, 2, 2, 2);
 
 -- status_inscricao
 INSERT INTO status_inscricao (tipo_inscricao) VALUES
