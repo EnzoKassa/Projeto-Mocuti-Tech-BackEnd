@@ -13,7 +13,8 @@ class EnderecoJpaController(val repositorio: EnderecoRepository) {
     @PostMapping
     fun postEndereco(@RequestBody @Valid endereco: Endereco): ResponseEntity<Endereco> {
         val novoEndereco = repositorio.save(endereco)
-        return ResponseEntity.status(201).body(novoEndereco)
+        return if (novoEndereco == null) ResponseEntity.status(204).build()
+        else ResponseEntity.status(201).body(novoEndereco)
     }
 
     @GetMapping
