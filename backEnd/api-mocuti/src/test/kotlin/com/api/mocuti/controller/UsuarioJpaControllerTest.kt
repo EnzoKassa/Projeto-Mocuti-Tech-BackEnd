@@ -94,6 +94,7 @@ class UsuarioJpaControllerTest {
         assertEquals(listOf(usuarioTeste), response.body)
     }
 
+
     @Test
     fun `deve retornar not found quando cargo existe mas nao possui usuarios`() {
         `when`(cargoRepository.findById(cargoTeste.id)).thenReturn(Optional.of(cargoTeste))
@@ -102,7 +103,7 @@ class UsuarioJpaControllerTest {
         val response = controller.listarPorCargo(cargoTeste.id)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertTrue(response.body!!.isEmpty())
+        assertTrue(response.body is List<*> && (response.body as List<*>).isEmpty())
     }
 
     @Test
@@ -113,18 +114,18 @@ class UsuarioJpaControllerTest {
         val response = controller.listarPorCargo(idCargoInexistente)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertTrue(response.body!!.isEmpty())
+        assertEquals("Cargo não encontrado", response.body)
     }
 
     @Test
     fun `deve retornar erro ao listar usuarios por cargo inexistente`() {
-        // Cenário 3: Tentar listar usuários de um cargo inexistente.
-        `when`(repositorio.findByCargo(cargoTeste)).thenReturn(emptyList())
+        val idCargoInexistente = 999
+        `when`(cargoRepository.findById(idCargoInexistente)).thenReturn(Optional.empty())
 
-        val response = controller.listarPorCargo(cargoTeste.id)
+        val response = controller.listarPorCargo(idCargoInexistente)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertTrue(response.body!!.isEmpty())
+        assertEquals("Cargo não encontrado", response.body)
     }
 
     @Test

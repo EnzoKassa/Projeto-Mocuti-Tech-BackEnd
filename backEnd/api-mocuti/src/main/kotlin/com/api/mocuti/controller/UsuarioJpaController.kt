@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.api.mocuti.repository.UsuarioRepository
 import org.springframework.http.HttpStatus
+import kotlin.text.get
+import kotlin.text.toLong
 
 @RestController
 @RequestMapping("/usuarios")
@@ -25,81 +27,76 @@ class UsuarioJpaController(
     @GetMapping("/listar")
     fun listarTodos(): ResponseEntity<List<Usuario>> {
         val usuarios = repositorio.findAll()
-
-        return ResponseEntity.ok(usuarios)
+        return if (usuarios.isNotEmpty()) {
+            ResponseEntity.ok(usuarios)
+        } else {
+            ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+        }
     }
 
     @GetMapping("/listar-por-cargo/{cargo}")
-    fun listarPorCargo(@PathVariable cargo: Int): ResponseEntity<List<Usuario>> {
+    fun listarPorCargo(@PathVariable cargo: Int): ResponseEntity<Any> {
         val cargoOptional = cargoRepository.findById(cargo)
         if (cargoOptional.isEmpty) {
-            return ResponseEntity.status(404).body(emptyList())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cargo não encontrado")
         }
 
         val usuarios = repositorio.findByCargo(cargoOptional.get())
         return if (usuarios.isNotEmpty()) {
             ResponseEntity.ok(usuarios)
         } else {
-            ResponseEntity.status(404).body(emptyList())
+            ResponseEntity.status(HttpStatus.NO_CONTENT).build()
         }
     }
 
     @PostMapping("/cadastrar")
-    fun cadastrar(usuario: Usuario): ResponseEntity<Any> {
-        if (!usuario.email.contains("@")) {
-            throw IllegalArgumentException("E-mail inválido")
-        }
+    fun cadastrar(@RequestBody @Valid usuario: Usuario): ResponseEntity<Any> {
+        return try {
+            if (!usuario.email.contains("@")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail inválido")
+            }
 
-        if (repositorio.existsByEmail(usuario.email)) {
-            return ResponseEntity("E-mail já cadastrado", HttpStatus.BAD_REQUEST)
-        }
+            if (repositorio.existsByEmail(usuario.email)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail já cadastrado")
+            }
 
-        if (repositorio.existsByCpf(usuario.cpf)) {
-            return ResponseEntity("CPF já cadastrado", HttpStatus.BAD_REQUEST)
-        }
+            if (repositorio.existsByCpf(usuario.cpf)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CPF já cadastrado")
+            }
 
-        val usuarioSalvo = repositorio.save(usuario)
-        return ResponseEntity(usuarioSalvo, HttpStatus.CREATED)
+            val usuarioSalvo = repositorio.save(usuario)
+            ResponseEntity.status(HttpStatus.CREATED).body(usuarioSalvo)
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao cadastrar usuário")
+        }
     }
 
     @PostMapping("/cadastrar-usuario")
     fun cadastroMantenedor(@RequestBody @Valid request: CadastroUsuarioRequest): ResponseEntity<Any> {
         if (repositorio.existsByEmail(request.email)) {
-            return ResponseEntity.status(400).body("E-mail já cadastrado")
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail já cadastrado")
         }
         if (repositorio.existsByCpf(request.cpf)) {
-            return ResponseEntity.status(400).body("CPF já cadastrado")
-        }
-
-        if (repositorio.existsByCpf(request.cpf) && repositorio.existsByEmail(request.email)) {
-            return ResponseEntity.status(400).body("CPF e E-mail já cadastrados")
-        }
-
-        if (request.cargo !in 1..3) {
-            return ResponseEntity.status(400).body("Cargo inválido. Deve ser 1, 2 ou 3.")
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("CPF já cadastrado")
         }
 
         val cargoOptional = cargoRepository.findById(request.cargo)
         if (cargoOptional.isEmpty) {
-            return ResponseEntity.status(400).body("Cargo não encontrado")
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cargo não encontrado")
         }
-
-        val cargo = cargoOptional.get()
 
         val enderecoOptional = enderecoRepository.findById(request.endereco)
         if (enderecoOptional.isEmpty) {
-            return ResponseEntity.status(400).body("Endereço não encontrado")
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Endereço não encontrado")
         }
-        val endereco = enderecoOptional.get()
 
         val canalComunicacaoOptional = canalComunicacaoRepository.findById(request.canalComunicacao)
         if (canalComunicacaoOptional.isEmpty) {
-            return ResponseEntity.status(400).body("Canal de comunicação não encontrado")
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Canal de comunicação não encontrado")
         }
-        val canalComunicacao = canalComunicacaoOptional.get()
 
         val novoUsuario = Usuario(
-            idUsuario = 0, // precisa passar, já que é obrigatório e será gerado pelo BD
+            idUsuario = 0,
             nomeCompleto = request.nomeCompleto,
             cpf = request.cpf,
             telefone = request.telefone,
@@ -107,13 +104,13 @@ class UsuarioJpaController(
             genero = request.genero,
             email = request.email,
             senha = request.senha,
-            cargo = cargo,
-            endereco = endereco,
-            canalComunicacao = canalComunicacao
+            cargo = cargoOptional.get(),
+            endereco = enderecoOptional.get(),
+            canalComunicacao = canalComunicacaoOptional.get()
         )
 
         val usuarioSalvo = repositorio.save(novoUsuario)
-        return ResponseEntity.status(201).body(usuarioSalvo)
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioSalvo)
     }
 
     @PatchMapping("/logar/{idUsuario}")
@@ -123,9 +120,9 @@ class UsuarioJpaController(
             val usuarioAtualizado = usuario.get()
             usuarioAtualizado.isAutenticado = true
             repositorio.save(usuarioAtualizado)
-            ResponseEntity.status(200).body("Login bem-sucedido")
+            ResponseEntity.ok("Login bem-sucedido")
         } else {
-            ResponseEntity.status(404).body("Credenciais inválidas ou usuário não encontrado")
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas ou usuário não encontrado")
         }
     }
 
@@ -136,9 +133,9 @@ class UsuarioJpaController(
             val usuarioAtualizado = usuario.get()
             usuarioAtualizado.isAutenticado = false
             repositorio.save(usuarioAtualizado)
-            ResponseEntity.status(200).body("Logout bem-sucedido")
+            ResponseEntity.ok("Logout bem-sucedido")
         } else {
-            ResponseEntity.status(404).body("Usuário não encontrado")
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado")
         }
     }
 
@@ -172,11 +169,11 @@ class UsuarioJpaController(
         return if (usuario.isPresent) {
             val usuarioAtualizado = usuario.get()
             usuarioAtualizado.senha =
-                novaSenha["senha"] ?: return ResponseEntity.status(400).body("Senha não fornecida")
+                novaSenha["senha"] ?: return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha não fornecida")
             repositorio.save(usuarioAtualizado)
-            ResponseEntity.status(200).body("Senha redefinida com sucesso")
+            ResponseEntity.ok("Senha redefinida com sucesso")
         } else {
-            ResponseEntity.status(404).body("Usuário não encontrado")
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado")
         }
     }
 }
