@@ -9,6 +9,7 @@ data class NotaFeedback (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(name="idnota")
     var id: Int? = null,
 
     @Column(nullable = true)

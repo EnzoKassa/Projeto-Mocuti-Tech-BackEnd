@@ -1,5 +1,4 @@
 -- INSERTS PARA TESTE DA API
-
 -- endereco
 INSERT INTO endereco (CEP, logradouro, numero, complemento, UF, estado, bairro) VALUES
 ('12345678', 'Rua A', 123, 'Apto 101', 'SP', 'São Paulo', 'Centro'),

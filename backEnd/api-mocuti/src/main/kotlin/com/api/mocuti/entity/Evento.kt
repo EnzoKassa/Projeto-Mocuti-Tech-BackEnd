@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size
 import java.sql.Time
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Entity
 data class Evento(
@@ -25,10 +26,11 @@ data class Evento(
 
     var dia: LocalDate,
 
-    var horaInicio: LocalDateTime,
+    var horaInicio: LocalTime,
 
-    var horaFim: LocalDateTime,
+    var horaFim: LocalTime,
 
+    @Column(columnDefinition="tinyint")
     var isAberto: Boolean,
 
     @field:PositiveOrZero
@@ -42,23 +44,23 @@ data class Evento(
     var foto: ByteArray? = null,
 
     @ManyToOne
-    @JoinColumn(name = "endereco_evento")
+    @JoinColumn(name = "fk_endereco_evento")
     var endereco: Endereco? = null,
 
     @ManyToOne
-    @JoinColumn(name = "status_evento")
+    @JoinColumn(name = "fk_status_evento")
     var statusEvento: StatusEvento? = null,
 
     @ManyToOne
-    @JoinColumn(name = "publico_evento")
+    @JoinColumn(name = "fk_publico_alvo_evento")
     var publicoAlvoEvento: PublicoAlvo? = null,
 
     @ManyToOne
-    @JoinColumn(name = "categoria_evento")
+    @JoinColumn(name = "fk_categoria_evento")
     var categoria: Categoria? = null
 ) {
     constructor() : this(
-        0, "", "", LocalDate.now(), LocalDateTime.now(), LocalDateTime.now(),
+        0, "", "", LocalDate.now(), LocalTime.now(), LocalTime.now(),
         false, null, null, null, null, null,
         null, null
     )

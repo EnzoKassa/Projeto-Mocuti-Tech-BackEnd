@@ -8,22 +8,23 @@ data class Feedback (
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id_feedbak")
     var id: Int?,
 
-    @Lob
+
     @Column(nullable = false)
     val comentario: String?,
 
     @ManyToOne
-    @JoinColumn(name = "feedback_nota")
+    @JoinColumn(name = "fk_nota_feedback")
     var nota: NotaFeedback? = null,
 
     @ManyToOne
-    @JoinColumn(name = "feedback_evento")
+    @JoinColumn(name = "fk_evento_feedback")
     var evento: Evento? = null,
 
     @ManyToOne
-    @JoinColumn(name = "feedback_usuario")
+    @JoinColumn(name = "fk_usuario_feedback")
     var usuario: Usuario? = null,
 
     ) {
