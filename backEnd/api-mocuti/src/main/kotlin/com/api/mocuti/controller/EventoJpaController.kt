@@ -35,12 +35,8 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
 
     @PostMapping
     fun post(@RequestBody @Valid evento: Evento): ResponseEntity<Evento> {
-        return if (evento.nomeEvento.isBlank()) {
-            ResponseEntity.status(400).build()
-        } else {
-            val eventoSalvo = repositorioEvento.save(evento)
-            ResponseEntity.status(201).body(eventoSalvo)
-        }
+        val eventoSalvo = repositorioEvento.save(evento)
+        return ResponseEntity.status(201).body(eventoSalvo)
     }
 
     @DeleteMapping("/{id}")

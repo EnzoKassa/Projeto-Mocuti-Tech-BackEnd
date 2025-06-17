@@ -43,12 +43,9 @@ class FeedbackJpaController(val repositorio: FeedbackRepository) {
 
     @PostMapping
     fun post(@RequestBody @Valid novoFeedback: Feedback): ResponseEntity<Feedback> {
-        return if (novoFeedback.comentario?.isBlank() != false) {
-            ResponseEntity.status(400).build() // Bad Request
-        } else {
-            val feedback = repositorio.save(novoFeedback)
-            ResponseEntity.status(201).body(feedback) // Created
-        }
+        val feedback = repositorio.save(novoFeedback)
+        return ResponseEntity.status(201).body(feedback) // Created
+
     }
 
     @PutMapping("/{id}")

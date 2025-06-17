@@ -2,6 +2,7 @@ package com.api.mocuti.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
+import jakarta.validation.constraints.NotBlank
 
 @Entity
 data class Feedback (
@@ -13,6 +14,7 @@ data class Feedback (
 
 
     @Column(nullable = false)
+    @field:NotBlank
     val comentario: String?,
 
     @ManyToOne

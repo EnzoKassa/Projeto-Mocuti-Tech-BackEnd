@@ -45,7 +45,7 @@ class EnderecoJpaController(val repositorio: EnderecoRepository) {
     fun getEnderecoDoUsuario(@PathVariable idUsuario: Int): ResponseEntity<Endereco> {
         val endereco = repositorio.findEnderecoByUsuarioId(idUsuario)
         return if (endereco == null) {
-            ResponseEntity.status(204).build()
+            ResponseEntity.status(404).build()
         } else {
             ResponseEntity.status(200).body(endereco)
         }
@@ -55,7 +55,7 @@ class EnderecoJpaController(val repositorio: EnderecoRepository) {
     fun getEnderecoDoEvento(@PathVariable idEvento: Int): ResponseEntity<Endereco> {
         val endereco = repositorio.findEnderecoByEventoId(idEvento)
         return if (endereco == null) {
-            ResponseEntity.status(204).build()
+            ResponseEntity.status(404).build()
         } else {
             ResponseEntity.status(200).body(endereco)
         }
