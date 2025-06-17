@@ -10,11 +10,11 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
 @Entity
-data class PublicoAlvo (
+data class PublicoAlvo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name="id_publico_alvo")
+    @Column(name = "id_publico_alvo")
     var id: Int? = null,
 
     @field:NotBlank @field:Size(min = 2, max = 45)

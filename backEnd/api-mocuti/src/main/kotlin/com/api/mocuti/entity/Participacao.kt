@@ -3,14 +3,14 @@ package com.api.mocuti.entity
 import jakarta.persistence.*
 
 @Entity
-data class Participacao (
+data class Participacao(
     @EmbeddedId  // Indica que `id` é uma chave composta, baseada em uma classe `@Embeddable`
     val id: ParticipacaoId,
 
-    @Column(columnDefinition="tinyint")
+    @Column(columnDefinition = "tinyint")
     val isInscrito: Boolean? = null,
 
-    @Column(columnDefinition="tinyint")
+    @Column(columnDefinition = "tinyint")
     val isPresente: Boolean? = null,
 
     @ManyToOne

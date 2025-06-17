@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/publicos-alvos")
-class PublicoAlvoJpaController (var repositorioPublicoAlvo: PublicoAlvoRepository) {
+class PublicoAlvoJpaController(var repositorioPublicoAlvo: PublicoAlvoRepository) {
 
     @GetMapping
     fun get(): ResponseEntity<List<PublicoAlvo>> {

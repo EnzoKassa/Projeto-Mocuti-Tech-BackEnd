@@ -5,11 +5,11 @@ import jakarta.persistence.*
 import jakarta.validation.constraints.Size
 
 @Entity
-data class NotaFeedback (
+data class NotaFeedback(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name="idnota")
+    @Column(name = "id_nota_feedback")
     var id: Int? = null,
 
     @Column(nullable = true)

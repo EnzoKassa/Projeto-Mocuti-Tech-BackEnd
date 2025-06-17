@@ -9,7 +9,7 @@ data class Categoria(
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id_categoria")
+    @Column(name = "id_categoria")
     var id: Int?,
     @field:NotBlank @field:Size(min = 2, max = 20) var nome: String?,
     @field:NotBlank var descricao: String?

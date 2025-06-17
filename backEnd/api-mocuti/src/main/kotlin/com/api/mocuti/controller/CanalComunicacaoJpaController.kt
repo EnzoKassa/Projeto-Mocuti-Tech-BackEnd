@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/canal-comunicacao")
-class CanalComunicacaoJpaController (var repositorioCanalComunicacao: CanalComunicacaoRepository) {
+class CanalComunicacaoJpaController(var repositorioCanalComunicacao: CanalComunicacaoRepository) {
     @GetMapping
     fun get(): ResponseEntity<List<CanalComunicacao>> {
         val canais = repositorioCanalComunicacao.findAll()

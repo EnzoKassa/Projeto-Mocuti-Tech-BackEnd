@@ -14,7 +14,7 @@ data class Cargo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name="id_cargo")
+    @Column(name = "id_cargo")
     var id_cargo: Int,
 
     @field:NotBlank @field:Size(min = 2, max = 45)

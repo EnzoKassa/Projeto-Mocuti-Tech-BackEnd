@@ -60,5 +60,4 @@ class EnderecoJpaController(val repositorio: EnderecoRepository) {
             ResponseEntity.status(200).body(endereco)
         }
     }
-
 }

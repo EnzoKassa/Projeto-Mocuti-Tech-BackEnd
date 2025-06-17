@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/status-eventos")
-class StatusEventoJpaController (var repositorioStatusEvento: StatusEventoRepository) {
+class StatusEventoJpaController(var repositorioStatusEvento: StatusEventoRepository) {
 
     @GetMapping
     fun get(): ResponseEntity<List<StatusEvento>> {

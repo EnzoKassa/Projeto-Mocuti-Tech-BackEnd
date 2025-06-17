@@ -30,7 +30,7 @@ data class Evento(
 
     var horaFim: LocalTime,
 
-    @Column(columnDefinition="tinyint")
+    @Column(columnDefinition = "tinyint")
     var isAberto: Boolean,
 
     @field:PositiveOrZero

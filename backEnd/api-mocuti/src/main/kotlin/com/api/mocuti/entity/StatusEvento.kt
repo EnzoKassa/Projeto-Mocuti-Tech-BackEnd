@@ -10,11 +10,11 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
 @Entity
-data class StatusEvento (
+data class StatusEvento(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name="id_status_evento")
+    @Column(name = "id_status_evento")
     var id: Int? = null,
 
     @field:NotBlank @field:Size(min = 2, max = 45)

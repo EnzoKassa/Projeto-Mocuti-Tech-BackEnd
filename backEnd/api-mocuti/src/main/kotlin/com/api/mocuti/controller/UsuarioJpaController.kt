@@ -167,7 +167,10 @@ class UsuarioJpaController(
     }
 
     @PatchMapping("/redefinirSenha/{idUsuario}")
-    fun redefinirSenha(@PathVariable idUsuario: Int, @RequestBody novaSenha: Map<String, String>): ResponseEntity<String> {
+    fun redefinirSenha(
+        @PathVariable idUsuario: Int,
+        @RequestBody novaSenha: Map<String, String>
+    ): ResponseEntity<String> {
         val usuario = repositorio.findById(idUsuario)
         return if (usuario.isPresent) {
             val usuarioAtualizado = usuario.get()

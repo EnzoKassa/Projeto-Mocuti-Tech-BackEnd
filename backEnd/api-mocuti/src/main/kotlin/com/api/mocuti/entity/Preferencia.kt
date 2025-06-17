@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 
 @Entity
-data class Preferencia (
+data class Preferencia(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name="id_preferencia")
+    @Column(name = "id_preferencia")
     var id: Int? = null,
 
     @ManyToOne

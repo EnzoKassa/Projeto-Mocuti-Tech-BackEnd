@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/preferencias")
 class PreferenciaJpaController(var repositorioPreferencia: PreferenciaRepository) {
 
-     @GetMapping
-     fun get(): ResponseEntity<List<Preferencia>> {
-         val preferencias = repositorioPreferencia.findAll()
+    @GetMapping
+    fun get(): ResponseEntity<List<Preferencia>> {
+        val preferencias = repositorioPreferencia.findAll()
 
-         return if (preferencias.isEmpty()) {
-             ResponseEntity.status(204).build()
-         } else {
-             ResponseEntity.status(200).body(preferencias)
-         }
-     }
+        return if (preferencias.isEmpty()) {
+            ResponseEntity.status(204).build()
+        } else {
+            ResponseEntity.status(200).body(preferencias)
+        }
+    }
 }

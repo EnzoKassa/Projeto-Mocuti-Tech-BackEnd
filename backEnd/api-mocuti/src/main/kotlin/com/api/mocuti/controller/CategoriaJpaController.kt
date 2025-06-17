@@ -9,14 +9,9 @@ import com.api.mocuti.repository.CategoriaRepository
 @RestController
 @RequestMapping("/categorias")
 class CategoriaJpaController(val repositorio: CategoriaRepository) {
-    /*
-    Definimos um construtor que recebe um objeto do tipo CategoriaRepository
-    Assim, o Spring vai INJETAR um objeto desse tipo pronto para uso.
-     */
 
     @GetMapping
     fun get(): ResponseEntity<List<Categoria>> {
-        // repositorio.findAll() -> faz um "select * from musica"
         val categorias = repositorio.findAll()
 
         return if (categorias.isEmpty()) {
@@ -27,43 +22,30 @@ class CategoriaJpaController(val repositorio: CategoriaRepository) {
     }
 
     @GetMapping("/{id}")
-    fun get(@PathVariable id:Int):
-            ResponseEntity<Categoria> {
-        /*
-        findById() retorna um Optional da entidade
-        "por baixo dos panos" executa um
-        "select * from musica where id = ?"
-         */
+    fun get(@PathVariable id: Int): ResponseEntity<Categoria> {
         val categoria = repositorio.findById(id)
 
         /*
-ResponseEntity.of(<variável Optional>)
-- se a variável Optional tiver valor:
-  retorna 200 com o valor no corpo
-- caso contrário, retorna 404 sem corpo
+        ResponseEntity.of(<variável Optional>)
+        - se a variável Optional tiver valor:
+          retorna 200 com o valor no corpo
+        - caso contrário, retorna 404 sem corpo
          */
         return ResponseEntity.of(categoria)
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id:Int):
-            ResponseEntity<Void> {
-        /*
-        O existsById() verifica se o id indicado existe na tabela
-        por baixo dos panos, ele faz um...
-        "select count(*) from musica where id = ?"
-         */
+    fun delete(@PathVariable id: Int): ResponseEntity<Void> {
+
         if (repositorio.existsById(id)) {
             repositorio.deleteById(id)
-// por dos panos o deleteById faz um "delete from musica where id = ?"
             return ResponseEntity.status(204).build()
         }
         return ResponseEntity.status(404).build()
     }
 
     @PostMapping
-    fun post(@RequestBody @Valid novaMusica: Categoria):
-            ResponseEntity<Categoria> {
+    fun post(@RequestBody @Valid novaMusica: Categoria): ResponseEntity<Categoria> {
         /*
         save() pode fazer INSERT ou UPDATE
         Se o identificador for vazio, fará INSERT
@@ -77,12 +59,6 @@ ResponseEntity.of(<variável Optional>)
         return ResponseEntity.status(201).body(categoria)
     }
 
-    /*
-Crie o endpoint PUT /musicas/{id}  {JSON na requisição}
-Se o id não existir, retorne 404 sem corpo
-Caso contrário, atualize a música e retorne 200
-com a música atualizada no corpo da resposta.
-     */
     @PutMapping("/{id}")
     fun put(
         @PathVariable id: Int,
@@ -96,6 +72,4 @@ com a música atualizada no corpo da resposta.
         val musica = repositorio.save(categoriaAtualizada)
         return ResponseEntity.status(200).body(musica)
     }
-
-
 }

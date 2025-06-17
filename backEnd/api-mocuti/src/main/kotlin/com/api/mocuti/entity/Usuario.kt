@@ -15,10 +15,10 @@ data class Usuario(
     var nomeCompleto: String,
 
     @field:NotBlank @field:Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}")
-    @Column(columnDefinition="char(14)")
+    @Column(columnDefinition = "char(14)")
     var cpf: String,
 
-    @field:Size(max = 20) @Column(columnDefinition="char(11)")
+    @field:Size(max = 20) @Column(columnDefinition = "char(11)")
     var telefone: String? = null,
 
     @field:NotBlank @field:Email @field:Size(max = 45)
@@ -33,11 +33,11 @@ data class Usuario(
     @field:NotBlank @field:Size(max = 14)
     var senha: String,
 
-    @Column(columnDefinition="tinyint")
+    @Column(columnDefinition = "tinyint")
     @JsonIgnore
     var isAutenticado: Boolean = false,
 
-    @Column(columnDefinition="tinyint")
+    @Column(columnDefinition = "tinyint")
     @JsonIgnore
     var isAtivo: Boolean = true,
 
@@ -57,8 +57,10 @@ data class Usuario(
     var canalComunicacao: CanalComunicacao? = null,
 
     ) {
-    constructor() : this(0, "", "", null, "", null,
-        null, "", false, true, null, null) {
+    constructor() : this(
+        0, "", "", null, "", null,
+        null, "", false, true, null, null
+    ) {
         this.dtDesativacao = null
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/notas-feedbacks")
-class NotaFeedbackJpaController (var repositorioNotaFeedback: NotaFeedbackRepository) {
+class NotaFeedbackJpaController(var repositorioNotaFeedback: NotaFeedbackRepository) {
 
     @GetMapping
     fun get(): ResponseEntity<List<NotaFeedback>> {

@@ -14,7 +14,7 @@ data class CanalComunicacao(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name="id_canal_comunicacao")
+    @Column(name = "id_canal_comunicacao")
     var id: Int? = null,
 
     @field:NotBlank
