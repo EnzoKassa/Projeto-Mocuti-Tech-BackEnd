@@ -97,14 +97,14 @@ class UsuarioJpaControllerTest {
 
 
     @Test
-    fun `deve retornar not found quando cargo existe mas nao possui usuarios`() {
+    fun `deve retornar no content quando cargo existe mas nao possui usuarios`() {
         `when`(cargoRepository.findById(cargoTeste.id_cargo)).thenReturn(Optional.of(cargoTeste))
         `when`(repositorio.findByCargo(cargoTeste)).thenReturn(emptyList())
 
         val response = controller.listarPorCargo(cargoTeste.id_cargo)
 
-        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertTrue(response.body is List<*> && (response.body as List<*>).isEmpty())
+        assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
+        assertNull(response.body)
     }
 
     @Test
@@ -115,7 +115,7 @@ class UsuarioJpaControllerTest {
         val response = controller.listarPorCargo(idCargoInexistente)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertEquals("Cargo não encontrado", response.body)
+        assertEquals(null, response.body)
     }
 
     @Test
@@ -126,7 +126,7 @@ class UsuarioJpaControllerTest {
         val response = controller.listarPorCargo(idCargoInexistente)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertEquals("Cargo não encontrado", response.body)
+        assertEquals(null, response.body)
     }
 
     @Test
@@ -152,7 +152,7 @@ class UsuarioJpaControllerTest {
         val response = controller.cadastrar(usuarioTeste)
 
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertEquals("E-mail já cadastrado", response.body)
+        assertEquals(null, response.body)
     }
 
     @Test

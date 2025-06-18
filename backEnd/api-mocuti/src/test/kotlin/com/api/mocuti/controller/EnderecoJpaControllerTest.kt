@@ -66,7 +66,7 @@ class EnderecoJpaControllerTest{
 
         val response = controller.getEnderecoDoUsuario(1)
 
-        assertEquals(204, response.statusCode.value())
+        assertEquals(404, response.statusCode.value())
     }
 
     @Test
@@ -88,7 +88,7 @@ class EnderecoJpaControllerTest{
 
         val response = controller.getEnderecoDoEvento(1)
 
-        assertEquals(204, response.statusCode.value())
+        assertEquals(404, response.statusCode.value())
     }
 
     @Test

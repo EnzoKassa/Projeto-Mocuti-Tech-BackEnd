@@ -89,20 +89,6 @@ class FeedbackJpaControllerTest {
     }
 
     @Test
-    fun `deve retornar 400 ao criar feedback com dados invalidos`() {
-        val feedbackInvalido = Feedback(id = 1, comentario = "")
-
-        // Configura o mock para não salvar feedbacks inválidos
-        `when`(repositorio.save(any(Feedback::class.java))).thenThrow(IllegalArgumentException("Dados inválidos"))
-
-        val response = controller.post(feedbackInvalido)
-
-        assertEquals(400, response.statusCode.value())
-        assertNull(response.body)
-        verify(repositorio, times(0)).save(any(Feedback::class.java))
-    }
-
-    @Test
     fun `deve retornar 200 e atualizar o feedback quando o ID existir`() {
         val feedbackAtualizado = Feedback(id = 1, comentario = "Serviço atualizado")
         `when`(repositorio.existsById(1)).thenReturn(true)

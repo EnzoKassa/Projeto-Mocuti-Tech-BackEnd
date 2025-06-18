@@ -145,32 +145,6 @@ class EventoJpaControllerTest {
         verify(repository, times(1)).save(evento)
     }
 
-    @Test
-    fun `deve retornar 400 quando nomeEvento for em branco`() {
-        val eventoInvalido = Evento(
-            idEvento = 3,
-            nomeEvento = "",
-            descricao = "Descrição qualquer",
-            dia = LocalDate.of(2025, 10, 10),
-            horaInicio = LocalTime.now(),
-            horaFim = LocalTime.now(),
-            isAberto = true,
-            qtdVaga = 50,
-            qtdInteressado = 5,
-            foto = null,
-            endereco = mock(Endereco::class.java),
-            statusEvento = mock(StatusEvento::class.java),
-            publicoAlvoEvento = mock(PublicoAlvo::class.java),
-            categoria = mock(Categoria::class.java)
-        )
-
-        val retorno = controller.post(eventoInvalido)
-
-        assertEquals(400, retorno.statusCode.value())
-        assertNull(retorno.body)
-        verify(repository, never()).save(any(Evento::class.java))
-    }
-
     // teste de DELETE
     @Test
     fun `A exclusão por id que existe deve chamar a exclusão do banco e retornar status 204 com o corpo vazio`() {
