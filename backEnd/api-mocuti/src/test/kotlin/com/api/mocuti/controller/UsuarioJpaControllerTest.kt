@@ -33,7 +33,7 @@ class UsuarioJpaControllerTest {
     fun setup() {
 
         cargoTeste = Cargo(
-            id = 1,
+            id_cargo = 1,
             tipoCargo = "Administrador"
         )
 
@@ -59,7 +59,7 @@ class UsuarioJpaControllerTest {
             cpf = "123.456.789-00",
             telefone = "99999-9999",
             email = "teste@email.com",
-            dataNascimento = LocalDate.of(1990, 1, 1),
+            dt_nasc = LocalDate.of(1990, 1, 1),
             genero = "Masculino",
             senha = "senha123",
             isAutenticado = false,
@@ -68,6 +68,7 @@ class UsuarioJpaControllerTest {
             cargo = cargoTeste,
             endereco = enderecoTeste,
             canalComunicacao = comunicacaoTeste
+
         )
     }
 
@@ -85,10 +86,10 @@ class UsuarioJpaControllerTest {
 
     @Test
     fun `deve retornar usuarios quando cargo existe e possui usuarios`() {
-        `when`(cargoRepository.findById(cargoTeste.id)).thenReturn(Optional.of(cargoTeste))
+        `when`(cargoRepository.findById(cargoTeste.id_cargo)).thenReturn(Optional.of(cargoTeste))
         `when`(repositorio.findByCargo(cargoTeste)).thenReturn(listOf(usuarioTeste))
 
-        val response = controller.listarPorCargo(cargoTeste.id)
+        val response = controller.listarPorCargo(cargoTeste.id_cargo)
 
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(listOf(usuarioTeste), response.body)
@@ -97,10 +98,10 @@ class UsuarioJpaControllerTest {
 
     @Test
     fun `deve retornar not found quando cargo existe mas nao possui usuarios`() {
-        `when`(cargoRepository.findById(cargoTeste.id)).thenReturn(Optional.of(cargoTeste))
+        `when`(cargoRepository.findById(cargoTeste.id_cargo)).thenReturn(Optional.of(cargoTeste))
         `when`(repositorio.findByCargo(cargoTeste)).thenReturn(emptyList())
 
-        val response = controller.listarPorCargo(cargoTeste.id)
+        val response = controller.listarPorCargo(cargoTeste.id_cargo)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
         assertTrue(response.body is List<*> && (response.body as List<*>).isEmpty())

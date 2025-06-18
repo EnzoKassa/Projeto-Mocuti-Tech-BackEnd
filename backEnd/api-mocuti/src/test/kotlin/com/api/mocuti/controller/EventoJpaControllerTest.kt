@@ -10,6 +10,7 @@ import org.mockito.Mockito.*
 import java.sql.Time
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.*
 
 class EventoJpaControllerTest {
@@ -57,8 +58,8 @@ class EventoJpaControllerTest {
             nomeEvento = "Feira de Tecnologia",
             descricao = "Evento com foco em inovação e startups",
             dia = LocalDate.of(2025, 6, 15),
-            horaInicio = LocalDateTime.now(),
-            horaFim = LocalDateTime.now(),
+            horaInicio = LocalTime.now(),
+            horaFim = LocalTime.now(),
             isAberto = true,
             qtdVaga = 100,
             qtdInteressado = 25,
@@ -122,8 +123,8 @@ class EventoJpaControllerTest {
             nomeEvento = "Hackathon 2025",
             descricao = "Maratona de programação",
             dia = LocalDate.of(2025, 9, 12),
-            horaInicio = LocalDateTime.now(),
-            horaFim = LocalDateTime.now(),
+            horaInicio = LocalTime.now(),
+            horaFim = LocalTime.now(),
             isAberto = true,
             qtdVaga = 150,
             qtdInteressado = 20,
@@ -151,8 +152,8 @@ class EventoJpaControllerTest {
             nomeEvento = "",
             descricao = "Descrição qualquer",
             dia = LocalDate.of(2025, 10, 10),
-            horaInicio = LocalDateTime.now(),
-            horaFim = LocalDateTime.now(),
+            horaInicio = LocalTime.now(),
+            horaFim = LocalTime.now(),
             isAberto = true,
             qtdVaga = 50,
             qtdInteressado = 5,
