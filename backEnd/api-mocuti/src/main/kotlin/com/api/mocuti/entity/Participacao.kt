@@ -8,22 +8,22 @@ data class Participacao(
     val id: ParticipacaoId,
 
     @Column(columnDefinition = "tinyint")
-    val isInscrito: Boolean? = null,
+    val isInscrito: Boolean,
 
     @Column(columnDefinition = "tinyint")
-    val isPresente: Boolean? = null,
+    val isPresente: Boolean,
 
     @ManyToOne
     @JoinColumn(name = "fk_inscricao_participacao")
-    val statusInscricao: StatusInscricao? = null,
+    val statusInscricao: StatusInscricao,
 
     @MapsId("usuarioId")
     @ManyToOne
     @JoinColumn(name = "fk_usuario_participacao")
-    val usuario: Usuario? = null,
+    val usuario: Usuario,
 
     @MapsId("eventoId")
     @ManyToOne
     @JoinColumn(name = "fk_evento_participacao")
-    val evento: Evento? = null
+    val evento: Evento
 )

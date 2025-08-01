@@ -2,15 +2,22 @@ package com.api.mocuti.controller
 
 import com.api.mocuti.entity.Participacao
 import com.api.mocuti.repository.ParticipacaoRepository
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/particopacoes")
+@Tag(name = "Participação", description = "Operações relacionadas às participações")
+@RequestMapping("/participacoes")
 class ParticipacaoJpaController(var repositorioParticipacao: ParticipacaoRepository) {
 
+    @Operation(
+        summary = "Listar todas as participações",
+        description = "Retorna todas as participações cadastradas no sistema"
+    )
     @GetMapping
     fun get(): ResponseEntity<List<Participacao>> {
         val participacoes = repositorioParticipacao.findAll()
