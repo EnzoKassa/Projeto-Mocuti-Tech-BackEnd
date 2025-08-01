@@ -11,29 +11,38 @@ data class Usuario(
     @JsonProperty(access = JsonProperty.Access.READ_ONLY) @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var idUsuario: Int,
 
-    @field:NotBlank @field:Size(max = 45)
+    @field:NotBlank @field:Size(max = 125)
     var nomeCompleto: String,
 
-    @field:NotBlank @field:Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}")
+    @field:NotNull
+    @field:Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}") // CPF format: XXX.XXX.XXX-XX
     @Column(columnDefinition = "char(14)")
     var cpf: String,
 
-    @field:Size(max = 20) @Column(columnDefinition = "char(11)")
+    @field:Pattern(regexp = "\\(\\d{2}\\) \\d{4,5}-\\d{4}") // Phone format: (XX) XXXX-XXXX or (XX) XXXXX-XXXX
+    @field:Size(min = 11, max = 15)
     var telefone: String? = null,
 
-    @field:NotBlank @field:Email @field:Size(max = 45)
+    @field:NotBlank
+    @field:Email
     var email: String,
 
-    @field:Past var
-    dt_nasc: LocalDate?,
+    @field:Past
+    var dt_nasc: LocalDate,
 
-    @field:Size(max = 45)
-    var genero: String? = null,
+    @field:NotBlank @field:Size(max = 125)
+    var etnia: String,
 
-    @field:NotBlank @field:Size(max = 14)
+    @field:NotBlank @field:Size(max = 125)
+    var nacionalidade: String,
+
+    @field:NotBlank @field:Size(max = 125)
+    var genero: String,
+
+    @field:NotBlank
+    @field:Size(max = 14)
     var senha: String,
 
-    @Column(columnDefinition = "tinyint")
     @JsonIgnore
     var isAutenticado: Boolean = false,
 
@@ -46,21 +55,13 @@ data class Usuario(
 
     @ManyToOne
     @JoinColumn(name = "fk_cargo_usuario")
-    var cargo: Cargo? = null,
+    var cargo: Cargo,
 
     @ManyToOne
     @JoinColumn(name = "fk_endereco_usuario")
-    var endereco: Endereco? = null,
+    var endereco: Endereco,
 
     @ManyToOne
     @JoinColumn(name = "fk_canal_comunicacao_usuario")
-    var canalComunicacao: CanalComunicacao? = null,
-
-    ) {
-    constructor() : this(
-        0, "", "", null, "", null,
-        null, "", false, true, null, null
-    ) {
-        this.dtDesativacao = null
-    }
-}
+    var canalComunicacao: CanalComunicacao
+)

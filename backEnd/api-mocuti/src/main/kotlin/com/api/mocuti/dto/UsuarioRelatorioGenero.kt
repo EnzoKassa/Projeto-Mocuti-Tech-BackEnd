@@ -1,6 +1,6 @@
 package com.api.mocuti.dto
 
-data class RelatorioGenero(
+data class UsuarioRelatorioGenero(
     val totalHomens: Int,
     val totalMulheres: Int
 

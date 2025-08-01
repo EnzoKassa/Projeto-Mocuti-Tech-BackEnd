@@ -15,6 +15,8 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
 
     fun existsByEmail(email: String): Boolean
 
+    fun findByEmail(email: String): Usuario?
+
     @Transactional
     @Modifying
     @Query("update Usuario u set u.isAtivo = false, u.dtDesativacao = current_date where u.idUsuario = ?1")
