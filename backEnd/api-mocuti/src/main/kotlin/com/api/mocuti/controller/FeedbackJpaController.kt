@@ -1,15 +1,37 @@
 package com.api.mocuti.controller
 
+import com.api.mocuti.dto.FeedbackAtualizarRequest
+import com.api.mocuti.dto.FeedbackNovoRequest
 import com.api.mocuti.entity.Feedback
-import jakarta.validation.Valid
+import com.api.mocuti.repository.EventoRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.api.mocuti.repository.FeedbackRepository
+import com.api.mocuti.repository.NotaFeedbackRepository
+import com.api.mocuti.repository.UsuarioRepository
+import com.api.mocuti.service.FeedbackService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 
 @RestController
+@Tag(name = "Feedback", description = "Operações relacionadas aos feedbacks")
 @RequestMapping("/feedback")
-class FeedbackJpaController(val repositorio: FeedbackRepository) {
-
+class FeedbackJpaController(
+    val repositorio: FeedbackRepository,
+    val eventoRepository: EventoRepository,
+    val usuarioRepository: UsuarioRepository,
+    val notaFeedbackRepository: NotaFeedbackRepository,
+    val feedbackService: FeedbackService = FeedbackService(
+        repositorio,
+        notaFeedbackRepository,
+        eventoRepository,
+        usuarioRepository
+    )
+) {
+    @Operation(
+        summary = "Listar todos os feedbacks",
+        description = "Retorna todos os feedbacks cadastrados"
+    )
     @GetMapping
     fun get(): ResponseEntity<List<Feedback>> {
         val feedback = repositorio.findAll()
@@ -20,16 +42,24 @@ class FeedbackJpaController(val repositorio: FeedbackRepository) {
         }
     }
 
+    @Operation(
+        summary = "Buscar feedback por ID",
+        description = "Retorna o feedback correspondente ao ID fornecido"
+    )
     @GetMapping("/{id}")
     fun get(@PathVariable id: Int): ResponseEntity<Feedback> {
-        val feedback = repositorio.findById(id)
-        return if (feedback.isPresent) {
-            ResponseEntity.status(200).body(feedback.get())
-        } else {
-            ResponseEntity.status(404).build()
+        if (!repositorio.existsById(id)) {
+            return ResponseEntity.status(404).build()
         }
+
+        val feedback = repositorio.findById(id).get()
+        return ResponseEntity.status(200).body(feedback)
     }
 
+    @Operation(
+        summary = "Deletar um feedback",
+        description = "Remove o feedback com o ID fornecido"
+    )
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<Void> {
         return if (repositorio.existsById(id)) {
@@ -40,20 +70,26 @@ class FeedbackJpaController(val repositorio: FeedbackRepository) {
         }
     }
 
+    @Operation(
+        summary = "Criar um novo feedback",
+        description = "Cadastra um novo feedback no sistema"
+    )
     @PostMapping
-    fun post(@RequestBody @Valid novoFeedback: Feedback): ResponseEntity<Feedback> {
-        val feedback = repositorio.save(novoFeedback)
+    fun post(@RequestBody novoFeedback: FeedbackNovoRequest): ResponseEntity<Feedback> {
+        val feedback = feedbackService.criar(novoFeedback)
         return ResponseEntity.status(201).body(feedback)
     }
 
+    @Operation(
+        summary = "Atualizar um feedback",
+        description = "Atualiza os dados do feedback com o ID fornecido"
+    )
     @PutMapping("/{id}")
-    fun put(@PathVariable id: Int, @RequestBody @Valid feedbackAtualizado: Feedback): ResponseEntity<Feedback> {
-        return if (!repositorio.existsById(id)) {
-            ResponseEntity.status(404).build()
-        } else {
-            val feedbackComId = feedbackAtualizado.copy(id = id)
-            val feedback = repositorio.save(feedbackComId)
-            ResponseEntity.status(200).body(feedback)
-        }
+    fun put(
+        @PathVariable id: Int,
+        @RequestBody feedbackAtualizado: FeedbackAtualizarRequest
+    ): ResponseEntity<Feedback> {
+        val feedback = feedbackService.atualizar(id, feedbackAtualizado)
+        return ResponseEntity.ok(feedback)
     }
 }
