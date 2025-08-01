@@ -5,11 +5,19 @@ import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.api.mocuti.repository.CategoriaRepository
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 
 @RestController
+@Tag(name = "Categoria", description = "Operações relacionadas categoria dos eventos")
+
 @RequestMapping("/categorias")
 class CategoriaJpaController(val repositorio: CategoriaRepository) {
 
+    @Operation(
+        summary = "Listar todas as categorias",
+        description = "Retorna uma lista com todas as categorias cadastradas"
+    )
     @GetMapping
     fun get(): ResponseEntity<List<Categoria>> {
         val categorias = repositorio.findAll()
@@ -21,19 +29,21 @@ class CategoriaJpaController(val repositorio: CategoriaRepository) {
         }
     }
 
+    @Operation(
+        summary = "Buscar categoria por ID",
+        description = "Retorna a categoria referente ao ID fornecido"
+    )
     @GetMapping("/{id}")
     fun get(@PathVariable id: Int): ResponseEntity<Categoria> {
         val categoria = repositorio.findById(id)
 
-        /*
-        ResponseEntity.of(<variável Optional>)
-        - se a variável Optional tiver valor:
-          retorna 200 com o valor no corpo
-        - caso contrário, retorna 404 sem corpo
-         */
         return ResponseEntity.of(categoria)
     }
 
+    @Operation(
+        summary = "Deletar categoria por ID",
+        description = "Remove a categoria referente ao ID fornecido"
+    )
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<Void> {
 
@@ -44,21 +54,20 @@ class CategoriaJpaController(val repositorio: CategoriaRepository) {
         return ResponseEntity.status(404).build()
     }
 
+    @Operation(
+        summary = "Criar uma nova categoria",
+        description = "Adiciona uma nova categoria ao sistema"
+    )
     @PostMapping
-    fun post(@RequestBody @Valid novaMusica: Categoria): ResponseEntity<Categoria> {
-        /*
-        save() pode fazer INSERT ou UPDATE
-        Se o identificador for vazio, fará INSERT
-        Caso contrário, o JPA verifica se existe na base.
-        Se não existir, faz INSERT. Caso contrário faz update
-
-        Seu retorno é a entidade salva
-        Com todos os valores pós atualização preenchidos
-         */
-        val categoria = repositorio.save(novaMusica)
+    fun post(@RequestBody @Valid novaCategoria: Categoria): ResponseEntity<Categoria> {
+        val categoria = repositorio.save(novaCategoria)
         return ResponseEntity.status(201).body(categoria)
     }
 
+    @Operation(
+        summary = "Atualizar uma categoria",
+        description = "Atualiza a categoria com o ID fornecido"
+    )
     @PutMapping("/{id}")
     fun put(
         @PathVariable id: Int,
@@ -68,8 +77,8 @@ class CategoriaJpaController(val repositorio: CategoriaRepository) {
         if (!repositorio.existsById(id)) {
             return ResponseEntity.status(404).build()
         }
-        categoriaAtualizada.id = id
-        val musica = repositorio.save(categoriaAtualizada)
-        return ResponseEntity.status(200).body(musica)
+        categoriaAtualizada.idCategoria = id
+        val categoria = repositorio.save(categoriaAtualizada)
+        return ResponseEntity.status(200).body(categoria)
     }
 }
