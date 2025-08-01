@@ -8,15 +8,13 @@ data class Preferencia(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "id_preferencia")
-    var id: Int? = null,
+    var idPreferencia: Int,
 
     @ManyToOne
     @JoinColumn(name = "fk_usuario_preferencia")
-    var usuario: Usuario? = null,
+    var usuario: Usuario,
 
     @ManyToOne
     @JoinColumn(name = "fk_categoria_preferencia")
-    var categoria: Categoria? = null,
-) {
-}
+    var categoria: Categoria
+)

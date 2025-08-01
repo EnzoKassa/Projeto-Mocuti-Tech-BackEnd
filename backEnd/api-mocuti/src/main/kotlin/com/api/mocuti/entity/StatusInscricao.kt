@@ -1,7 +1,6 @@
 package com.api.mocuti.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -14,10 +13,9 @@ data class StatusInscricao(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "id_inscricao")
-    var id: Int? = null,
+    var idStatusInscricao: Int,
 
-    @field:NotBlank @field:Size(min = 2, max = 45)
-    var tipoInscricao: String? = null
-) {
-}
+    @field:NotBlank
+    @field:Size(min = 2, max = 45)
+    var tipoInscricao: String
+)

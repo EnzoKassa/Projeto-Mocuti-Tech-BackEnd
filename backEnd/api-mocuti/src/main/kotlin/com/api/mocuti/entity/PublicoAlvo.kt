@@ -14,10 +14,9 @@ data class PublicoAlvo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "id_publico_alvo")
-    var id: Int? = null,
+    var idPublicoAlvo: Int,
 
-    @field:NotBlank @field:Size(min = 2, max = 45)
-    var tipoPublico: String? = null
-) {
-}
+    @field:NotBlank
+    @field:Size(min = 2, max = 45)
+    var tipoPublico: String
+)
