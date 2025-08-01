@@ -1,7 +1,6 @@
 package com.api.mocuti.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -13,19 +12,30 @@ import jakarta.validation.constraints.Size
 
 @Entity
 data class Endereco(
+    @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Id // do pacote jakarta.persistence
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var idEndereco: Int?, @field:NotNull
-    @Column(columnDefinition = "char(8)")
-    @field:Size(min = 8, max = 8) var CEP: String? = null,
-    @field:NotBlank var logradouro: String? = null,
-    @field:Min(1) var numero: Int = 0,
-    @field:Size(max = 45) var complemento: String? = null,
-    @Column(columnDefinition = "char(2)")
-    @field:Size(min = 2, max = 2) var UF: String? = null,
-    @field:Size(max = 45) var estado: String? = null,
-    @field:Size(max = 125) var bairro: String? = null
-) {
-    constructor() : this(null, null)
-}
+    var idEndereco: Int,
+
+    @field:NotNull
+    @field:Size(min = 8, max = 9)
+    var cep: String,
+
+    var logradouro: String,
+
+    @field:Min(1)
+    var numero: Int,
+
+    @field:Size(max = 225)
+    var complemento: String?,
+
+    @field:Size(min = 2, max = 2)
+    var uf: String,
+
+    @field:NotBlank
+    var estado: String,
+
+    @field:NotBlank
+    @field:Size(max = 125)
+    var bairro: String
+)
