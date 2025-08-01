@@ -1,18 +1,40 @@
 package com.api.mocuti.controller
 
+import EventoService
+import com.api.mocuti.dto.EventoAttDiaHoraRequest
+import com.api.mocuti.dto.EventoAtualizarRequest
+import com.api.mocuti.dto.EventoCadastroRequest
 import com.api.mocuti.entity.Evento
-import com.api.mocuti.repository.EventoRepository
+import com.api.mocuti.repository.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.sql.Time
-import java.time.LocalDate
 
 @RestController
+@Tag(name = "Evento", description = "Gerenciamento dos eventos cadastrados no sistema")
 @RequestMapping("/eventos")
-class EventoJpaController(var repositorioEvento: EventoRepository) {
+class EventoJpaController(
+    val repositorioEvento: EventoRepository,
+    val enderecoRepository: EnderecoRepository,
+    val statusEventoRepository: StatusEventoRepository,
+    val publicoAlvoRepository: PublicoAlvoRepository,
+    val categoriaRepository: CategoriaRepository,
+    val eventoService: EventoService = EventoService(
+        repositorioEvento,
+        enderecoRepository,
+        statusEventoRepository,
+        publicoAlvoRepository,
+        categoriaRepository
+    )
+) {
 
+    @Operation(
+        summary = "Listar todos os eventos",
+        description = "Retorna todos os eventos cadastrados no sistema; retorna 204 se não houver eventos"
+    )
     @GetMapping
     fun get(): ResponseEntity<List<Evento>> {
         val eventos = repositorioEvento.findAll()
@@ -24,6 +46,10 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         return ResponseEntity.status(200).body(eventos)
     }
 
+    @Operation(
+        summary = "Buscar evento por ID",
+        description = "Retorna um evento específico a partir do ID informado"
+    )
     @GetMapping("/{id}")
     fun getPorId(@PathVariable id: Int): ResponseEntity<Evento> {
         if (!repositorioEvento.existsById(id)) {
@@ -33,12 +59,20 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         return ResponseEntity.status(200).body(repositorioEvento.findById(id).get())
     }
 
+    @Operation(
+        summary = "Cadastrar novo evento",
+        description = "Cria um novo evento com os dados informados"
+    )
     @PostMapping
-    fun post(@RequestBody @Valid evento: Evento): ResponseEntity<Evento> {
-        val eventoSalvo = repositorioEvento.save(evento)
-        return ResponseEntity.status(201).body(eventoSalvo)
+    fun post(@RequestBody @Valid dto: EventoCadastroRequest): ResponseEntity<Evento> {
+        val evento = eventoService.criarEvento(dto)
+        return ResponseEntity.status(201).body(evento)
     }
 
+    @Operation(
+        summary = "Excluir evento por ID",
+        description = "Remove o evento do sistema com base no ID"
+    )
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<Void> {
         if (repositorioEvento.existsById(id)) {
@@ -49,35 +83,35 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         return ResponseEntity.status(404).build()
     }
 
+    @Operation(
+        summary = "Atualizar dados do evento",
+        description = "Atualiza todos os campos de um evento existente"
+    )
     @PutMapping("/{id}")
-    fun put(@PathVariable id: Int, @RequestBody eventoAtualizado: Evento): ResponseEntity<Evento> {
-        if (!repositorioEvento.existsById(id)) {
-            return ResponseEntity.status(404).build()
-        }
-
-        eventoAtualizado.idEvento = id
-        val evento = repositorioEvento.save(eventoAtualizado)
-
-        return ResponseEntity.status(200).body(evento)
+    fun put(@PathVariable id: Int, @RequestBody eventoAtualizacaoRequest: EventoAtualizarRequest): ResponseEntity<Evento> {
+        val eventoAtualizado = eventoService.atualizarEvento(id, eventoAtualizacaoRequest)
+        return ResponseEntity.status(200).body(eventoAtualizado)
     }
 
+    // possivelmente irá para service
+    @Operation(
+        summary = "Atualizar data e horário do evento",
+        description = "Permite alterar somente o dia e os horários de início e fim do evento"
+    )
     @PatchMapping("/{id}")
     fun patchDiaHora(
         @PathVariable id: Int,
-        @RequestParam dia: LocalDate,
-        @RequestParam horaInicio: Time,
-        @RequestParam horaFim: Time
+        @RequestBody eventoAttDiaHoraRequest: EventoAttDiaHoraRequest
     ): ResponseEntity<Evento> {
-        if (!repositorioEvento.existsById(id)) {
-            return ResponseEntity.status(404).build()
-        }
+        val eventoAtualizado = eventoService.atualizarDiaHora(id, eventoAttDiaHoraRequest)
 
-        repositorioEvento.atualizarDiaHora(id, dia, horaInicio, horaFim)
-        val eventoEncontrado = repositorioEvento.findById(id).get()
-
-        return ResponseEntity.status(200).body(eventoEncontrado)
+        return ResponseEntity.status(200).body(eventoAtualizado)
     }
 
+    @Operation(
+        summary = "Buscar foto do evento",
+        description = "Retorna a imagem (foto) vinculada ao evento"
+    )
     @GetMapping(
         value = ["/foto/{id}"],
         produces = ["image/png", "image/jpeg", "image/jpg"]
@@ -93,7 +127,10 @@ class EventoJpaController(var repositorioEvento: EventoRepository) {
         return ResponseEntity.status(200).body(foto)
     }
 
-    // ENDPOINT de foto
+    @Operation(
+        summary = "Atualizar foto do evento",
+        description = "Altera apenas a imagem (foto) do evento"
+    )
     @PatchMapping("/foto/{id}")
     fun patchFoto(@PathVariable id: Int, @RequestBody foto: ByteArray): ResponseEntity<Evento> {
         if (!repositorioEvento.existsById(id)) {
