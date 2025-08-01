@@ -13,8 +13,7 @@ interface EnderecoRepository : JpaRepository<Endereco, Int> {
                 "WHERE u.id_usuario = :idUsuario",
         nativeQuery = true
     )
-    fun findEnderecoByUsuarioId(@Param("idUsuario") idUsuario: Int): Endereco?
-
+    fun findByUsuarioId(idUsuario: Int): Endereco?
 
     @Query(
         value = "SELECT e.* FROM endereco e " +
