@@ -1,7 +1,6 @@
 package com.api.mocuti.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -14,11 +13,9 @@ data class CanalComunicacao(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Column(name = "id_canal_comunicacao")
-    var id: Int? = null,
+    var idCanalComunicacao: Int,
 
     @field:NotBlank
     @field:Size(min = 2, max = 45)
-    var tipoCanalComunicacao: String? = null
-) {
-}
+    var tipoCanalComunicacao: String
+)
