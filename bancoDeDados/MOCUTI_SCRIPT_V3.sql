@@ -18,13 +18,13 @@ USE `mocuti` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mocuti`.`endereco` (
   `id_endereco` INT NOT NULL AUTO_INCREMENT,
-  `CEP` CHAR(8) NULL,
-  `logradouro` VARCHAR(125) NULL,
-  `numero` INT NULL,
+  `cep` VARCHAR(9) NOT NULL,
+  `logradouro` VARCHAR(125) NOT NULL,
+  `numero` INT NOT NULL,
   `complemento` VARCHAR(255) NULL,
-  `uf` CHAR(2) NULL,
-  `estado` VARCHAR(45) NULL,
-  `bairro` VARCHAR(125) NULL,
+  `uf` VARCHAR(2) NOT NULL,
+  `estado` VARCHAR(45) NOT NULL,
+  `bairro` VARCHAR(125) NOT NULL,
   PRIMARY KEY (`id_endereco`))
 ENGINE = InnoDB;
 
@@ -51,16 +51,18 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mocuti`.`usuario` (
   `id_usuario` INT NOT NULL AUTO_INCREMENT,
-  `nome_completo` VARCHAR(45) NULL,
-  `CPF` CHAR(14) NULL,
-  `telefone` CHAR(11) NULL,
-  `email` VARCHAR(45) NULL,
-  `dt_nasc` DATE NULL,
-  `genero` VARCHAR(45) NULL,
-  `senha` VARCHAR(14) NULL,
-  `is_ativo` TINYINT NULL,
+  `nome_completo` VARCHAR(125),
+  `CPF` CHAR(14),
+  `telefone` VARCHAR(15) NULL,
+  `email` VARCHAR(125),
+  `dt_nasc` DATE,
+  `etnia` VARCHAR(125),
+  `nacionalidade` VARCHAR(125),
+  `genero` VARCHAR(45),
+  `senha` VARCHAR(14),
+  `is_ativo` TINYINT,
   `dt_desativacao` DATE NULL,
-  `is_autenticado` TINYINT NULL,
+  `is_autenticado` boolean,
   `fk_endereco_usuario` INT NOT NULL,
   `fk_cargo_usuario` INT NOT NULL,
   `fk_canal_comunicacao_usuario` INT NOT NULL,
@@ -99,7 +101,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mocuti`.`publico_alvo` (
   `id_publico_alvo` INT NOT NULL AUTO_INCREMENT,
-  `tipo_publico` VARCHAR(45) NULL,
+  `tipo_publico` VARCHAR(45),
   PRIMARY KEY (`id_publico_alvo`))
 ENGINE = InnoDB;
 
@@ -118,12 +120,12 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mocuti`.`evento` (
   `id_evento` INT NOT NULL AUTO_INCREMENT,
-  `nome_evento` VARCHAR(45) NULL,
-  `descricao` VARCHAR(255) NULL,
-  `dia` DATE NULL,
-  `hora_inicio` TIME NULL,
-  `hora_fim` TIME NULL,
-  `is_aberto` TINYINT NULL,
+  `nome_evento` VARCHAR(125),
+  `descricao` VARCHAR(255),
+  `dia` DATE,
+  `hora_inicio` TIME,
+  `hora_fim` TIME,
+  `is_aberto` TINYINT,
   `qtd_vaga` INT NULL,
   `qtd_interessado` INT NULL,
   `foto` MEDIUMBLOB NULL,
@@ -162,9 +164,9 @@ ENGINE = InnoDB;
 -- Table `mocuti`.`status_inscricao`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mocuti`.`status_inscricao` (
-  `id_inscricao` INT NOT NULL AUTO_INCREMENT,
+  `id_status_inscricao` INT NOT NULL AUTO_INCREMENT,
   `tipo_inscricao` VARCHAR(45) NULL,
-  PRIMARY KEY (`id_inscricao`))
+  PRIMARY KEY (`id_status_inscricao`))
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
@@ -193,7 +195,7 @@ CREATE TABLE IF NOT EXISTS `mocuti`.`participacao` (
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_participacao_status_inscricao1`
     FOREIGN KEY (`fk_inscricao_participacao`)
-    REFERENCES `mocuti`.`status_inscricao` (`id_inscricao`)
+    REFERENCES `mocuti`.`status_inscricao` (`id_status_inscricao`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -268,7 +270,7 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- ------------------------------------------------------
 
 -- endereco
-INSERT INTO endereco (CEP, logradouro, numero, complemento, uf, estado, bairro) VALUES
+INSERT INTO endereco (cep, logradouro, numero, complemento, uf, estado, bairro) VALUES
 ('12345678', 'Rua A', 123, 'Apto 101', 'SP', 'São Paulo', 'Centro'),
 ('98765432', 'Rua B', 456, 'Apto 202', 'RJ', 'Rio de Janeiro', 'Copacabana');
 
@@ -285,16 +287,16 @@ INSERT INTO cargo (tipo_cargo) VALUES
 ('Moderador');
 
 -- usuario
-INSERT INTO usuario (nome_completo, CPF, telefone, email, dt_nasc, genero, senha, is_ativo, dt_desativacao,
+INSERT INTO usuario (nome_completo, CPF, telefone, email, dt_nasc, etnia, nacionalidade, genero, senha, is_ativo, dt_desativacao,
 is_autenticado,fk_cargo_usuario, fk_endereco_usuario, fk_canal_comunicacao_usuario) VALUES
 -- Mulheres
-('Beatriz Oliveira', '111.222.333-44', '71912345678', 'beatriz.oliveira@email.com', '1990-02-20', 'Feminino', 'senha015', TRUE, NULL, FALSE, 1, 1, 1),
-('Camila Santos', '222.333.444-55', '81987654321', 'camila.santos@email.com', '1994-08-15', 'Feminino', 'senha016', TRUE, NULL, FALSE, 2, 2, 2),
-('Juliana Costa', '333.444.555-66', '91998765432', 'juliana.costa@email.com', '1996-12-05', 'Feminino', 'senha017', TRUE, NULL, FALSE, 3, 2, 3),
+('Beatriz Oliveira', '111.222.333-44', '(71) 91234-5678', 'beatriz.oliveira@email.com', '1990-02-20', 'amarelo', 'Brasileiro', 'Prefiro não identificar', 'senha015', TRUE, NULL, FALSE, 1, 1, 1),
+('Camila Santos', '222.333.444-55', '(81) 98765-4321', 'camila.santos@email.com', '1994-08-15', 'Pardo', 'Boliviano', 'Feminino', 'senha016', TRUE, NULL, FALSE, 2, 2, 2),
+('Juliana Costa', '333.444.555-66', '(91) 99876-5432', 'juliana.costa@email.com', '1996-12-05', 'Indígena', 'Bransileiro','Feminino', 'senha017', TRUE, NULL, FALSE, 3, 2, 3),
 
 -- Homens
-('Lucas Almeida', '444.555.666-77', '61912346789', 'lucas.almeida@email.com', '1987-03-10', 'Masculino', 'senha018', TRUE, NULL, FALSE, 1, 1, 1),
-('Gabriel Souza', '555.666.777-88', '71987651234', 'gabriel.souza@email.com', '1992-06-25', 'Masculino', 'senha019', TRUE, NULL, FALSE, 2, 2, 2);
+('Lucas Almeida', '444.555.666-77', '(61) 91234 6789', 'lucas.almeida@email.com', '1987-03-10', 'Negro', 'Bransileiro', 'Masculino', 'senha018', TRUE, NULL, FALSE, 1, 1, 1),
+('Gabriel Souza', '555.666.777-88', '(71) 98765-1234', 'gabriel.souza@email.com', '1992-06-25', 'Branco', 'Bransileiro', 'Prefiro não identificar', 'senha019', TRUE, NULL, FALSE, 2, 2, 2);
 
 -- status_evento
 INSERT INTO status_evento (situacao) VALUES
@@ -356,4 +358,19 @@ INSERT INTO preferencia (fk_usuario_preferencia, fk_categoria_preferencia) VALUE
 (3, 4),
 (4, 2);
 
+SELECT id_usuario, nome_completo, id_cargo, tipo_cargo FROM usuario
+inner join cargo
+on fk_cargo_usuario = id_cargo
+where id_cargo = 1;
+
+
+select * from usuario;
+SELECT * FROM cargo;
+SELECT * FROM endereco;
+SELECT * FROM canal_comunicacao;
 SELECT * FROM categoria;
+SELECT * FROM publico_alvo;
+SELECT * FROM evento;
+SELECT * FROM status_evento;
+SELECT * FROM nota_feedback;
+SELECT * FROM feedback;
