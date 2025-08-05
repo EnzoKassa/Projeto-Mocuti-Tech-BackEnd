@@ -43,6 +43,9 @@ data class Evento(
     @field:PositiveOrZero
     var qtdInteressado: Int,
 
+    @field:NotNull
+    var publicoAlvo: String,
+
     @JsonIgnore
     @Column(length = 100 * 1024 * 1024)
     var foto: ByteArray? = null,
@@ -54,10 +57,6 @@ data class Evento(
     @ManyToOne
     @JoinColumn(name = "fk_status_evento")
     var statusEvento: StatusEvento,
-
-    @ManyToOne
-    @JoinColumn(name = "fk_publico_alvo_evento")
-    var publicoAlvoEvento: PublicoAlvo,
 
     @ManyToOne
     @JoinColumn(name = "fk_categoria_evento")

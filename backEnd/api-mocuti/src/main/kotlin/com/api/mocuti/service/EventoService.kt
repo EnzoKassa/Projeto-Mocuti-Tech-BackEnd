@@ -1,4 +1,5 @@
 import com.api.mocuti.dto.EventoAttDiaHoraRequest
+import com.api.mocuti.dto.EventoAtualizaStatusRequest
 import com.api.mocuti.dto.EventoAtualizarRequest
 import com.api.mocuti.dto.EventoCadastroRequest
 import com.api.mocuti.entity.Evento
@@ -10,7 +11,6 @@ class EventoService(
     val eventoRepository: EventoRepository,
     val enderecoRepository: EnderecoRepository,
     val statusEventoRepository: StatusEventoRepository,
-    val publicoAlvoRepository: PublicoAlvoRepository,
     val categoriaRepository: CategoriaRepository
 ) {
     fun criarEvento(dto: EventoCadastroRequest): Evento {
@@ -19,9 +19,6 @@ class EventoService(
 
         val status = statusEventoRepository.findById(dto.statusEventoId)
             .orElseThrow { IllegalArgumentException("Status não encontrado") }
-
-        val publicoAlvo = publicoAlvoRepository.findById(dto.publicoAlvoEventoId)
-            .orElseThrow { IllegalArgumentException("Público Alvo não encontrado") }
 
         val categoria = categoriaRepository.findById(dto.categoriaId)
             .orElseThrow { IllegalArgumentException("Categoria não encontrada") }
@@ -35,11 +32,11 @@ class EventoService(
             horaFim = dto.horaFim,
             isAberto = dto.isAberto,
             qtdVaga = dto.qtdVaga,
+            publicoAlvo = dto.publicoAlvo,
             qtdInteressado = dto.qtdInteressado,
             foto = ByteArray(0),
             endereco = endereco,
             statusEvento = status,
-            publicoAlvoEvento = publicoAlvo,
             categoria = categoria
         )
 
@@ -56,9 +53,6 @@ class EventoService(
         val status = statusEventoRepository.findById(dto.statusEventoId)
             .orElseThrow { IllegalArgumentException("Status não encontrado") }
 
-        val publicoAlvo = publicoAlvoRepository.findById(dto.publicoAlvoEventoId)
-            .orElseThrow { IllegalArgumentException("Público Alvo não encontrado") }
-
         val categoria = categoriaRepository.findById(dto.categoriaId)
             .orElseThrow { IllegalArgumentException("Categoria não encontrada") }
 
@@ -70,10 +64,10 @@ class EventoService(
         eventoExistente.horaFim = dto.horaFim
         eventoExistente.isAberto = dto.isAberto
         eventoExistente.qtdVaga = dto.qtdVaga
+        eventoExistente.publicoAlvo = dto.publicoAlvo
         eventoExistente.qtdInteressado = dto.qtdInteressado
         eventoExistente.endereco = endereco
         eventoExistente.statusEvento = status
-        eventoExistente.publicoAlvoEvento = publicoAlvo
         eventoExistente.categoria = categoria
 
         return eventoRepository.save(eventoExistente)
@@ -86,4 +80,16 @@ class EventoService(
         eventoRepository.atualizarDiaHora(id, dto.dia, dto.horaInicio, dto.horaFim)
         return eventoRepository.findById(id).get()
     }
+
+    fun atualizarStatusEvento(idEvento: Int, dto: EventoAtualizaStatusRequest): Evento {
+        val evento = eventoRepository.findById(idEvento)
+            .orElseThrow { NoSuchElementException("Evento com ID $idEvento não encontrado") }
+
+        val novoStatus = statusEventoRepository.findById(dto.idStatusEvento)
+            .orElseThrow { NoSuchElementException("StatusEvento com ID ${dto.idStatusEvento} não encontrado") }
+
+        evento.statusEvento = novoStatus
+        return eventoRepository.save(evento)
+    }
+
 }

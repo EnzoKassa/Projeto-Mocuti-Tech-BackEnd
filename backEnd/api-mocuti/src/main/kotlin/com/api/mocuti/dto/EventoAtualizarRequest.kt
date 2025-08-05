@@ -31,17 +31,18 @@ data class EventoAtualizarRequest(
     @field:PositiveOrZero
     val qtdVaga: Int,
 
+
     @field:PositiveOrZero
     val qtdInteressado: Int,
+
+    @field:NotNull
+    val publicoAlvo: String,
 
     @field:NotNull
     val enderecoId: Int,
 
     @field:NotNull
     val statusEventoId: Int,
-
-    @field:NotNull
-    val publicoAlvoEventoId: Int,
 
     @field:NotNull
     val categoriaId: Int

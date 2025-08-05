@@ -2,6 +2,7 @@ package com.api.mocuti.controller
 
 import EventoService
 import com.api.mocuti.dto.EventoAttDiaHoraRequest
+import com.api.mocuti.dto.EventoAtualizaStatusRequest
 import com.api.mocuti.dto.EventoAtualizarRequest
 import com.api.mocuti.dto.EventoCadastroRequest
 import com.api.mocuti.entity.Evento
@@ -20,13 +21,11 @@ class EventoJpaController(
     val repositorioEvento: EventoRepository,
     val enderecoRepository: EnderecoRepository,
     val statusEventoRepository: StatusEventoRepository,
-    val publicoAlvoRepository: PublicoAlvoRepository,
     val categoriaRepository: CategoriaRepository,
     val eventoService: EventoService = EventoService(
         repositorioEvento,
         enderecoRepository,
         statusEventoRepository,
-        publicoAlvoRepository,
         categoriaRepository
     )
 ) {
@@ -142,5 +141,18 @@ class EventoJpaController(
         repositorioEvento.save(fotoEvento)
 
         return ResponseEntity.status(200).body(fotoEvento)
+    }
+
+    @Operation(
+        summary = "Atualizar status do evento",
+        description = "Altera apenas o status (FK) de um evento"
+    )
+    @PatchMapping("/{id}/status")
+    fun patchStatusEvento(
+        @PathVariable id: Int,
+        @RequestBody dto: EventoAtualizaStatusRequest
+    ): ResponseEntity<Evento> {
+        val eventoAtualizado = eventoService.atualizarStatusEvento(id, dto)
+        return ResponseEntity.ok(eventoAtualizado)
     }
 }

@@ -11,9 +11,9 @@ data class EventoCadastroRequest(
     val horaFim: LocalTime,
     val isAberto: Boolean,
     val qtdVaga: Int,
+    val publicoAlvo: String,
     val qtdInteressado: Int,
     val enderecoId: Int,
     val statusEventoId: Int,
-    val publicoAlvoEventoId: Int,
     val categoriaId: Int
 )
