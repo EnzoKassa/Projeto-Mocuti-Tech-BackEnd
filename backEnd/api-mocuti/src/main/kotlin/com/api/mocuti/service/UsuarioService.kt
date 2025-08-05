@@ -6,6 +6,7 @@ import com.api.mocuti.dto.UsuarioRedefinirSenhaRequest
 import com.api.mocuti.entity.Usuario
 import com.api.mocuti.repository.*
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class UsuarioService(
@@ -92,4 +93,25 @@ class UsuarioService(
         usuario.senha = request.senha
         usuarioRepository.save(usuario)
     }
+
+    fun desativarUsuario(idUsuario: Int): Usuario {
+        val usuario = usuarioRepository.findById(idUsuario)
+            .orElseThrow { NoSuchElementException("Usuário com ID $idUsuario não encontrado") }
+
+        usuario.isAtivo = false
+        usuario.dtDesativacao = LocalDate.now()
+
+        return usuarioRepository.save(usuario)
+    }
+
+    fun ativarUsuario(idUsuario: Int): Usuario {
+        val usuario = usuarioRepository.findById(idUsuario)
+            .orElseThrow { NoSuchElementException("Usuário com ID $idUsuario não encontrado") }
+
+        usuario.isAtivo = true
+        usuario.dtDesativacao = null
+
+        return usuarioRepository.save(usuario)
+    }
+
 }

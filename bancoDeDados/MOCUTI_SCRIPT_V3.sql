@@ -92,17 +92,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mocuti`.`status_evento` (
   `id_status_evento` INT NOT NULL AUTO_INCREMENT,
-  `situacao` VARCHAR(45) NULL,
+  `situacao` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id_status_evento`))
-ENGINE = InnoDB;
-
--- -----------------------------------------------------
--- Table `mocuti`.`publico_alvo`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mocuti`.`publico_alvo` (
-  `id_publico_alvo` INT NOT NULL AUTO_INCREMENT,
-  `tipo_publico` VARCHAR(45),
-  PRIMARY KEY (`id_publico_alvo`))
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
@@ -128,15 +119,14 @@ CREATE TABLE IF NOT EXISTS `mocuti`.`evento` (
   `is_aberto` TINYINT,
   `qtd_vaga` INT NULL,
   `qtd_interessado` INT NULL,
+  `publico_alvo` VARCHAR(125) NOT NULL,
   `foto` MEDIUMBLOB NULL,
   `fk_endereco_evento` INT NOT NULL,
   `fk_status_evento` INT NOT NULL,
-  `fk_publico_alvo_evento` INT NOT NULL,
   `fk_categoria_evento` INT NOT NULL,
   PRIMARY KEY (`id_evento`),
   INDEX `fk_evento_endereco1_idx` (`fk_endereco_evento` ASC) VISIBLE,
   INDEX `fk_evento_status_evento1_idx` (`fk_status_evento` ASC) VISIBLE,
-  INDEX `fk_evento_publico_alvo1_idx` (`fk_publico_alvo_evento` ASC) VISIBLE,
   INDEX `fk_evento_categoria1_idx` (`fk_categoria_evento` ASC) VISIBLE,
   CONSTRAINT `fk_evento_endereco1`
     FOREIGN KEY (`fk_endereco_evento`)
@@ -146,11 +136,6 @@ CREATE TABLE IF NOT EXISTS `mocuti`.`evento` (
   CONSTRAINT `fk_evento_status_evento1`
     FOREIGN KEY (`fk_status_evento`)
     REFERENCES `mocuti`.`status_evento` (`id_status_evento`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_evento_publico_alvo1`
-    FOREIGN KEY (`fk_publico_alvo_evento`)
-    REFERENCES `mocuti`.`publico_alvo` (`id_publico_alvo`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_evento_categoria1`
@@ -304,13 +289,6 @@ INSERT INTO status_evento (situacao) VALUES
 ('Encerrado'),
 ('Em andamento');
 
--- publico_alvo
-INSERT INTO publico_alvo (tipo_publico) VALUES
-('Crianças'),
-('Adolescentes'),
-('Adultos'),
-('Idosos');
-
 -- categoria
 INSERT INTO categoria (nome, descricao) VALUES
 ('Palestra', 'Palestras tematicas com power point'),
@@ -320,10 +298,10 @@ INSERT INTO categoria (nome, descricao) VALUES
 
 -- evento
 INSERT INTO evento (nome_evento, descricao, dia, hora_inicio, hora_fim, is_aberto, qtd_vaga,
- qtd_interessado, foto, fk_endereco_evento, fk_status_evento, fk_publico_alvo_evento, fk_categoria_evento) VALUES
-('Oficina de Pintura', 'Aprenda técnicas básicas de pintura.', '2025-06-15', '14:00:00', '17:00:00', 1, 30, 10, NULL, 1, 1, 1, 1),
-('Torneio de Futsal', 'Competição entre equipes locais.', '2025-06-20', '09:00:00', '12:00:00', 1, 20, 5, NULL, 2, 1, 2, 2),
-('Palestra sobre Meio Ambiente', 'Discussão sobre sustentabilidade.', '2025-07-10', '10:00:00', '12:00:00', 1, 50, 20, NULL, 2, 1, 3, 3);
+ qtd_interessado, publico_alvo, foto, fk_endereco_evento, fk_status_evento, fk_publico_alvo_evento, fk_categoria_evento) VALUES
+('Oficina de Pintura', 'Aprenda técnicas básicas de pintura.', '2025-06-15', '14:00:00', '17:00:00', 1, 30, 10, 'Jovens', NULL, 1, 1, 1, 1),
+('Torneio de Futsal', 'Competição entre equipes locais.', '2025-06-20', '09:00:00', '12:00:00', 1, 20, 5 , 'Crianças', NULL, 2, 1, 2, 2),
+('Palestra sobre Meio Ambiente', 'Discussão sobre sustentabilidade.', '2025-07-10', '10:00:00', '12:00:00', 1, 50, 20, 'Mulheres Negras', NULL, 2, 1, 3, 3);
 
 -- status_inscricao
 INSERT INTO status_inscricao (tipo_inscricao) VALUES

@@ -130,5 +130,26 @@ class UsuarioJpaController(
         usuarioService.redefinirSenha(idUsuario, request)
         return ResponseEntity.status(200).build()
     }
+
+    @Operation(
+        summary = "Desativar usuário",
+        description = "Define isAtivo como false e define a data de desativação para hoje"
+    )
+    @PatchMapping("/desativar/{idUsuario}")
+    fun desativarUsuario(@PathVariable idUsuario: Int): ResponseEntity<Usuario> {
+        val usuarioAtualizado = usuarioService.desativarUsuario(idUsuario)
+        return ResponseEntity.status(200).body(usuarioAtualizado)
+    }
+
+    @Operation(
+        summary = "Ativar usuário",
+        description = "Define isAtivo como true e limpa a data de desativação"
+    )
+    @PatchMapping("/ativar/{idUsuario}")
+    fun ativarUsuario(@PathVariable idUsuario: Int): ResponseEntity<Usuario> {
+        val usuarioAtualizado = usuarioService.ativarUsuario(idUsuario)
+        return ResponseEntity.status(200).body(usuarioAtualizado)
+    }
+
 }
 
