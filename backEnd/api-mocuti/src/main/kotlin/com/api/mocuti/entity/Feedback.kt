@@ -1,7 +1,9 @@
 package com.api.mocuti.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
+import java.time.LocalDate
 
 @Entity
 data class Feedback(
@@ -11,6 +13,9 @@ data class Feedback(
     var idFeedback: Int,
 
     var comentario: String? = null,
+
+    @JsonIgnore
+    var data_feedback: LocalDate = LocalDate.now(),
 
     @ManyToOne
     @JoinColumn(name = "fk_nota_feedback")

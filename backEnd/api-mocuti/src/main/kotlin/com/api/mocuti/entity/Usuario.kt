@@ -51,6 +51,9 @@ data class Usuario(
     var isAtivo: Boolean = true,
 
     @JsonIgnore
+    var dtCadastro: LocalDate = LocalDate.now(),
+
+    @JsonIgnore
     var dtDesativacao: LocalDate? = null,
 
     @ManyToOne

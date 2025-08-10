@@ -115,7 +115,7 @@ class FeedbackServiceTest {
 
         `when`(eventoRepository.findById(1)).thenReturn(Optional.of(evento))
         `when`(usuarioRepository.findById(1)).thenReturn(Optional.of(usuario))
-        val feedbackSalvo = Feedback(1, "Muito bom", null, evento, usuario)
+        val feedbackSalvo = Feedback(1, "Muito bom", LocalDate.now(), null, evento, usuario)
         `when`(feedbackRepository.save(any(Feedback::class.java))).thenReturn(feedbackSalvo)
 
         val result = service.criar(request)
@@ -153,12 +153,12 @@ class FeedbackServiceTest {
 
     @Test
     fun `atualizar deve alterar comentario e nota`() {
-        val feedbackExistente = Feedback(1, "Antigo", null, evento, usuario)
+        val feedbackExistente = Feedback(1, "Antigo", LocalDate.now(),null, evento, usuario)
         val dto = FeedbackAtualizarRequest(comentario = "Novo comentário", idNota = 1)
 
         `when`(feedbackRepository.findById(1)).thenReturn(Optional.of(feedbackExistente))
         `when`(notaRepository.findById(1)).thenReturn(Optional.of(nota))
-        val feedbackSalvo = Feedback(1, "Novo comentário", nota, evento, usuario)
+        val feedbackSalvo = Feedback(1, "Novo comentário", LocalDate.now(),  nota, evento, usuario)
         `when`(feedbackRepository.save(any(Feedback::class.java))).thenReturn(feedbackSalvo)
 
         val result = service.atualizar(1, dto)
@@ -170,7 +170,7 @@ class FeedbackServiceTest {
 
     @Test
     fun `atualizar deve alterar apenas comentario se idNota for null`() {
-        val feedbackExistente = Feedback(1, "Antigo", null, evento, usuario)
+        val feedbackExistente = Feedback(1, "Antigo", LocalDate.now(), null, evento, usuario)
         val dto = FeedbackAtualizarRequest(comentario = "Apenas comentário", idNota = null)
 
         `when`(feedbackRepository.findById(1)).thenReturn(Optional.of(feedbackExistente))
@@ -198,7 +198,7 @@ class FeedbackServiceTest {
 
     @Test
     fun `atualizar deve lançar exceção se nota não encontrada`() {
-        val feedbackExistente = Feedback(1, "Antigo", null, evento, usuario)
+        val feedbackExistente = Feedback(1, "Antigo", LocalDate.now(), null, evento, usuario)
         val dto = FeedbackAtualizarRequest("Comentário", 1)
 
         `when`(feedbackRepository.findById(1)).thenReturn(Optional.of(feedbackExistente))
