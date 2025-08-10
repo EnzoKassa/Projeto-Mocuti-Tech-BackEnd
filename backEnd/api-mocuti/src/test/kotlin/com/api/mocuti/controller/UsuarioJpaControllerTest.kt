@@ -1,28 +1,31 @@
 import com.api.mocuti.controller.UsuarioJpaController
-import com.api.mocuti.entity.CanalComunicacao
+import com.api.mocuti.dto.*
+import com.api.mocuti.entity.*
+import com.api.mocuti.repository.*
+import com.api.mocuti.service.UsuarioService
 import org.junit.jupiter.api.Assertions.*
-import com.api.mocuti.repository.UsuarioRepository
-import org.junit.jupiter.api.Test
-import org.springframework.http.HttpStatus
-import com.api.mocuti.entity.Usuario
-import com.api.mocuti.entity.Cargo
-import com.api.mocuti.entity.Endereco
-import com.api.mocuti.repository.CanalComunicacaoRepository
-import com.api.mocuti.repository.CargoRepository
-import com.api.mocuti.repository.EnderecoRepository
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
+import org.springframework.http.HttpStatus
 import java.time.LocalDate
-import java.util.Optional
-
+import java.util.*
 
 class UsuarioJpaControllerTest {
+
     private val repositorio: UsuarioRepository = mock(UsuarioRepository::class.java)
     private val cargoRepository: CargoRepository = mock(CargoRepository::class.java)
     private val enderecoRepository: EnderecoRepository = mock(EnderecoRepository::class.java)
     private val canalComunicacaoRepository: CanalComunicacaoRepository = mock(CanalComunicacaoRepository::class.java)
-    private val controller =
-        UsuarioJpaController(repositorio, cargoRepository, enderecoRepository, canalComunicacaoRepository)
+    private val usuarioService: UsuarioService = mock(UsuarioService::class.java)
+
+    private val controller = UsuarioJpaController(
+        repositorio,
+        cargoRepository,
+        enderecoRepository,
+        canalComunicacaoRepository,
+        usuarioService
+    )
 
     private lateinit var cargoTeste: Cargo
     private lateinit var enderecoTeste: Endereco
@@ -31,35 +34,27 @@ class UsuarioJpaControllerTest {
 
     @BeforeEach
     fun setup() {
-
-        cargoTeste = Cargo(
-            id_cargo = 1,
-            tipoCargo = "Administrador"
-        )
-
+        cargoTeste = Cargo(idCargo = 1, tipoCargo = "Administrador")
         enderecoTeste = Endereco(
             idEndereco = 1,
-            CEP = "12345678",
+            cep = "12345678",
             logradouro = "Rua das Flores",
             numero = 123,
             complemento = "Apto 45",
-            UF = "SP",
+            uf = "SP",
             estado = "São Paulo",
             bairro = "Centro"
         )
-
-        comunicacaoTeste = CanalComunicacao(
-            id = 1,
-            tipoCanalComunicacao = "Email"
-        )
-
+        comunicacaoTeste = CanalComunicacao(idCanalComunicacao = 1, tipoCanalComunicacao = "Email")
         usuarioTeste = Usuario(
             idUsuario = 1,
             nomeCompleto = "Teste",
             cpf = "123.456.789-00",
-            telefone = "99999-9999",
+            telefone = "(11) 99999-9999",
             email = "teste@email.com",
             dt_nasc = LocalDate.of(1990, 1, 1),
+            etnia = "Branco",
+            nacionalidade = "Brasileira",
             genero = "Masculino",
             senha = "senha123",
             isAutenticado = false,
@@ -68,14 +63,11 @@ class UsuarioJpaControllerTest {
             cargo = cargoTeste,
             endereco = enderecoTeste,
             canalComunicacao = comunicacaoTeste
-
         )
     }
 
     @Test
     fun `deve listar todos os usuarios`() {
-        // Cenário 1: Listar todos os usuários cadastrados.
-
         `when`(repositorio.findAll()).thenReturn(listOf(usuarioTeste))
 
         val response = controller.listarTodos()
@@ -86,22 +78,21 @@ class UsuarioJpaControllerTest {
 
     @Test
     fun `deve retornar usuarios quando cargo existe e possui usuarios`() {
-        `when`(cargoRepository.findById(cargoTeste.id_cargo)).thenReturn(Optional.of(cargoTeste))
+        `when`(cargoRepository.findById(cargoTeste.idCargo)).thenReturn(Optional.of(cargoTeste))
         `when`(repositorio.findByCargo(cargoTeste)).thenReturn(listOf(usuarioTeste))
 
-        val response = controller.listarPorCargo(cargoTeste.id_cargo)
+        val response = controller.listarPorCargo(cargoTeste.idCargo)
 
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(listOf(usuarioTeste), response.body)
     }
 
-
     @Test
     fun `deve retornar no content quando cargo existe mas nao possui usuarios`() {
-        `when`(cargoRepository.findById(cargoTeste.id_cargo)).thenReturn(Optional.of(cargoTeste))
+        `when`(cargoRepository.findById(cargoTeste.idCargo)).thenReturn(Optional.of(cargoTeste))
         `when`(repositorio.findByCargo(cargoTeste)).thenReturn(emptyList())
 
-        val response = controller.listarPorCargo(cargoTeste.id_cargo)
+        val response = controller.listarPorCargo(cargoTeste.idCargo)
 
         assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
         assertNull(response.body)
@@ -115,85 +106,84 @@ class UsuarioJpaControllerTest {
         val response = controller.listarPorCargo(idCargoInexistente)
 
         assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertEquals(null, response.body)
-    }
-
-    @Test
-    fun `deve retornar erro ao listar usuarios por cargo inexistente`() {
-        val idCargoInexistente = 999
-        `when`(cargoRepository.findById(idCargoInexistente)).thenReturn(Optional.empty())
-
-        val response = controller.listarPorCargo(idCargoInexistente)
-
-        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertEquals(null, response.body)
+        assertNull(response.body)
     }
 
     @Test
     fun `deve cadastrar usuario com sucesso`() {
-        // Cenário 4: Cadastrar um novo usuário com dados válidos.
+        val request = UsuarioCadastroRequest(
+            nomeCompleto = "Teste",
+            cpf = "123.456.789-00",
+            telefone = "(11) 99999-9999",
+            email = "teste@email.com",
+            dataNascimento = LocalDate.of(1990, 1, 1),
+            etnia = "Branco",
+            nacionalidade = "Brasileira",
+            genero = "Masculino",
+            senha = "senha123",
+            cargo = 1,
+            endereco = 1,
+            canalComunicacao = 1
+        )
 
-        `when`(repositorio.existsByEmail(usuarioTeste.email)).thenReturn(false)
-        `when`(repositorio.existsByCpf(usuarioTeste.cpf)).thenReturn(false)
-        `when`(repositorio.save(usuarioTeste)).thenReturn(usuarioTeste)
+        `when`(usuarioService.cadastrarUsuario(request)).thenReturn(usuarioTeste)
 
-        val response = controller.cadastrar(usuarioTeste)
+        val response = controller.cadastrar(request)
 
         assertEquals(HttpStatus.CREATED, response.statusCode)
         assertEquals(usuarioTeste, response.body)
     }
 
     @Test
-    fun `deve retornar erro ao cadastrar usuario com email ja cadastrado`() {
-        // Cenário 5: Tentar cadastrar um usuário com e-mail já existente.
-
-        `when`(repositorio.existsByEmail(usuarioTeste.email)).thenReturn(true)
-
-        val response = controller.cadastrar(usuarioTeste)
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertEquals(null, response.body)
-    }
-
-    @Test
     fun `deve redefinir senha com sucesso`() {
-        // Cenário 6: Redefinir a senha de um usuário existente.
-        val usuarioComSenhaAntiga = usuarioTeste.copy(senha = "senhaAntiga")
-        val novaSenha = mapOf("senha" to "novaSenha123")
+        val request = UsuarioRedefinirSenhaRequest(senha = "novaSenha123")
 
-        `when`(repositorio.findById(usuarioTeste.idUsuario)).thenReturn(Optional.of(usuarioTeste))
-        `when`(repositorio.save(any())).thenReturn(usuarioTeste)
+        doNothing().`when`(usuarioService).redefinirSenha(usuarioTeste.idUsuario, request)
 
-        val response = controller.redefinirSenha(usuarioTeste.idUsuario, novaSenha)
+        val response = controller.redefinirSenha(usuarioTeste.idUsuario, request)
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals("Senha redefinida com sucesso", response.body)
-        assertEquals("novaSenha123", usuarioTeste.senha)
     }
 
     @Test
-    fun `deve retornar erro ao redefinir senha sem fornecer nova senha`() {
-        // Cenário 7: Tentar redefinir a senha sem fornecer a nova senha.
+    fun `deve logar com sucesso`() {
+        val loginRequest = UsuarioLoginRequest(email = "teste@email.com", senha = "senha123")
+        `when`(usuarioService.autenticarUsuario(loginRequest)).thenReturn(usuarioTeste)
 
-        `when`(repositorio.findById(usuarioTeste.idUsuario)).thenReturn(Optional.of(usuarioTeste))
+        val response = controller.logar(loginRequest)
 
-        val response = controller.redefinirSenha(usuarioTeste.idUsuario, emptyMap())
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
-        assertEquals("Senha não fornecida", response.body)
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(usuarioTeste, response.body)
     }
 
     @Test
-    fun `deve retornar erro ao redefinir senha de usuario nao encontrado`() {
-        // Cenário 8: Tentar redefinir a senha de um usuário inexistente.
-        val idUsuario = 99
-        val novaSenha = mapOf("senha" to "novaSenha123")
+    fun `deve deslogar com sucesso`() {
+        val loginRequest = UsuarioLoginRequest(email = "teste@email.com", senha = "senha123")
+        `when`(usuarioService.desautenticarUsuario(loginRequest)).thenReturn(usuarioTeste)
 
-        `when`(repositorio.findById(idUsuario)).thenReturn(Optional.empty())
+        val response = controller.deslogar(loginRequest)
 
-        val response = controller.redefinirSenha(idUsuario, novaSenha)
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(usuarioTeste, response.body)
+    }
 
-        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertEquals("Usuário não encontrado", response.body)
+    @Test
+    fun `deve desativar usuario com sucesso`() {
+        `when`(usuarioService.desativarUsuario(usuarioTeste.idUsuario)).thenReturn(usuarioTeste)
+
+        val response = controller.desativarUsuario(usuarioTeste.idUsuario)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(usuarioTeste, response.body)
+    }
+
+    @Test
+    fun `deve ativar usuario com sucesso`() {
+        `when`(usuarioService.ativarUsuario(usuarioTeste.idUsuario)).thenReturn(usuarioTeste)
+
+        val response = controller.ativarUsuario(usuarioTeste.idUsuario)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals(usuarioTeste, response.body)
     }
 }
