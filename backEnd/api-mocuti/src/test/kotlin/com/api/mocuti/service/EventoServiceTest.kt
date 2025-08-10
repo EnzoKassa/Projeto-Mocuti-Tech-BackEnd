@@ -138,7 +138,7 @@ class EventoServiceTest {
 
         val result = service.atualizarStatusEvento(1, dto)
 
-        assertEquals("Finalizado", result.statusEvento.idStatusEvento)
+        assertEquals(2, result.statusEvento.idStatusEvento)
     }
 
     @Test
