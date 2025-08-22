@@ -52,14 +52,14 @@
 	CREATE TABLE IF NOT EXISTS `mocuti`.`usuario` (
 	  `id_usuario` INT NOT NULL AUTO_INCREMENT,
 	  `nome_completo` VARCHAR(125),
-	  `CPF` CHAR(14),
+	  `CPF` VARCHAR(14) NULL,
 	  `telefone` VARCHAR(15) NULL,
 	  `email` VARCHAR(125),
 	  `dt_nasc` DATE,
 	  `etnia` VARCHAR(125),
 	  `nacionalidade` VARCHAR(125),
 	  `genero` VARCHAR(45),
-	  `senha` VARCHAR(14),
+	  `senha` VARCHAR(18),
 	  `is_ativo` TINYINT,
 	  `dt_cadastro`DATE NOT NULL,
 	  `dt_desativacao` DATE NULL,
@@ -358,6 +358,7 @@
 	-- 1. Visão Geral de Usuários OK
 	CREATE OR REPLACE VIEW visao_geral_usuarios AS
 	SELECT
+	1 AS id, -- ID fixo só para JPA
 	  (SELECT COUNT(*) FROM usuario WHERE is_ativo = 1) AS total_usuarios_ativos,
 	  (SELECT COUNT(*) FROM usuario WHERE is_ativo = 0) AS total_usuarios_inativos,
 	  (SELECT COUNT(*) FROM usuario u 

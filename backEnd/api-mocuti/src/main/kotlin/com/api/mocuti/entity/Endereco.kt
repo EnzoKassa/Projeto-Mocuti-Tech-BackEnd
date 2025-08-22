@@ -5,10 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Size
+import jakarta.validation.constraints.*
 
 @Entity
 data class Endereco(
@@ -19,6 +16,7 @@ data class Endereco(
 
     @field:NotNull
     @field:Size(min = 8, max = 9)
+    @field:Pattern(regexp = "\\d{5}-\\d{3}") // CPF format: 000000-000
     var cep: String,
 
     var logradouro: String,

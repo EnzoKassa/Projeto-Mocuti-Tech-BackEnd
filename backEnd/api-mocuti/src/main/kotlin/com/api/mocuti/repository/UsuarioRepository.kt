@@ -1,36 +1,24 @@
-package com.api.mocuti.repository
+    package com.api.mocuti.repository
 
-import com.api.mocuti.entity.Cargo
-import com.api.mocuti.entity.Usuario
-import jakarta.transaction.Transactional
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Modifying
-import org.springframework.data.jpa.repository.Query
+    import com.api.mocuti.entity.Cargo
+    import com.api.mocuti.entity.Usuario
+    import org.springframework.data.jpa.repository.JpaRepository
+    import org.springframework.data.jpa.repository.Query
 
-interface UsuarioRepository : JpaRepository<Usuario, Int> {
+    interface UsuarioRepository : JpaRepository<Usuario, Int> {
 
-    override fun findAll(): List<Usuario>
+        override fun findAll(): List<Usuario>
 
-    fun findByEmailAndSenha(email: String, senha: String): Usuario?
+        fun existsByEmail(email: String): Boolean
 
-    fun existsByEmail(email: String): Boolean
+        fun findByEmail(email: String): Usuario?
 
-    fun findByEmail(email: String): Usuario?
+        @Query("select count(u) from Usuario u where u.isAtivo = ?1")
+        fun countByIsAtivo(isAtivo: Boolean): Long
 
-    @Transactional
-    @Modifying
-    @Query("update Usuario u set u.isAtivo = false, u.dtDesativacao = current_date where u.idUsuario = ?1")
-    fun desativarUsuario(idUsuario: Int): Int
+        @Query("select u from Usuario u where u.cargo = ?1")
+        fun findByCargo(cargo: Cargo): List<Usuario>
 
-    @Query("select count(u) from Usuario u where u.isAtivo = ?1")
-    fun countByIsAtivo(isAtivo: Boolean): Long
-
-    @Query("select u from Usuario u where u.cargo = ?1")
-    fun findByCargo(cargo: Cargo): List<Usuario>
-
-    @Query("select count(u) > 0 from Usuario u where u.cpf = ?1")
-    fun existsByCpf(cpf: String): Boolean
-
-    @Query("select u.genero, count(u) from Usuario u where u.genero in ('Masculino', 'Feminino') group by u.genero")
-    fun countByGenero(string: String): List<Array<Any>>
-}
+        @Query("select count(u) > 0 from Usuario u where u.cpf = ?1")
+        fun existsByCpf(cpf: String): Boolean
+    }

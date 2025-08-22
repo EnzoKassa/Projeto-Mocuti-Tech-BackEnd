@@ -14,10 +14,8 @@ data class Usuario(
     @field:NotBlank @field:Size(max = 125)
     var nomeCompleto: String,
 
-    @field:NotNull
-    @field:Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}") // CPF format: XXX.XXX.XXX-XX
-    @Column(columnDefinition = "char(14)")
-    var cpf: String,
+    @field:Size(max = 14)
+    var cpf: String? = null,
 
     @field:Pattern(regexp = "\\(\\d{2}\\) \\d{4,5}-\\d{4}") // Phone format: (XX) XXXX-XXXX or (XX) XXXXX-XXXX
     @field:Size(min = 11, max = 15)
@@ -40,7 +38,7 @@ data class Usuario(
     var genero: String,
 
     @field:NotBlank
-    @field:Size(max = 14)
+    @field:Size(min = 8, max = 18)
     var senha: String,
 
     @JsonIgnore
