@@ -16,8 +16,6 @@ import jakarta.validation.Valid
 class UsuarioJpaController(
     val repositorio: UsuarioRepository,
     val cargoRepository: CargoRepository,
-    val enderecoRepository: EnderecoRepository,
-    val canalComunicacaoRepository: CanalComunicacaoRepository,
     val usuarioService: UsuarioService
 ) {
 

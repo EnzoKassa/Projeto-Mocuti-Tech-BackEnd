@@ -34,11 +34,10 @@ class UsuarioService(
                 .orElseThrow { IllegalArgumentException("Cargo não encontrado") }
         }
 
-        val endereco = enderecoRepository.findById(request.endereco)
-            .orElseThrow { IllegalArgumentException("Endereço não encontrado") }
-
         val canalComunicacao = canalComunicacaoRepository.findById(request.canalComunicacao)
             .orElseThrow { IllegalArgumentException("Canal de comunicação não encontrado") }
+
+        val endereco = enderecoRepository.save(request.endereco)
 
         val novoUsuario = Usuario(
             idUsuario = 0,
