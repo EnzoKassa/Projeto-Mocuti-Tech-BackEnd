@@ -358,7 +358,6 @@
 	-- 1. Visão Geral de Usuários OK
 	CREATE OR REPLACE VIEW visao_geral_usuarios AS
 	SELECT
-	1 AS id, -- ID fixo só para JPA
 	  (SELECT COUNT(*) FROM usuario WHERE is_ativo = 1) AS total_usuarios_ativos,
 	  (SELECT COUNT(*) FROM usuario WHERE is_ativo = 0) AS total_usuarios_inativos,
 	  (SELECT COUNT(*) FROM usuario u 
@@ -378,9 +377,12 @@
 		WHERE u.is_ativo = 1 AND c.tipo_cargo = 'Participante') AS total_beneficiarios_ativos,
 	  (SELECT COUNT(*) FROM usuario u
 		JOIN cargo c ON u.fk_cargo_usuario = c.id_cargo
-		WHERE u.is_ativo = 0 AND c.tipo_cargo = 'Participante') AS total_beneficiarios_inativos;
+		WHERE u.is_ativo = 0 AND c.tipo_cargo = 'Participante') AS total_beneficiarios_inativos;	
+        
+        select * from visao_geral_usuarios;
 
-	-- 2. Rank Categoria OK
+	
+    -- 2. Rank Categoria OK
 	CREATE OR REPLACE VIEW rank_categoria AS
 	SELECT c.id_categoria, c.nome, c.descricao, COUNT(p.id_preferencia) AS total_votos
 	FROM categoria c
@@ -397,7 +399,9 @@
 	LEFT JOIN feedback f ON f.fk_evento_feedback = e.id_evento
 	LEFT JOIN nota_feedback nf ON nf.id_nota_feedback = f.fk_nota_feedback
 	GROUP BY ce.nome;
-
+    
+    select * from rank_categoria;
+    
 -- 4. Feedback por Categoria no Mês Atual
 CREATE OR REPLACE VIEW feedback_categoria_mes_atual AS
 SELECT c.nome AS categoria, COUNT(CASE WHEN nf.tipo_nota = 'like' THEN 1 END) AS qtd_positivos,
