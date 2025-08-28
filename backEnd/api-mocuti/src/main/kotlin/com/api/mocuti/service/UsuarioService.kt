@@ -115,4 +115,16 @@ class UsuarioService(
     fun getVisaoGeralUsuarios(): VisaoGeralUsuariosRequest {
         return usuarioRepository.buscarVisaoGeralUsuarios()
     }
+
+    fun getIncricoesMesDuranteAno(): List<InscricoesMesDuranteAnoRequest> {
+        return usuarioRepository.getInscricoesMesDuranteAno()
+    }
+
+    fun getPublicoAlvoGenero(): List<PublicoAlvoGeneroRequest> {
+        return usuarioRepository.getPublicoAlvoGenero()
+    }
+
+    fun getFaixaEtariaUsuariosAtivos(): List<FaixaEtariaUsuariosAtivosRequest> {
+        return usuarioRepository.getFaixaEtariaUsuariosAtivos()
+    }
 }

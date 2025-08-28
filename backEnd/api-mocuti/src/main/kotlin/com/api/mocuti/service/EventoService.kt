@@ -1,7 +1,4 @@
-import com.api.mocuti.dto.EventoAttDiaHoraRequest
-import com.api.mocuti.dto.EventoAtualizaStatusRequest
-import com.api.mocuti.dto.EventoAtualizarRequest
-import com.api.mocuti.dto.EventoCadastroRequest
+import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.repository.*
 import org.springframework.stereotype.Service
@@ -92,4 +89,11 @@ class EventoService(
         return eventoRepository.save(evento)
     }
 
+    fun getEventosUsuario(): List<EventosUsuariosRequest> {
+        return eventoRepository.getEventosUsuario()
+    }
+
+    fun getEventosUsuarioId(idUsuario: Int): EventosUsuariosRequest {
+        return eventoRepository.getEventosUsuarioPorId(idUsuario = idUsuario)
+    }
 }

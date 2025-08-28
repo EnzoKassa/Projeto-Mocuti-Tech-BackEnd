@@ -1,7 +1,6 @@
 package com.api.mocuti.controller
 
-import com.api.mocuti.dto.FeedbackAtualizarRequest
-import com.api.mocuti.dto.FeedbackNovoRequest
+import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Feedback
 import com.api.mocuti.repository.EventoRepository
 import org.springframework.http.ResponseEntity
@@ -91,5 +90,35 @@ class FeedbackJpaController(
     ): ResponseEntity<Feedback> {
         val feedback = feedbackService.atualizar(id, feedbackAtualizado)
         return ResponseEntity.ok(feedback)
+    }
+
+    @Operation(
+        summary = "Feedbacks por categoria",
+        description = "Quantidade de feedbacks agrupados por categoria"
+    )
+    @GetMapping("/view/feedbacks-por-categoria")
+    fun getFeedbackCategoria(): ResponseEntity<List<FeedbacksPorCategoriaRequest>> {
+        val feedback = feedbackService.getFeedbackPorCategoria()
+        return ResponseEntity.status(200).body(feedback)
+    }
+
+    @Operation(
+        summary = "Feedbacks por categoria no mês atual",
+        description = "Quantidade de feedbacks agrupados por categoria do mês atual"
+    )
+    @GetMapping("/view/feedback-categoria-mes-atual")
+    fun getFeedbackCategoriaMesAtual(): ResponseEntity<List<FeedbackCategoriaMesAtualRequest>> {
+        val feedback = feedbackService.getFeedbackCategoriaMesAtual()
+        return ResponseEntity.status(200).body(feedback)
+    }
+
+    @Operation(
+        summary = "Feedbacks por evento",
+        description = "Quantidade de feedbacks agrupados por evento"
+    )
+    @GetMapping("/view/feedback-evento")
+    fun getFeedbackEvento(): ResponseEntity<List<FeedbackEventoRequest>> {
+        val feedback = feedbackService.getFeedbackEvento()
+        return ResponseEntity.status(200).body(feedback)
     }
 }

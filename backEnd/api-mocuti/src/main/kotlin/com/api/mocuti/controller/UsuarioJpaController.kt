@@ -155,11 +155,43 @@ class UsuarioJpaController(
         summary = "Listar todos os tipos de Usuários e se estão ativos ou inativos",
         description = "Retorna uma lista todos os tipos de Usuários e se estão ativos ou inativos"
     )
-    @GetMapping("/view/visaoGeral")
+    @GetMapping("/view/visao-geral")
     fun get(): ResponseEntity<VisaoGeralUsuariosRequest> {
         val visaoGeral = usuarioService.getVisaoGeralUsuarios()
 
         return ResponseEntity.status(200).body(visaoGeral)
+    }
+
+    @Operation(
+        summary = "Listar todas as inscrições por mês durante o ano",
+        description = "Retorna uma lista com todas as inscrições por mês durante o ano"
+    )
+    @GetMapping("/view/inscricoes-mes-durante-ano")
+    fun getInscricoes(): ResponseEntity<List<InscricoesMesDuranteAnoRequest>> {
+        val inscricao = usuarioService.getIncricoesMesDuranteAno()
+
+        return ResponseEntity.status(200).body(inscricao)
+    }
+
+    @Operation(
+        summary = "Listar público alvo por gênero",
+        description = "Retorna uma lista com o público alvo por gênero"
+    )
+    @GetMapping("/view/publico-alvo-genero")
+    fun getPublicoAlvo(): ResponseEntity<List<PublicoAlvoGeneroRequest>> {
+        val publicoAlvo = usuarioService.getPublicoAlvoGenero()
+
+        return ResponseEntity.status(200).body(publicoAlvo)
+    }
+
+    @Operation(
+        summary = "Listar faixa etária dos usuários ativos",
+        description = "Retorna uma lista com a faixa etária dos usuários ativos"
+    )
+    @GetMapping("/view/faixa-etaria-usuarios-ativos")
+    fun getFaixaEtariaUsuariosAtivos(): ResponseEntity<List<FaixaEtariaUsuariosAtivosRequest>> {
+        val faixaEtaria = usuarioService.getFaixaEtariaUsuariosAtivos()
+        return ResponseEntity.status(200).body(faixaEtaria)
     }
 }
 

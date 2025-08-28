@@ -1,6 +1,6 @@
 package com.api.mocuti.repository
 
-import com.api.mocuti.dto.VisaoGeralUsuariosRequest
+import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Cargo
 import com.api.mocuti.entity.Usuario
 import org.springframework.data.jpa.repository.JpaRepository
@@ -26,5 +26,21 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
     @Query(value = "SELECT * FROM visao_geral_usuarios", nativeQuery = true)
     fun buscarVisaoGeralUsuarios(): VisaoGeralUsuariosRequest
 
+    @Query(
+        value = "SELECT * FROM inscricoes_mes_durante_ano",
+        nativeQuery = true
+    )
+    fun getInscricoesMesDuranteAno(): List<InscricoesMesDuranteAnoRequest>
 
+    @Query(
+        value = "SELECT * FROM publico_alvo_genero",
+        nativeQuery = true
+    )
+    fun getPublicoAlvoGenero(): List<PublicoAlvoGeneroRequest>
+
+    @Query(
+        value = "SELECT * FROM faixa_etaria_usuarios_ativos",
+        nativeQuery = true
+    )
+    fun getFaixaEtariaUsuariosAtivos(): List<FaixaEtariaUsuariosAtivosRequest>
 }

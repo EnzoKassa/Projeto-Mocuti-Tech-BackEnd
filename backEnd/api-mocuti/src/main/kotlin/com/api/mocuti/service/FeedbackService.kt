@@ -1,7 +1,6 @@
 package com.api.mocuti.service
 
-import com.api.mocuti.dto.FeedbackAtualizarRequest
-import com.api.mocuti.dto.FeedbackNovoRequest
+import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Feedback
 import com.api.mocuti.repository.EventoRepository
 import com.api.mocuti.repository.FeedbackRepository
@@ -49,5 +48,17 @@ class FeedbackService(
         }
 
         return feedbackRepository.save(feedbackExistente)
+    }
+
+    fun getFeedbackPorCategoria(): List<FeedbacksPorCategoriaRequest> {
+        return feedbackRepository.getFeedbacksPorCategoria()
+    }
+
+    fun getFeedbackCategoriaMesAtual(): List<FeedbackCategoriaMesAtualRequest> {
+        return feedbackRepository.getFeedbackCategoriaMesAtual()
+    }
+
+    fun getFeedbackEvento(): List<FeedbackEventoRequest> {
+        return feedbackRepository.getFeedbackEvento()
     }
 }
