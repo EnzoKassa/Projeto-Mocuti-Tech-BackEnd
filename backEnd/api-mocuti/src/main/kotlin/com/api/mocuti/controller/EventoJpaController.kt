@@ -1,10 +1,7 @@
 package com.api.mocuti.controller
 
 import EventoService
-import com.api.mocuti.dto.EventoAttDiaHoraRequest
-import com.api.mocuti.dto.EventoAtualizaStatusRequest
-import com.api.mocuti.dto.EventoAtualizarRequest
-import com.api.mocuti.dto.EventoCadastroRequest
+import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.repository.*
 import io.swagger.v3.oas.annotations.Operation
@@ -154,5 +151,31 @@ class EventoJpaController(
     ): ResponseEntity<Evento> {
         val eventoAtualizado = eventoService.atualizarStatusEvento(id, dto)
         return ResponseEntity.ok(eventoAtualizado)
+    }
+
+    @Operation(
+        summary = "Listar informacoes do evento e usuario responsavel",
+        description = "Retorna uma lista com as informacoes do evento e do usuario responsavel por ele"
+    )
+    @GetMapping("/view/eventos-usuario")
+    fun getEventoUsuario(): ResponseEntity<List<EventosUsuariosRequest>> {
+        val evento = eventoService.getEventosUsuario()
+
+        return ResponseEntity.status(200).body(evento)
+    }
+
+    @Operation(
+        summary = "Listar informacoes do evento com id do usuario responsavel",
+        description = "Retorna uma lista com as informacoes do evento e do usuario responsavel por ele"
+    )
+    @GetMapping("/view/eventos-usuario/{idUsuario}")
+    fun getEventoUsuarioPorId(@PathVariable idUsuario: Int): ResponseEntity<EventosUsuariosRequest> {
+        if (!repositorioEvento.existsById(idUsuario)) {
+            return ResponseEntity.status(404).build()
+        }
+
+        val evento = eventoService.getEventosUsuarioId(idUsuario)
+
+        return ResponseEntity.status(200).body(evento)
     }
 }

@@ -1,10 +1,12 @@
 package com.api.mocuti.controller
 
+import com.api.mocuti.dto.RankCategoriaRequest
 import com.api.mocuti.entity.Categoria
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import com.api.mocuti.repository.CategoriaRepository
+import com.api.mocuti.service.CategoriaService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 
@@ -12,7 +14,10 @@ import io.swagger.v3.oas.annotations.tags.Tag
 @Tag(name = "Categoria", description = "Operações relacionadas categoria dos eventos")
 
 @RequestMapping("/categorias")
-class CategoriaJpaController(val repositorio: CategoriaRepository) {
+class CategoriaJpaController(
+    val repositorio: CategoriaRepository,
+    val categoriaService: CategoriaService
+) {
 
     @Operation(
         summary = "Listar todas as categorias",
@@ -80,5 +85,15 @@ class CategoriaJpaController(val repositorio: CategoriaRepository) {
         categoriaAtualizada.idCategoria = id
         val categoria = repositorio.save(categoriaAtualizada)
         return ResponseEntity.status(200).body(categoria)
+    }
+
+    @Operation(
+        summary = "Rank Categoria",
+        description = "Rank Categoria com base no total de votos recebidos"
+    )
+    @GetMapping("/view/ranking")
+    fun getRanking(): ResponseEntity<List<RankCategoriaRequest>> {
+        val ranking = categoriaService.getRanking()
+        return ResponseEntity.status(200).body(ranking)
     }
 }

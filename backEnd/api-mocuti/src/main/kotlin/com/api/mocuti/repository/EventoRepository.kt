@@ -1,5 +1,6 @@
 package com.api.mocuti.repository
 
+import com.api.mocuti.dto.EventosUsuariosRequest
 import com.api.mocuti.entity.Evento
 import jakarta.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
@@ -16,4 +17,16 @@ interface EventoRepository : JpaRepository<Evento, Int> {
         nativeQuery = true
     )
     fun atualizarDiaHora(id: Int, dia: LocalDate, horaInicio: LocalTime, horaFim: LocalTime): Int
+
+    @Query(
+        value = "SELECT * FROM eventos_usuario",
+        nativeQuery = true
+    )
+    fun getEventosUsuario(): List<EventosUsuariosRequest>
+
+    @Query(
+        value = "SELECT * FROM eventos_usuario WHERE id_usuario = ?1",
+        nativeQuery = true
+    )
+    fun getEventosUsuarioPorId(idUsuario: Int): EventosUsuariosRequest
 }

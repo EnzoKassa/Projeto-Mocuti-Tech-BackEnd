@@ -1,8 +1,6 @@
 package com.api.mocuti.service
 
-import com.api.mocuti.dto.UsuarioLoginRequest
-import com.api.mocuti.dto.UsuarioCadastroRequest
-import com.api.mocuti.dto.UsuarioRedefinirSenhaRequest
+import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Usuario
 import com.api.mocuti.repository.*
 import org.springframework.stereotype.Service
@@ -113,4 +111,19 @@ class UsuarioService(
         return usuarioRepository.save(usuario)
     }
 
+    fun getVisaoGeralUsuarios(): VisaoGeralUsuariosRequest {
+        return usuarioRepository.buscarVisaoGeralUsuarios()
+    }
+
+    fun getIncricoesMesDuranteAno(): List<InscricoesMesDuranteAnoRequest> {
+        return usuarioRepository.getInscricoesMesDuranteAno()
+    }
+
+    fun getPublicoAlvoGenero(): List<PublicoAlvoGeneroRequest> {
+        return usuarioRepository.getPublicoAlvoGenero()
+    }
+
+    fun getFaixaEtariaUsuariosAtivos(): List<FaixaEtariaUsuariosAtivosRequest> {
+        return usuarioRepository.getFaixaEtariaUsuariosAtivos()
+    }
 }
