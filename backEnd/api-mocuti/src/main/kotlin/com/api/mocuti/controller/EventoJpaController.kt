@@ -10,6 +10,7 @@ import jakarta.validation.Valid
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 
 @RestController
 @Tag(name = "Evento", description = "Gerenciamento dos eventos cadastrados no sistema")
@@ -177,5 +178,29 @@ class EventoJpaController(
         val evento = eventoService.getEventosUsuarioId(idUsuario)
 
         return ResponseEntity.status(200).body(evento)
+    }
+
+    @GetMapping("/por-eventos")
+    fun listarEventos(
+        @RequestParam(required = false) nome: String?,
+        @RequestParam(required = false) dataInicio: LocalDate?,
+        @RequestParam(required = false) dataFim: LocalDate?,
+    ): List<EventoDTO> {
+        val filtro = EventoFiltroRequest(nome, dataInicio, dataFim)
+        return eventoService.buscarComFiltros(filtro)
+    }
+
+    @GetMapping("/por-categoria")
+    fun listarEventosPorCategoria(
+        @RequestParam categoriaId: Int
+    ): List<EventoDTO> {
+        return eventoService.buscarPorCategoria(categoriaId)
+    }
+
+    @GetMapping("/status")
+    fun listarEventosPorStatus(
+        @RequestParam statusEventoId: Int
+    ): List<EventoDTO> {
+        return eventoService.buscarPorStatus(statusEventoId)
     }
 }

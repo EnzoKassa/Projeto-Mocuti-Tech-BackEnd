@@ -4,12 +4,13 @@ import com.api.mocuti.dto.EventosUsuariosRequest
 import com.api.mocuti.entity.Evento
 import jakarta.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import java.time.LocalDate
 import java.time.LocalTime
-
-interface EventoRepository : JpaRepository<Evento, Int> {
+// Herdar JpaSpecificationExecutor permite usar o método: findAll(EventoSpecification.comFiltros(filtro))
+interface EventoRepository : JpaRepository<Evento, Int>, JpaSpecificationExecutor<Evento> {
     @Transactional
     @Modifying
     @Query(
@@ -29,4 +30,9 @@ interface EventoRepository : JpaRepository<Evento, Int> {
         nativeQuery = true
     )
     fun getEventosUsuarioPorId(idUsuario: Int): EventosUsuariosRequest
+
+    fun findByCategoria_IdCategoria(categoriaId: Int): List<Evento>
+
+    fun findByStatusEvento_IdStatusEvento(statusEventoId: Int): List<Evento>
+
 }

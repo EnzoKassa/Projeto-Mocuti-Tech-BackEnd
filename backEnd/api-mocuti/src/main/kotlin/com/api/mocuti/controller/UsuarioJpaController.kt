@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 
+@CrossOrigin(origins = ["http://localhost:5173"])
 @RestController
 @Tag(name = "Usuário", description = "Operações relacionadas a usuários")
 @RequestMapping("/usuarios")
@@ -66,10 +67,16 @@ class UsuarioJpaController(
         summary = "Login do usuário",
         description = "Autentica o usuário com base no e-mail e senha fornecidos"
     )
-    @PatchMapping("/logar")
-    fun logar(@RequestBody usuarioLoginRequest: UsuarioLoginRequest): ResponseEntity<Usuario> {
+    @PatchMapping("/login")
+    fun logar(@RequestBody usuarioLoginRequest: UsuarioLoginRequest): ResponseEntity<UsuarioLoginDTO> {
         val usuarioAtualizado = usuarioService.autenticarUsuario(usuarioLoginRequest)
-        return ResponseEntity.status(200).body(usuarioAtualizado)
+        val response = UsuarioLoginDTO(
+            idUsuario = usuarioAtualizado.idUsuario.toLong(),
+            nomeCompleto = usuarioAtualizado.nomeCompleto,
+            email = usuarioAtualizado.email,
+            cargo = usuarioAtualizado.cargo
+        )
+        return ResponseEntity.status(200).body(response)
     }
 
     @Operation(
