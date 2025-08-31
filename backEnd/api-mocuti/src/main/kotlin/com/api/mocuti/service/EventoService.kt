@@ -1,6 +1,7 @@
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.repository.*
+import com.api.mocuti.specification.EventoSpecification
 import org.springframework.stereotype.Service
 
 @Service
@@ -96,4 +97,20 @@ class EventoService(
     fun getEventosUsuarioId(idUsuario: Int): EventosUsuariosRequest {
         return eventoRepository.getEventosUsuarioPorId(idUsuario = idUsuario)
     }
+
+    fun buscarComFiltros(filtro: EventoFiltroRequest): List<EventoDTO> {
+        return eventoRepository.findAll(EventoSpecification.comFiltros(filtro))
+            .map { EventoDTO(it.nomeEvento, it.dia) }
+    }
+
+    fun buscarPorCategoria(categoriaId: Int): List<EventoDTO> {
+        return eventoRepository.findByCategoria_IdCategoria(categoriaId)
+            .map { EventoDTO(it.nomeEvento, it.dia) }
+    }
+
+    fun buscarPorStatus(statusEventoId: Int): List<EventoDTO> {
+        return eventoRepository.findByStatusEvento_IdStatusEvento(statusEventoId)
+            .map { EventoDTO(it.nomeEvento, it.dia) }
+    }
+
 }
