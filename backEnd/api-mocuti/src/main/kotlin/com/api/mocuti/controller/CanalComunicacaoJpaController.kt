@@ -19,7 +19,7 @@ class CanalComunicacaoJpaController(var repositorioCanalComunicacao: CanalComuni
         description = "Retorna uma lista com todos os canais de comunicação cadastrados"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<CanalComunicacao>> {
+    fun getCanalComunicacao(): ResponseEntity<List<CanalComunicacao>> {
         val canais = repositorioCanalComunicacao.findAll()
 
         return if (canais.isEmpty()) {

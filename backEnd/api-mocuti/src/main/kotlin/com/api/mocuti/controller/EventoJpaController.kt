@@ -33,7 +33,7 @@ class EventoJpaController(
         description = "Retorna todos os eventos cadastrados no sistema; retorna 204 se não houver eventos"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<Evento>> {
+    fun getEvento(): ResponseEntity<List<Evento>> {
         val eventos = repositorioEvento.findAll()
 
         if (eventos.isEmpty()) {
@@ -61,7 +61,7 @@ class EventoJpaController(
         description = "Cria um novo evento com os dados informados"
     )
     @PostMapping
-    fun post(@RequestBody @Valid dto: EventoCadastroRequest): ResponseEntity<Evento> {
+    fun postEvento(@RequestBody @Valid dto: EventoCadastroRequest): ResponseEntity<Evento> {
         val evento = eventoService.criarEvento(dto)
         return ResponseEntity.status(201).body(evento)
     }
@@ -71,7 +71,7 @@ class EventoJpaController(
         description = "Remove o evento do sistema com base no ID"
     )
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Int): ResponseEntity<Void> {
+    fun deleteEvento(@PathVariable id: Int): ResponseEntity<Void> {
         if (repositorioEvento.existsById(id)) {
             repositorioEvento.deleteById(id)
             return ResponseEntity.status(204).build()
@@ -85,7 +85,7 @@ class EventoJpaController(
         description = "Atualiza todos os campos de um evento existente"
     )
     @PutMapping("/{id}")
-    fun put(@PathVariable id: Int, @RequestBody eventoAtualizacaoRequest: EventoAtualizarRequest): ResponseEntity<Evento> {
+    fun putEvento(@PathVariable id: Int, @RequestBody eventoAtualizacaoRequest: EventoAtualizarRequest): ResponseEntity<Evento> {
         val eventoAtualizado = eventoService.atualizarEvento(id, eventoAtualizacaoRequest)
         return ResponseEntity.status(200).body(eventoAtualizado)
     }

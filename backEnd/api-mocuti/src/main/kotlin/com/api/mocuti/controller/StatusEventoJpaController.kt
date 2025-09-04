@@ -17,7 +17,7 @@ class StatusEventoJpaController(var repositorioStatusEvento: StatusEventoReposit
         description = "Retorna todos os status de eventos cadastrados no sistema"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<StatusEvento>> {
+    fun getStatus(): ResponseEntity<List<StatusEvento>> {
         val statusEvento = repositorioStatusEvento.findAll()
 
         return if (statusEvento.isEmpty()) {

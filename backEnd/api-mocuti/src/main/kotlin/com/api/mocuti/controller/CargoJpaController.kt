@@ -19,7 +19,7 @@ class CargoJpaController(var repositorioCargo: CargoRepository) {
         description = "Retorna uma lista com todos os cargos cadastrados"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<Cargo>> {
+    fun getCargo(): ResponseEntity<List<Cargo>> {
         val cargos = repositorioCargo.findAll()
 
         return if (cargos.isEmpty()) {

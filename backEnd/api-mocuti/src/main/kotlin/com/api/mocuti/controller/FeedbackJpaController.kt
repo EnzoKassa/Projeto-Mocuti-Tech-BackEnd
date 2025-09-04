@@ -32,7 +32,7 @@ class FeedbackJpaController(
         description = "Retorna todos os feedbacks cadastrados"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<Feedback>> {
+    fun getFeedback(): ResponseEntity<List<Feedback>> {
         val feedback = repositorio.findAll()
         return if (feedback.isEmpty()) {
             ResponseEntity.status(204).build()
@@ -46,7 +46,7 @@ class FeedbackJpaController(
         description = "Retorna o feedback correspondente ao ID fornecido"
     )
     @GetMapping("/{id}")
-    fun get(@PathVariable id: Int): ResponseEntity<Feedback> {
+    fun getFeedbackPorId(@PathVariable id: Int): ResponseEntity<Feedback> {
         if (!repositorio.existsById(id)) {
             return ResponseEntity.status(404).build()
         }
@@ -60,7 +60,7 @@ class FeedbackJpaController(
         description = "Remove o feedback com o ID fornecido"
     )
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Int): ResponseEntity<Void> {
+    fun deleteFeedback(@PathVariable id: Int): ResponseEntity<Void> {
         return if (repositorio.existsById(id)) {
             repositorio.deleteById(id)
             ResponseEntity.status(204).build()
@@ -74,7 +74,7 @@ class FeedbackJpaController(
         description = "Cadastra um novo feedback no sistema"
     )
     @PostMapping
-    fun post(@RequestBody novoFeedback: FeedbackNovoRequest): ResponseEntity<Feedback> {
+    fun postFeedback(@RequestBody novoFeedback: FeedbackNovoRequest): ResponseEntity<Feedback> {
         val feedback = feedbackService.criar(novoFeedback)
         return ResponseEntity.status(201).body(feedback)
     }
@@ -84,7 +84,7 @@ class FeedbackJpaController(
         description = "Atualiza os dados do feedback com o ID fornecido"
     )
     @PutMapping("/{id}")
-    fun put(
+    fun putFeedback(
         @PathVariable id: Int,
         @RequestBody feedbackAtualizado: FeedbackAtualizarRequest
     ): ResponseEntity<Feedback> {

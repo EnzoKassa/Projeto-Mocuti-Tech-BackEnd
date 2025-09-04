@@ -31,7 +31,7 @@ class FeedbackJpaControllerTest {
         val feedbacks = listOf(mock(Feedback::class.java))
         `when`(feedbackRepository.findAll()).thenReturn(feedbacks)
 
-        val response = controller.get()
+        val response = controller.getFeedback()
 
         assertEquals(200, response.statusCode.value())
         assertEquals(feedbacks, response.body)
@@ -41,7 +41,7 @@ class FeedbackJpaControllerTest {
     fun `deve retornar 204 quando nao houver nenhum feedback`() {
         `when`(feedbackRepository.findAll()).thenReturn(emptyList())
 
-        val response = controller.get()
+        val response = controller.getFeedback()
 
         assertEquals(204, response.statusCode.value())
         assertNull(response.body)
@@ -53,7 +53,7 @@ class FeedbackJpaControllerTest {
         `when`(feedbackRepository.existsById(1)).thenReturn(true)
         `when`(feedbackRepository.findById(1)).thenReturn(Optional.of(feedback))
 
-        val response = controller.get(1)
+        val response = controller.getFeedbackPorId(1)
 
         assertEquals(200, response.statusCode.value())
         assertEquals(feedback, response.body)
@@ -63,7 +63,7 @@ class FeedbackJpaControllerTest {
     fun `deve retornar 404 quando o ID nao existir`() {
         `when`(feedbackRepository.existsById(1)).thenReturn(false)
 
-        val response = controller.get(1)
+        val response = controller.getFeedbackPorId(1)
 
         assertEquals(404, response.statusCode.value())
         assertNull(response.body)
@@ -73,7 +73,7 @@ class FeedbackJpaControllerTest {
     fun `deve retornar 204 e deletar o feedback quando o ID existir`() {
         `when`(feedbackRepository.existsById(1)).thenReturn(true)
 
-        val response = controller.delete(1)
+        val response = controller.deleteFeedback(1)
 
         assertEquals(204, response.statusCode.value())
         assertNull(response.body)
@@ -84,7 +84,7 @@ class FeedbackJpaControllerTest {
     fun `deve retornar 404 quando o ID nao existir ao deletar`() {
         `when`(feedbackRepository.existsById(1)).thenReturn(false)
 
-        val response = controller.delete(1)
+        val response = controller.deleteFeedback(1)
 
         assertEquals(404, response.statusCode.value())
         assertNull(response.body)
@@ -97,7 +97,7 @@ class FeedbackJpaControllerTest {
 
         `when`(service.criar(dto)).thenReturn(feedback)
 
-        val response = controller.post(dto)
+        val response = controller.postFeedback(dto)
 
         assertEquals(201, response.statusCode.value())
         assertEquals(feedback, response.body)
@@ -110,7 +110,7 @@ class FeedbackJpaControllerTest {
 
         `when`(service.atualizar(1, dto)).thenReturn(feedbackAtualizado)
 
-        val response = controller.put(1, dto)
+        val response = controller.putFeedback(1, dto)
 
         assertEquals(200, response.statusCode.value())
         assertEquals(feedbackAtualizado, response.body)

@@ -80,7 +80,7 @@ class UsuarioServiceTest {
             genero = "Feminino",
             senha = "senha123",
             cargo = 1,
-            endereco = 1,
+            endereco = endereco,
             canalComunicacao = 1
         )
 
@@ -102,7 +102,7 @@ class UsuarioServiceTest {
         val request = UsuarioCadastroRequest(
             "Nome", "123.456.789-00", "(11) 98888-8888",
             LocalDate.of(1995, 5, 20), "email@test.com", "Pardo",
-            "Brasileira", "Feminino", "senha123", 1, 1, 1
+            "Brasileira", "Feminino", "senha123", 1, endereco, 1
         )
 
         `when`(usuarioRepository.existsByEmail(request.email)).thenReturn(true)

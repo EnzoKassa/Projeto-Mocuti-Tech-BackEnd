@@ -50,7 +50,7 @@ class EventoJpaControllerTest {
     fun `get deve retornar 200 com lista de eventos`() {
         `when`(eventoRepo.findAll()).thenReturn(listOf(evento))
 
-        val response = controller.get()
+        val response = controller.getEvento()
 
         assertEquals(200, response.statusCode.value())
         assertEquals(1, response.body?.size)
@@ -60,7 +60,7 @@ class EventoJpaControllerTest {
     fun `get deve retornar 204 se não houver eventos`() {
         `when`(eventoRepo.findAll()).thenReturn(emptyList())
 
-        val response = controller.get()
+        val response = controller.getEvento()
 
         assertEquals(204, response.statusCode.value())
     }
@@ -91,7 +91,7 @@ class EventoJpaControllerTest {
 
         `when`(service.criarEvento(dto)).thenReturn(evento)
 
-        val response = controller.post(dto)
+        val response = controller.postEvento(dto)
 
         assertEquals(201, response.statusCode.value())
         assertEquals(evento, response.body)
@@ -101,7 +101,7 @@ class EventoJpaControllerTest {
     fun `delete deve retornar 204 se evento existir`() {
         `when`(eventoRepo.existsById(1)).thenReturn(true)
 
-        val response = controller.delete(1)
+        val response = controller.deleteEvento(1)
 
         assertEquals(204, response.statusCode.value())
         verify(eventoRepo).deleteById(1)
@@ -111,7 +111,7 @@ class EventoJpaControllerTest {
     fun `delete deve retornar 404 se evento não existir`() {
         `when`(eventoRepo.existsById(1)).thenReturn(false)
 
-        val response = controller.delete(1)
+        val response = controller.deleteEvento(1)
 
         assertEquals(404, response.statusCode.value())
         verify(eventoRepo, never()).deleteById(1)
@@ -122,7 +122,7 @@ class EventoJpaControllerTest {
         val dto = mock(EventoAtualizarRequest::class.java)
         `when`(service.atualizarEvento(1, dto)).thenReturn(evento)
 
-        val response = controller.put(1, dto)
+        val response = controller.putEvento(1, dto)
 
         assertEquals(200, response.statusCode.value())
         assertEquals(evento, response.body)

@@ -19,7 +19,7 @@ class ParticipacaoJpaController(var repositorioParticipacao: ParticipacaoReposit
         description = "Retorna todas as participações cadastradas no sistema"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<Participacao>> {
+    fun getParticipacao(): ResponseEntity<List<Participacao>> {
         val participacoes = repositorioParticipacao.findAll()
 
         return if (participacoes.isEmpty()) {

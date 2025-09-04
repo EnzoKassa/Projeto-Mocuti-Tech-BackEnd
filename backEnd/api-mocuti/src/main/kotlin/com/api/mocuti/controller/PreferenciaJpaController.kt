@@ -19,7 +19,7 @@ class PreferenciaJpaController(var repositorioPreferencia: PreferenciaRepository
         description = "Retorna todas as preferências cadastradas no sistema"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<Preferencia>> {
+    fun getPreferencia(): ResponseEntity<List<Preferencia>> {
         val preferencias = repositorioPreferencia.findAll()
 
         return if (preferencias.isEmpty()) {

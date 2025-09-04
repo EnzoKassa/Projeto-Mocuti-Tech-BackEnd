@@ -161,7 +161,7 @@ class UsuarioJpaController(
         description = "Retorna uma lista todos os tipos de Usuários e se estão ativos ou inativos"
     )
     @GetMapping("/view/visao-geral")
-    fun get(): ResponseEntity<VisaoGeralUsuariosRequest> {
+    fun getVisaoGeral(): ResponseEntity<VisaoGeralUsuariosRequest> {
         val visaoGeral = usuarioService.getVisaoGeralUsuarios()
 
         return ResponseEntity.status(200).body(visaoGeral)

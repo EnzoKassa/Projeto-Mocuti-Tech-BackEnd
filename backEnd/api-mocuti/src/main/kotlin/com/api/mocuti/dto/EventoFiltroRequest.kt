@@ -1,6 +1,5 @@
 package com.api.mocuti.dto
 
-import com.api.mocuti.entity.StatusEvento
 import java.time.LocalDate
 
 data class EventoFiltroRequest(

@@ -19,7 +19,7 @@ class StatusInscricaoJpaController(var repositorioStatusInscricao: StatusInscric
         description = "Retorna todos os status de inscrições cadastrados no sistema"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<StatusInscricao>> {
+    fun getStatusInscricao(): ResponseEntity<List<StatusInscricao>> {
         val statusInscricao = repositorioStatusInscricao.findAll()
 
         return if (statusInscricao.isEmpty()) {

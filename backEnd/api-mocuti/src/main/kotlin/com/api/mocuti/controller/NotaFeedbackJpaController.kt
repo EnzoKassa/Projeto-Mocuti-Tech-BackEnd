@@ -19,7 +19,7 @@ class NotaFeedbackJpaController(var repositorioNotaFeedback: NotaFeedbackReposit
         description = "Retorna todas as notas de feedback cadastradas no sistema"
     )
     @GetMapping
-    fun get(): ResponseEntity<List<NotaFeedback>> {
+    fun getNota(): ResponseEntity<List<NotaFeedback>> {
         val notaFeedback = repositorioNotaFeedback.findAll()
 
         return if (notaFeedback.isEmpty()) {

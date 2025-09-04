@@ -15,15 +15,11 @@ class UsuarioJpaControllerTest {
 
     private val repositorio: UsuarioRepository = mock(UsuarioRepository::class.java)
     private val cargoRepository: CargoRepository = mock(CargoRepository::class.java)
-    private val enderecoRepository: EnderecoRepository = mock(EnderecoRepository::class.java)
-    private val canalComunicacaoRepository: CanalComunicacaoRepository = mock(CanalComunicacaoRepository::class.java)
     private val usuarioService: UsuarioService = mock(UsuarioService::class.java)
 
     private val controller = UsuarioJpaController(
         repositorio,
         cargoRepository,
-        enderecoRepository,
-        canalComunicacaoRepository,
         usuarioService
     )
 
@@ -122,7 +118,7 @@ class UsuarioJpaControllerTest {
             genero = "Masculino",
             senha = "senha123",
             cargo = 1,
-            endereco = 1,
+            endereco = enderecoTeste,
             canalComunicacao = 1
         )
 

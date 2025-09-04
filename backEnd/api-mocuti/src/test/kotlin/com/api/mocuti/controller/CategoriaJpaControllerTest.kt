@@ -2,6 +2,7 @@ package com.api.mocuti.controller
 
 import com.api.mocuti.entity.Categoria
 import com.api.mocuti.repository.CategoriaRepository
+import com.api.mocuti.service.CategoriaService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -11,7 +12,9 @@ import java.util.*
 class CategoriaJpaControllerTest {
 
     val repository = mock(CategoriaRepository::class.java)
-    val controller = CategoriaJpaController(repository)
+    private val service = mock(CategoriaService::class.java)
+
+    val controller = CategoriaJpaController(repository, service)
 
     val categoriaExistente = Categoria(1, "sdfgh",  "Eletrônicos")
 

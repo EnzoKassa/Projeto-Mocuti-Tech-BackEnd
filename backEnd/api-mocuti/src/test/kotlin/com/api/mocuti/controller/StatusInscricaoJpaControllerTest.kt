@@ -16,7 +16,7 @@ class StatusInscricaoJpaControllerTest {
     fun `A consulta de todos os status de inscricao com dados deve retornar status 200 com a lista correta`() {
         `when`(repository.findAll()).thenReturn(mutableListOf(mock(StatusInscricao::class.java)))
 
-        val retorno = controller.get()
+        val retorno = controller.getStatusInscricao()
 
         assertEquals(200, retorno.statusCode.value())
         assertEquals(1, retorno.body?.size)
@@ -28,7 +28,7 @@ class StatusInscricaoJpaControllerTest {
     fun `A consulta de todos os status de inscricao sem dados deve retornar status 204 com a lista vazia`() {
         `when`(repository.findAll()).thenReturn(emptyList())
 
-        val retorno = controller.get()
+        val retorno = controller.getStatusInscricao()
 
         assertEquals(204, retorno.statusCode.value())
         assertNull(retorno.body)

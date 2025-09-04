@@ -8,7 +8,6 @@ data class UsuarioCadastroRequest(
     val nomeCompleto: String,
     val cpf: String,
     val telefone: String?,
-    @JsonFormat(pattern = "yyyy-MM-dd")
     val dataNascimento: LocalDate,
     val etnia: String,
     val nacionalidade: String,
