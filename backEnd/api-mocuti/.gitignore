@@ -32,5 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 
-### banco ###
+# Variáveis de ambiente
 .env
