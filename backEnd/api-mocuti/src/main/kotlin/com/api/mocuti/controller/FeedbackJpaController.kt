@@ -2,12 +2,9 @@ package com.api.mocuti.controller
 
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Feedback
-import com.api.mocuti.repository.EventoRepository
+import com.api.mocuti.repository.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import com.api.mocuti.repository.FeedbackRepository
-import com.api.mocuti.repository.NotaFeedbackRepository
-import com.api.mocuti.repository.UsuarioRepository
 import com.api.mocuti.service.FeedbackService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -20,6 +17,7 @@ class FeedbackJpaController(
     val eventoRepository: EventoRepository,
     val usuarioRepository: UsuarioRepository,
     val notaFeedbackRepository: NotaFeedbackRepository,
+    val participacaoRepository: ParticipacaoRepository,
     val feedbackService: FeedbackService = FeedbackService(
         repositorio,
         notaFeedbackRepository,
@@ -70,25 +68,12 @@ class FeedbackJpaController(
     }
 
     @Operation(
-        summary = "Criar um novo feedback",
-        description = "Cadastra um novo feedback no sistema"
+        summary = "Criar ou atualizar feedback",
+        description = "Se já existe feedback do usuário no evento, atualiza; caso contrário, cria"
     )
     @PostMapping
     fun postFeedback(@RequestBody novoFeedback: FeedbackNovoRequest): ResponseEntity<Feedback> {
-        val feedback = feedbackService.criar(novoFeedback)
-        return ResponseEntity.status(201).body(feedback)
-    }
-
-    @Operation(
-        summary = "Atualizar um feedback",
-        description = "Atualiza os dados do feedback com o ID fornecido"
-    )
-    @PutMapping("/{id}")
-    fun putFeedback(
-        @PathVariable id: Int,
-        @RequestBody feedbackAtualizado: FeedbackAtualizarRequest
-    ): ResponseEntity<Feedback> {
-        val feedback = feedbackService.atualizar(id, feedbackAtualizado)
+        val feedback = feedbackService.criarOuAtualizar(novoFeedback)
         return ResponseEntity.ok(feedback)
     }
 

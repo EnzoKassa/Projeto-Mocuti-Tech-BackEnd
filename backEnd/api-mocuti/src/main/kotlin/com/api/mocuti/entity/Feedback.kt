@@ -10,7 +10,7 @@ data class Feedback(
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var idFeedback: Int,
+    var idFeedback: Int?,
 
     var comentario: String? = null,
 

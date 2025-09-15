@@ -2,10 +2,8 @@ package com.api.mocuti.service
 
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Feedback
-import com.api.mocuti.repository.EventoRepository
-import com.api.mocuti.repository.FeedbackRepository
-import com.api.mocuti.repository.NotaFeedbackRepository
-import com.api.mocuti.repository.UsuarioRepository
+import com.api.mocuti.repository.*
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
@@ -15,39 +13,40 @@ class FeedbackService(
     val eventoRepository: EventoRepository,
     val usuarioRepository: UsuarioRepository
 ) {
-    fun criar(request: FeedbackNovoRequest): Feedback {
+
+    @Transactional
+    fun criarOuAtualizar(request: FeedbackNovoRequest): Feedback {
         val evento = eventoRepository.findById(request.idEvento)
             .orElseThrow { IllegalArgumentException("Evento não encontrado") }
 
         val usuario = usuarioRepository.findById(request.idUsuario)
             .orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        val feedback = Feedback(
-            idFeedback = 0,
-            comentario = request.comentario,
-            evento = evento,
-            usuario = usuario
-        )
+        // Verifica se já existe feedback
+        val feedbackExistente = feedbackRepository.findByUsuarioAndEvento(usuario, evento)
 
-        return feedbackRepository.save(feedback)
-    }
-
-    fun atualizar(id: Int, dto: FeedbackAtualizarRequest): Feedback {
-        val feedbackExistente = feedbackRepository.findById(id)
-            .orElseThrow { IllegalArgumentException("Feedback não encontrado") }
-
-        if (dto.comentario != null) {
-            feedbackExistente.comentario = dto.comentario
+        // Se forneceu nota, busca
+        val nota = request.idNota?.let {
+            notaRepository.findById(it)
+                .orElseThrow { IllegalArgumentException("Nota inválida") }
         }
 
-        val idNota = dto.idNota
-        if (idNota != null) {
-            val nota = notaRepository.findById(idNota)
-                .orElseThrow { IllegalArgumentException("Nota não encontrada") }
+        return if (feedbackExistente != null) {
+            // Atualiza
+            feedbackExistente.comentario = request.comentario
             feedbackExistente.nota = nota
+            feedbackRepository.save(feedbackExistente)
+        } else {
+            // Cria novo
+            var novoFeedback = Feedback(
+                comentario = request.comentario,
+                evento = evento,
+                usuario = usuario,
+                nota = nota,
+                idFeedback = null
+            )
+            feedbackRepository.save(novoFeedback)
         }
-
-        return feedbackRepository.save(feedbackExistente)
     }
 
     fun getFeedbackPorCategoria(): List<FeedbacksPorCategoriaRequest> {
