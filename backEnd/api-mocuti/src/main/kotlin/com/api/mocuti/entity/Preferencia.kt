@@ -8,13 +8,13 @@ data class Preferencia(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    var idPreferencia: Int,
+    var idPreferencia: Int? = null, // deixar null pro JPA preencher
 
-    @ManyToOne
-    @JoinColumn(name = "fk_usuario_preferencia")
+    @ManyToOne(fetch = FetchType.LAZY) // Lazy evita carregar tudo de cara
+    @JoinColumn(name = "fk_usuario_preferencia", nullable = false)
     var usuario: Usuario,
 
-    @ManyToOne
-    @JoinColumn(name = "fk_categoria_preferencia")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_categoria_preferencia", nullable = false)
     var categoria: Categoria
 )

@@ -1,6 +1,7 @@
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.repository.*
+import com.api.mocuti.service.EmailService
 import com.api.mocuti.specification.EventoSpecification
 import org.springframework.stereotype.Service
 
@@ -9,7 +10,9 @@ class EventoService(
     val eventoRepository: EventoRepository,
     val enderecoRepository: EnderecoRepository,
     val statusEventoRepository: StatusEventoRepository,
-    val categoriaRepository: CategoriaRepository
+    val categoriaRepository: CategoriaRepository,
+    val preferenciaRepository: PreferenciaRepository,
+    val emailService: EmailService
 ) {
     fun criarEvento(dto: EventoCadastroRequest): Evento {
         val endereco = enderecoRepository.findById(dto.enderecoId)
@@ -37,6 +40,14 @@ class EventoService(
             statusEvento = status,
             categoria = categoria
         )
+
+        // pega todos os usuários que têm essa categoria como favorita
+        val usuarios = preferenciaRepository.findUsuariosByIdCategoria(evento.categoria.idCategoria!!)
+
+        // percorre a lista de usuários e envia o email
+        usuarios.forEach { usuario ->
+            emailService.enviarEmailNovoEvento(usuario.email, usuario.nomeCompleto, evento)
+        }
 
         return eventoRepository.save(evento)
     }

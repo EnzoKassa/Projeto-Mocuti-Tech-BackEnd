@@ -4,6 +4,7 @@ import EventoService
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.repository.*
+import com.api.mocuti.service.EmailService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -20,11 +21,15 @@ class EventoJpaController(
     val enderecoRepository: EnderecoRepository,
     val statusEventoRepository: StatusEventoRepository,
     val categoriaRepository: CategoriaRepository,
+    val preferenciaRepository: PreferenciaRepository,
+    val emailService: EmailService,
     val eventoService: EventoService = EventoService(
         repositorioEvento,
         enderecoRepository,
         statusEventoRepository,
-        categoriaRepository
+        categoriaRepository,
+        preferenciaRepository,
+        emailService
     )
 ) {
 
@@ -85,7 +90,10 @@ class EventoJpaController(
         description = "Atualiza todos os campos de um evento existente"
     )
     @PutMapping("/{id}")
-    fun putEvento(@PathVariable id: Int, @RequestBody eventoAtualizacaoRequest: EventoAtualizarRequest): ResponseEntity<Evento> {
+    fun putEvento(
+        @PathVariable id: Int,
+        @RequestBody eventoAtualizacaoRequest: EventoAtualizarRequest
+    ): ResponseEntity<Evento> {
         val eventoAtualizado = eventoService.atualizarEvento(id, eventoAtualizacaoRequest)
         return ResponseEntity.status(200).body(eventoAtualizado)
     }
