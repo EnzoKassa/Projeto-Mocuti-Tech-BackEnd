@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @Tag(name = "Participação", description = "Operações relacionadas às participações")
@@ -35,8 +36,16 @@ class ParticipacaoJpaController(
         }
     }
 
-    @GetMapping("/filtradas/{idUsuario}")
+    @GetMapping("/participacao-comentar/{idUsuario}")
     fun listarParticipacoes(@PathVariable idUsuario: Int): List<ParticipacaoFeedbackDTO> {
-        return participacaoService.listarParticipacoesFiltradasPorUsuario(idUsuario)
+        val cincoDiasAtras = LocalDate.now().minusDays(5)
+        return participacaoService.listarParticipacoesFiltradasPorUsuario(idUsuario, cincoDiasAtras)
     }
+
+    @GetMapping("/participacao-passados/{idUsuario}")
+    fun listarEventosPassados(@PathVariable idUsuario: Int): List<ParticipacaoFeedbackDTO> {
+        val cincoDiasAtras = LocalDate.now().minusDays(5)
+        return participacaoService.listarParticipacoesPassadas(idUsuario, cincoDiasAtras)
+    }
+
 }

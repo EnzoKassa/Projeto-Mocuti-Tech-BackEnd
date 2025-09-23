@@ -1,19 +1,35 @@
+package com.api.mocuti.service
+
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.repository.*
-import com.api.mocuti.service.EmailService
 import com.api.mocuti.specification.EventoSpecification
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class EventoService(
-    val eventoRepository: EventoRepository,
-    val enderecoRepository: EnderecoRepository,
-    val statusEventoRepository: StatusEventoRepository,
-    val categoriaRepository: CategoriaRepository,
-    val preferenciaRepository: PreferenciaRepository,
-    val emailService: EmailService
+    private val eventoRepository: EventoRepository,
+    private val enderecoRepository: EnderecoRepository,
+    private val statusEventoRepository: StatusEventoRepository,
+    private val categoriaRepository: CategoriaRepository,
+    private val preferenciaRepository: PreferenciaRepository,
+    private val emailService: EmailService
 ) {
+
+    fun listarTodos(): List<Evento> =
+        eventoRepository.findAll()
+
+    fun buscarPorId(id: Int): Evento? =
+        eventoRepository.findByIdOrNull(id)
+
+    fun deletar(id: Int): Boolean {
+        return if (eventoRepository.existsById(id)) {
+            eventoRepository.deleteById(id)
+            true
+        } else false
+    }
+
     fun criarEvento(dto: EventoCadastroRequest): Evento {
         val endereco = enderecoRepository.findById(dto.enderecoId)
             .orElseThrow { IllegalArgumentException("Endereço não encontrado") }
@@ -43,8 +59,6 @@ class EventoService(
 
         // pega todos os usuários que têm essa categoria como favorita
         val usuarios = preferenciaRepository.findUsuariosByIdCategoria(evento.categoria.idCategoria!!)
-
-        // percorre a lista de usuários e envia o email
         usuarios.forEach { usuario ->
             emailService.enviarEmailNovoEvento(usuario.email, usuario.nomeCompleto, evento)
         }
@@ -65,27 +79,28 @@ class EventoService(
         val categoria = categoriaRepository.findById(dto.categoriaId)
             .orElseThrow { IllegalArgumentException("Categoria não encontrada") }
 
-        // Atualiza campos do evento existente
-        eventoExistente.nomeEvento = dto.nomeEvento
-        eventoExistente.descricao = dto.descricao
-        eventoExistente.dia = dto.dia
-        eventoExistente.horaInicio = dto.horaInicio
-        eventoExistente.horaFim = dto.horaFim
-        eventoExistente.isAberto = dto.isAberto
-        eventoExistente.qtdVaga = dto.qtdVaga
-        eventoExistente.publicoAlvo = dto.publicoAlvo
-        eventoExistente.qtdInteressado = dto.qtdInteressado
-        eventoExistente.endereco = endereco
-        eventoExistente.statusEvento = status
-        eventoExistente.categoria = categoria
+        eventoExistente.apply {
+            nomeEvento = dto.nomeEvento
+            descricao = dto.descricao
+            dia = dto.dia
+            horaInicio = dto.horaInicio
+            horaFim = dto.horaFim
+            isAberto = dto.isAberto
+            qtdVaga = dto.qtdVaga
+            publicoAlvo = dto.publicoAlvo
+            qtdInteressado = dto.qtdInteressado
+            this.endereco = endereco
+            this.statusEvento = status
+            this.categoria = categoria
+        }
 
         return eventoRepository.save(eventoExistente)
     }
 
     fun atualizarDiaHora(id: Int, dto: EventoAttDiaHoraRequest): Evento {
-        val evento = eventoRepository.findById(id)
-            .orElseThrow { NoSuchElementException("Evento com ID $id não encontrado") }
-
+        if (!eventoRepository.existsById(id)) {
+            throw NoSuchElementException("Evento com ID $id não encontrado")
+        }
         eventoRepository.atualizarDiaHora(id, dto.dia, dto.horaInicio, dto.horaFim)
         return eventoRepository.findById(id).get()
     }
@@ -101,27 +116,32 @@ class EventoService(
         return eventoRepository.save(evento)
     }
 
-    fun getEventosUsuario(): List<EventosUsuariosRequest> {
-        return eventoRepository.getEventosUsuario()
+    fun atualizarFoto(id: Int, foto: ByteArray): Evento {
+        val evento = eventoRepository.findByIdOrNull(id)
+            ?: throw NoSuchElementException("Evento com ID $id não encontrado")
+
+        evento.foto = foto
+        return eventoRepository.save(evento)
     }
 
-    fun getEventosUsuarioId(idUsuario: Int): EventosUsuariosRequest {
-        return eventoRepository.getEventosUsuarioPorId(idUsuario = idUsuario)
-    }
+    fun getFoto(id: Int): ByteArray? =
+        eventoRepository.findByIdOrNull(id)?.foto
 
-    fun buscarComFiltros(filtro: EventoFiltroRequest): List<EventoDTO> {
-        return eventoRepository.findAll(EventoSpecification.comFiltros(filtro))
+    fun getEventosUsuario(): List<EventosUsuariosRequest> =
+        eventoRepository.getEventosUsuario()
+
+    fun getEventosUsuarioId(idUsuario: Int): EventosUsuariosRequest =
+        eventoRepository.getEventosUsuarioPorId(idUsuario)
+
+    fun buscarComFiltros(filtro: EventoFiltroRequest): List<EventoDTO> =
+        eventoRepository.findAll(EventoSpecification.comFiltros(filtro))
             .map { EventoDTO(it.nomeEvento, it.dia) }
-    }
 
-    fun buscarPorCategoria(categoriaId: Int): List<EventoDTO> {
-        return eventoRepository.findByCategoria_IdCategoria(categoriaId)
+    fun buscarPorCategoria(categoriaId: Int): List<EventoDTO> =
+        eventoRepository.findByCategoria_IdCategoria(categoriaId)
             .map { EventoDTO(it.nomeEvento, it.dia) }
-    }
 
-    fun buscarPorStatus(statusEventoId: Int): List<EventoDTO> {
-        return eventoRepository.findByStatusEvento_IdStatusEvento(statusEventoId)
+    fun buscarPorStatus(statusEventoId: Int): List<EventoDTO> =
+        eventoRepository.findByStatusEvento_IdStatusEvento(statusEventoId)
             .map { EventoDTO(it.nomeEvento, it.dia) }
-    }
-
 }

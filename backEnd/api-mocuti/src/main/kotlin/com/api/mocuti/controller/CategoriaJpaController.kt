@@ -2,98 +2,62 @@ package com.api.mocuti.controller
 
 import com.api.mocuti.dto.RankCategoriaRequest
 import com.api.mocuti.entity.Categoria
-import jakarta.validation.Valid
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
-import com.api.mocuti.repository.CategoriaRepository
 import com.api.mocuti.service.CategoriaService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @Tag(name = "Categoria", description = "Operações relacionadas categoria dos eventos")
-
 @RequestMapping("/categorias")
 class CategoriaJpaController(
-    val repositorio: CategoriaRepository,
-    val categoriaService: CategoriaService
+    private val categoriaService: CategoriaService
 ) {
 
-    @Operation(
-        summary = "Listar todas as categorias",
-        description = "Retorna uma lista com todas as categorias cadastradas"
-    )
+    @Operation(summary = "Listar todas as categorias")
     @GetMapping
     fun get(): ResponseEntity<List<Categoria>> {
-        val categorias = repositorio.findAll()
-
-        return if (categorias.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(categorias)
-        }
+        val categorias = categoriaService.listarTodos()
+        return if (categorias.isEmpty()) ResponseEntity.noContent().build()
+        else ResponseEntity.ok(categorias)
     }
 
-    @Operation(
-        summary = "Buscar categoria por ID",
-        description = "Retorna a categoria referente ao ID fornecido"
-    )
+    @Operation(summary = "Buscar categoria por ID")
     @GetMapping("/{id}")
     fun get(@PathVariable id: Int): ResponseEntity<Categoria> {
-        val categoria = repositorio.findById(id)
-
-        return ResponseEntity.of(categoria)
+        val categoria = categoriaService.buscarPorId(id)
+        return if (categoria != null) ResponseEntity.ok(categoria)
+        else ResponseEntity.notFound().build()
     }
 
-    @Operation(
-        summary = "Deletar categoria por ID",
-        description = "Remove a categoria referente ao ID fornecido"
-    )
+    @Operation(summary = "Deletar categoria por ID")
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<Void> {
-
-        if (repositorio.existsById(id)) {
-            repositorio.deleteById(id)
-            return ResponseEntity.status(204).build()
-        }
-        return ResponseEntity.status(404).build()
+        return if (categoriaService.deletar(id)) ResponseEntity.noContent().build()
+        else ResponseEntity.notFound().build()
     }
 
-    @Operation(
-        summary = "Criar uma nova categoria",
-        description = "Adiciona uma nova categoria ao sistema"
-    )
+    @Operation(summary = "Criar uma nova categoria")
     @PostMapping
     fun post(@RequestBody @Valid novaCategoria: Categoria): ResponseEntity<Categoria> {
-        val categoria = repositorio.save(novaCategoria)
+        val categoria = categoriaService.salvar(novaCategoria)
         return ResponseEntity.status(201).body(categoria)
     }
 
-    @Operation(
-        summary = "Atualizar uma categoria",
-        description = "Atualiza a categoria com o ID fornecido"
-    )
+    @Operation(summary = "Atualizar uma categoria")
     @PutMapping("/{id}")
-    fun put(
-        @PathVariable id: Int,
-        @RequestBody categoriaAtualizada: Categoria
-    ):
-            ResponseEntity<Categoria> {
-        if (!repositorio.existsById(id)) {
-            return ResponseEntity.status(404).build()
-        }
-        categoriaAtualizada.idCategoria = id
-        val categoria = repositorio.save(categoriaAtualizada)
-        return ResponseEntity.status(200).body(categoria)
+    fun put(@PathVariable id: Int, @RequestBody categoriaAtualizada: Categoria): ResponseEntity<Categoria> {
+        val categoria = categoriaService.atualizar(id, categoriaAtualizada)
+        return if (categoria != null) ResponseEntity.ok(categoria)
+        else ResponseEntity.notFound().build()
     }
 
-    @Operation(
-        summary = "Rank Categoria",
-        description = "Rank Categoria com base no total de votos recebidos"
-    )
+    @Operation(summary = "Rank Categoria")
     @GetMapping("/view/ranking")
     fun getRanking(): ResponseEntity<List<RankCategoriaRequest>> {
         val ranking = categoriaService.getRanking()
-        return ResponseEntity.status(200).body(ranking)
+        return ResponseEntity.ok(ranking)
     }
 }

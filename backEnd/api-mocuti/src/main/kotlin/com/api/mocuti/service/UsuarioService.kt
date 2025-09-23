@@ -8,11 +8,38 @@ import java.time.LocalDate
 
 @Service
 class UsuarioService(
-    val usuarioRepository: UsuarioRepository,
-    val cargoRepository: CargoRepository,
-    val enderecoRepository: EnderecoRepository,
-    val canalComunicacaoRepository: CanalComunicacaoRepository
+    private val usuarioRepository: UsuarioRepository,
+    private val cargoRepository: CargoRepository,
+    private val enderecoRepository: EnderecoRepository,
+    private val canalComunicacaoRepository: CanalComunicacaoRepository
 ) {
+    fun listarTodos(): List<Usuario> = usuarioRepository.findAll()
+
+    fun listarPorCargo(cargoId: Int): List<Usuario> {
+        val cargo = cargoRepository.findById(cargoId)
+            .orElseThrow { IllegalArgumentException("Cargo não encontrado") }
+        return usuarioRepository.findByCargo(cargo)
+    }
+
+    fun getRelatorioUsuarios(): UsuarioRelatorioUsuarios {
+        val totalAtivos = usuarioRepository.countByIsAtivo(true)
+        val totalDesativados = usuarioRepository.countByIsAtivo(false)
+        return UsuarioRelatorioUsuarios(totalAtivos, totalDesativados)
+    }
+
+    fun relatorioGenero(): Map<String, Long> {
+        val usuarios = usuarioRepository.findAll()
+        val totalMasculino = usuarios.count { it.genero == "Masculino" }.toLong()
+        val totalFeminino = usuarios.count { it.genero == "Feminino" }.toLong()
+        val totalNaoIdentificado = usuarios.count { it.genero == "Prefiro não identificar" }.toLong()
+
+        return mapOf(
+            "Masculino" to totalMasculino,
+            "Feminino" to totalFeminino,
+            "Prefiro não identificar" to totalNaoIdentificado
+        )
+    }
+    
     fun cadastrarUsuario(request: UsuarioCadastroRequest): Usuario {
         if (usuarioRepository.existsByEmail(request.email)) {
             throw IllegalArgumentException("Email já cadastrado")

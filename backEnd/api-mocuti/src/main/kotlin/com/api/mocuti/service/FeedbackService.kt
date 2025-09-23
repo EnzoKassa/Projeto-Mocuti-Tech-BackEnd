@@ -8,11 +8,23 @@ import org.springframework.stereotype.Service
 
 @Service
 class FeedbackService(
-    val feedbackRepository: FeedbackRepository,
-    val notaRepository: NotaFeedbackRepository,
-    val eventoRepository: EventoRepository,
-    val usuarioRepository: UsuarioRepository
+    private val feedbackRepository: FeedbackRepository,
+    private val notaRepository: NotaFeedbackRepository,
+    private val eventoRepository: EventoRepository,
+    private val usuarioRepository: UsuarioRepository
 ) {
+
+    fun listarTodos(): List<Feedback> = feedbackRepository.findAll()
+
+    fun buscarPorId(id: Int): Feedback? =
+        feedbackRepository.findById(id).orElse(null)
+
+    fun deletar(id: Int): Boolean {
+        return if (feedbackRepository.existsById(id)) {
+            feedbackRepository.deleteById(id)
+            true
+        } else false
+    }
 
     @Transactional
     fun criarOuAtualizar(request: FeedbackNovoRequest): Feedback {
@@ -22,42 +34,36 @@ class FeedbackService(
         val usuario = usuarioRepository.findById(request.idUsuario)
             .orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Verifica se já existe feedback
         val feedbackExistente = feedbackRepository.findByUsuarioAndEvento(usuario, evento)
 
-        // Se forneceu nota, busca
         val nota = request.idNota?.let {
             notaRepository.findById(it)
                 .orElseThrow { IllegalArgumentException("Nota inválida") }
         }
 
         return if (feedbackExistente != null) {
-            // Atualiza
             feedbackExistente.comentario = request.comentario
             feedbackExistente.nota = nota
             feedbackRepository.save(feedbackExistente)
         } else {
-            // Cria novo
-            var novoFeedback = Feedback(
-                comentario = request.comentario,
-                evento = evento,
-                usuario = usuario,
-                nota = nota,
-                idFeedback = null
+            feedbackRepository.save(
+                Feedback(
+                    comentario = request.comentario,
+                    evento = evento,
+                    usuario = usuario,
+                    nota = nota,
+                    idFeedback = null
+                )
             )
-            feedbackRepository.save(novoFeedback)
         }
     }
 
-    fun getFeedbackPorCategoria(): List<FeedbacksPorCategoriaRequest> {
-        return feedbackRepository.getFeedbacksPorCategoria()
-    }
+    fun getFeedbackPorCategoria(): List<FeedbacksPorCategoriaRequest> =
+        feedbackRepository.getFeedbacksPorCategoria()
 
-    fun getFeedbackCategoriaMesAtual(): List<FeedbackCategoriaMesAtualRequest> {
-        return feedbackRepository.getFeedbackCategoriaMesAtual()
-    }
+    fun getFeedbackCategoriaMesAtual(): List<FeedbackCategoriaMesAtualRequest> =
+        feedbackRepository.getFeedbackCategoriaMesAtual()
 
-    fun getFeedbackEvento(): List<FeedbackEventoRequest> {
-        return feedbackRepository.getFeedbackEvento()
-    }
+    fun getFeedbackEvento(): List<FeedbackEventoRequest> =
+        feedbackRepository.getFeedbackEvento()
 }

@@ -2,108 +2,64 @@ package com.api.mocuti.controller
 
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Feedback
-import com.api.mocuti.repository.*
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
 import com.api.mocuti.service.FeedbackService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @Tag(name = "Feedback", description = "Operações relacionadas aos feedbacks")
 @RequestMapping("/feedback")
 class FeedbackJpaController(
-    val repositorio: FeedbackRepository,
-    val eventoRepository: EventoRepository,
-    val usuarioRepository: UsuarioRepository,
-    val notaFeedbackRepository: NotaFeedbackRepository,
-    val participacaoRepository: ParticipacaoRepository,
-    val feedbackService: FeedbackService = FeedbackService(
-        repositorio,
-        notaFeedbackRepository,
-        eventoRepository,
-        usuarioRepository
-    )
+    private val feedbackService: FeedbackService
 ) {
-    @Operation(
-        summary = "Listar todos os feedbacks",
-        description = "Retorna todos os feedbacks cadastrados"
-    )
+
+    @Operation(summary = "Listar todos os feedbacks")
     @GetMapping
     fun getFeedback(): ResponseEntity<List<Feedback>> {
-        val feedback = repositorio.findAll()
-        return if (feedback.isEmpty()) {
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(200).body(feedback)
-        }
+        val feedbacks = feedbackService.listarTodos()
+        return if (feedbacks.isEmpty()) ResponseEntity.noContent().build()
+        else ResponseEntity.ok(feedbacks)
     }
 
-    @Operation(
-        summary = "Buscar feedback por ID",
-        description = "Retorna o feedback correspondente ao ID fornecido"
-    )
+    @Operation(summary = "Buscar feedback por ID")
     @GetMapping("/{id}")
     fun getFeedbackPorId(@PathVariable id: Int): ResponseEntity<Feedback> {
-        if (!repositorio.existsById(id)) {
-            return ResponseEntity.status(404).build()
-        }
-
-        val feedback = repositorio.findById(id).get()
-        return ResponseEntity.status(200).body(feedback)
+        val feedback = feedbackService.buscarPorId(id)
+        return if (feedback != null) ResponseEntity.ok(feedback)
+        else ResponseEntity.notFound().build()
     }
 
-    @Operation(
-        summary = "Deletar um feedback",
-        description = "Remove o feedback com o ID fornecido"
-    )
+    @Operation(summary = "Deletar um feedback")
     @DeleteMapping("/{id}")
     fun deleteFeedback(@PathVariable id: Int): ResponseEntity<Void> {
-        return if (repositorio.existsById(id)) {
-            repositorio.deleteById(id)
-            ResponseEntity.status(204).build()
-        } else {
-            ResponseEntity.status(404).build()
-        }
+        return if (feedbackService.deletar(id)) ResponseEntity.noContent().build()
+        else ResponseEntity.notFound().build()
     }
 
-    @Operation(
-        summary = "Criar ou atualizar feedback",
-        description = "Se já existe feedback do usuário no evento, atualiza; caso contrário, cria"
-    )
+    @Operation(summary = "Criar ou atualizar feedback")
     @PostMapping
     fun postFeedback(@RequestBody novoFeedback: FeedbackNovoRequest): ResponseEntity<Feedback> {
         val feedback = feedbackService.criarOuAtualizar(novoFeedback)
         return ResponseEntity.ok(feedback)
     }
 
-    @Operation(
-        summary = "Feedbacks por categoria",
-        description = "Quantidade de feedbacks agrupados por categoria"
-    )
+    @Operation(summary = "Feedbacks por categoria")
     @GetMapping("/view/feedbacks-por-categoria")
     fun getFeedbackCategoria(): ResponseEntity<List<FeedbacksPorCategoriaRequest>> {
-        val feedback = feedbackService.getFeedbackPorCategoria()
-        return ResponseEntity.status(200).body(feedback)
+        return ResponseEntity.ok(feedbackService.getFeedbackPorCategoria())
     }
 
-    @Operation(
-        summary = "Feedbacks por categoria no mês atual",
-        description = "Quantidade de feedbacks agrupados por categoria do mês atual"
-    )
+    @Operation(summary = "Feedbacks por categoria no mês atual")
     @GetMapping("/view/feedback-categoria-mes-atual")
     fun getFeedbackCategoriaMesAtual(): ResponseEntity<List<FeedbackCategoriaMesAtualRequest>> {
-        val feedback = feedbackService.getFeedbackCategoriaMesAtual()
-        return ResponseEntity.status(200).body(feedback)
+        return ResponseEntity.ok(feedbackService.getFeedbackCategoriaMesAtual())
     }
 
-    @Operation(
-        summary = "Feedbacks por evento",
-        description = "Quantidade de feedbacks agrupados por evento"
-    )
+    @Operation(summary = "Feedbacks por evento")
     @GetMapping("/view/feedback-evento")
     fun getFeedbackEvento(): ResponseEntity<List<FeedbackEventoRequest>> {
-        val feedback = feedbackService.getFeedbackEvento()
-        return ResponseEntity.status(200).body(feedback)
+        return ResponseEntity.ok(feedbackService.getFeedbackEvento())
     }
 }
