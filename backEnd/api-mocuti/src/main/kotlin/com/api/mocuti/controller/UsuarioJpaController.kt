@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 
 @RestController
+@CrossOrigin(origins = arrayOf("http://localhost:5173")) // libera apenas para o front
 @Tag(name = "Usuário", description = "Operações relacionadas a usuários")
 @RequestMapping("/usuarios")
 class UsuarioJpaController(
