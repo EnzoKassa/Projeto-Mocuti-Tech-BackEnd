@@ -6,6 +6,7 @@ import com.api.mocuti.repository.*
 import com.api.mocuti.specification.EventoSpecification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class EventoService(
@@ -116,12 +117,21 @@ class EventoService(
         return eventoRepository.save(evento)
     }
 
-    fun atualizarFoto(id: Int, foto: ByteArray): Evento {
+
+    fun atualizarFoto(id: Int, fotoRequest: ByteArray): FotoRequest {
         val evento = eventoRepository.findByIdOrNull(id)
             ?: throw NoSuchElementException("Evento com ID $id não encontrado")
 
-        evento.foto = foto
-        return eventoRepository.save(evento)
+        // garante que a data não quebre a validação
+        evento.dia = evento.dia.takeIf { !it.isBefore(LocalDate.now()) } ?: LocalDate.now()
+
+        evento.foto = fotoRequest
+        val eventoSalvo = eventoRepository.save(evento)
+
+        // retorna só o DTO, não a entity inteira
+        return FotoRequest(
+            foto = eventoSalvo.foto!!
+        )
     }
 
     fun getFoto(id: Int): ByteArray? =

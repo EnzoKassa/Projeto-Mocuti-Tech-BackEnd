@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
 
 @RestController
@@ -69,10 +70,13 @@ class EventoJpaController(
     }
 
     @Operation(summary = "Atualizar foto do evento")
-    @PatchMapping("/foto/{id}")
-    fun patchFoto(@PathVariable id: Int, @RequestBody foto: ByteArray): ResponseEntity<Evento> {
-        val eventoAtualizado = eventoService.atualizarFoto(id, foto)
-        return ResponseEntity.ok(eventoAtualizado)
+    @PatchMapping("/foto/{id}", consumes = ["multipart/form-data"])
+    fun patchFoto(
+        @PathVariable id: Int,
+        @RequestParam("foto") foto: MultipartFile
+    ): ResponseEntity<FotoRequest> {
+        val fotoAtualizada = eventoService.atualizarFoto(id, foto.bytes)
+        return ResponseEntity.ok(fotoAtualizada)
     }
 
     @Operation(summary = "Atualizar status do evento")
