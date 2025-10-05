@@ -145,13 +145,60 @@ class EventoService(
 
     fun buscarComFiltros(filtro: EventoFiltroRequest): List<EventoDTO> =
         eventoRepository.findAll(EventoSpecification.comFiltros(filtro))
-            .map { EventoDTO(it.nomeEvento, it.dia) }
+            .map {
+                // Usando argumentos nomeados para mapear corretamente todos os campos da Evento Entity
+                EventoDTO(
+                    idEvento = it.idEvento,
+                    nomeEvento = it.nomeEvento,
+                    nome = it.nomeEvento, // Preenchemos 'nome' e 'nomeEvento' para evitar o erro do frontend
+                    descricao = it.descricao,
+                    dia = it.dia,
+                    horaInicio = it.horaInicio,
+                    horaFim = it.horaFim,
+                    qtdVaga = it.qtdVaga,
+                    qtdInteressado = it.qtdInteressado,
+                    publicoAlvo = it.publicoAlvo,
+                    statusEvento = it.statusEvento,
+                    categoria = it.categoria
+                )
+            }
 
     fun buscarPorCategoria(categoriaId: Int): List<EventoDTO> =
         eventoRepository.findByCategoria_IdCategoria(categoriaId)
-            .map { EventoDTO(it.nomeEvento, it.dia) }
+            .map {
+                // Repete o mapeamento completo
+                EventoDTO(
+                    idEvento = it.idEvento,
+                    nomeEvento = it.nomeEvento,
+                    nome = it.nomeEvento,
+                    descricao = it.descricao,
+                    dia = it.dia,
+                    horaInicio = it.horaInicio,
+                    horaFim = it.horaFim,
+                    qtdVaga = it.qtdVaga,
+                    qtdInteressado = it.qtdInteressado,
+                    publicoAlvo = it.publicoAlvo,
+                    statusEvento = it.statusEvento,
+                    categoria = it.categoria
+                )
+            }
 
     fun buscarPorStatus(statusEventoId: Int): List<EventoDTO> =
         eventoRepository.findByStatusEvento_IdStatusEvento(statusEventoId)
-            .map { EventoDTO(it.nomeEvento, it.dia) }
+            .map {
+                EventoDTO(
+                    idEvento = it.idEvento,
+                    nomeEvento = it.nomeEvento,
+                    nome = it.nomeEvento,
+                    descricao = it.descricao,
+                    dia = it.dia,
+                    horaInicio = it.horaInicio,
+                    horaFim = it.horaFim,
+                    qtdVaga = it.qtdVaga,
+                    qtdInteressado = it.qtdInteressado,
+                    publicoAlvo = it.publicoAlvo,
+                    statusEvento = it.statusEvento,
+                    categoria = it.categoria
+                )
+            }
 }
