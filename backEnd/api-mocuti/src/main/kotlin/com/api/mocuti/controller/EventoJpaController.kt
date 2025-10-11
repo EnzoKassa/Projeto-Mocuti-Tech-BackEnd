@@ -104,9 +104,11 @@ class EventoJpaController(
     fun listarEventos(
         @RequestParam(required = false) nome: String?,
         @RequestParam(required = false) dataInicio: LocalDate?,
-        @RequestParam(required = false) dataFim: LocalDate?
+        @RequestParam(required = false) dataFim: LocalDate?,
+        @RequestParam(required = false) categoriaId: Int?,
+        @RequestParam(required = false) statusEventoId: Int?
     ): List<EventoDTO> {
-        val filtro = EventoFiltroRequest(nome, dataInicio, dataFim)
+        val filtro = EventoFiltroRequest(nome, dataInicio, dataFim, categoriaId, statusEventoId)
         return eventoService.buscarComFiltros(filtro)
     }
 
