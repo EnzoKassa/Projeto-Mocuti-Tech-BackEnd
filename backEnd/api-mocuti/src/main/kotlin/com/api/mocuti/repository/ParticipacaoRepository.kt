@@ -38,4 +38,7 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
     ): List<Participacao>
 
     fun findByUsuarioAndEvento(usuario: Usuario, evento: Evento): Participacao?
+
+    fun findByUsuario_IdUsuarioAndIsInscritoTrue(usuarioId: Int): List<Participacao>
+
 }
