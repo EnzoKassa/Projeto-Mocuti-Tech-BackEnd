@@ -18,14 +18,16 @@ class AuthService(
         val usuario = usuarioRepository.findByEmail(email)
             ?: throw IllegalArgumentException("Usuário não encontrado")
 
-        val token = (100000..999999).random().toString() // token de 6 dígitos
+        val token = (100000..999999).random().toString().trim() // token de 6 dígitos
         tokensResetSenha[token] = email
 
         emailService.enviarEmailResetSenha(email, token)
     }
 
     fun redefinirSenha(token: String, novaSenha: String) {
-        val email = tokensResetSenha[token]
+        val tokenLimpo = token.trim()
+
+        val email = tokensResetSenha[tokenLimpo]
             ?: throw IllegalArgumentException("Token inválido ou expirado")
 
         val usuario = usuarioRepository.findByEmail(email)
@@ -35,6 +37,6 @@ class AuthService(
 //        usuario.senha = novaSenha
         usuarioRepository.save(usuario)
 
-        tokensResetSenha.remove(token)
+        tokensResetSenha.remove(tokenLimpo)
     }
 }
