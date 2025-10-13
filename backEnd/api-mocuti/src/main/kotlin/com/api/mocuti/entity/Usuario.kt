@@ -38,7 +38,7 @@ data class Usuario(
     var genero: String,
 
     @field:NotBlank
-    @field:Size(min = 8, max = 18)
+//    @field:Size(min = 8, max = 18)
     var senha: String,
 
     @JsonIgnore
