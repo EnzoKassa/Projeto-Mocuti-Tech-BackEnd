@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 
+
 @RestController
 @CrossOrigin(origins = arrayOf("http://localhost:5173")) // libera apenas para o front
 @Tag(name = "Usuário", description = "Operações relacionadas a usuários")
@@ -117,4 +118,25 @@ class UsuarioJpaController(
     fun getFaixaEtariaUsuariosAtivos(): ResponseEntity<List<FaixaEtariaUsuariosAtivosRequest>> {
         return ResponseEntity.ok(usuarioService.getFaixaEtariaUsuariosAtivos())
     }
+
+    @Operation(summary = "Listar um usuário por ID")
+    @GetMapping("/listar/{idUsuario}")
+    fun listarUmUsuario(@PathVariable idUsuario: Int): ResponseEntity<Usuario> {
+        return try {
+            val usuario = usuarioService.buscarUsuarioPorId(idUsuario)
+            ResponseEntity.ok(usuario)
+        } catch (e: NoSuchElementException) {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    @PutMapping("/editar/{id}")
+    fun editarUsuario(
+        @PathVariable id: Long,
+        @RequestBody usuarioRequest: EditarUsuarioRequest
+    ): ResponseEntity<Usuario> {
+        val usuarioAtualizado = usuarioService.editarUsuario(id, usuarioRequest)
+        return ResponseEntity.ok(usuarioAtualizado)
+    }
+
 }

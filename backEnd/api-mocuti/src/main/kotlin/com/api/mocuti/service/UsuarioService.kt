@@ -5,6 +5,7 @@ import com.api.mocuti.entity.Usuario
 import com.api.mocuti.repository.*
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.format.DateTimeParseException
 
 @Service
 class UsuarioService(
@@ -153,4 +154,31 @@ class UsuarioService(
     fun getFaixaEtariaUsuariosAtivos(): List<FaixaEtariaUsuariosAtivosRequest> {
         return usuarioRepository.getFaixaEtariaUsuariosAtivos()
     }
+    fun buscarUsuarioPorId(idUsuario: Int): Usuario {
+        return usuarioRepository.findById(idUsuario)
+            .orElseThrow { NoSuchElementException("Usuário com ID $idUsuario não encontrado") }
+    }
+
+    fun editarUsuario(id: Long, usuarioRequest: EditarUsuarioRequest): Usuario {
+        val usuario = usuarioRepository.findById(id.toInt())
+            .orElseThrow { NoSuchElementException("Usuário não encontrado com ID: $id") }
+
+        usuario.nomeCompleto = usuarioRequest.nomeCompleto
+        usuario.cpf = usuarioRequest.cpf
+        usuario.telefone = usuarioRequest.telefone
+        usuario.email = usuarioRequest.email
+        usuario.dt_nasc = try {
+            LocalDate.parse(usuarioRequest.dt_nasc)
+        } catch (e: DateTimeParseException) {
+            throw IllegalArgumentException("Data de nascimento inválida. Use o formato yyyy-MM-dd.")
+        }
+        usuario.etnia = usuarioRequest.etnia
+        usuario.nacionalidade = usuarioRequest.nacionalidade
+        usuario.genero = usuarioRequest.genero
+
+        return usuarioRepository.save(usuario)
+    }
+
+
+
 }
