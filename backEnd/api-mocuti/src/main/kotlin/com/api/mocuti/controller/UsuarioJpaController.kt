@@ -28,7 +28,7 @@ class UsuarioJpaController(
     @Operation(summary = "Listar usuários por cargo")
     @GetMapping("/listar-por-cargo/{cargo}")
     fun listarPorCargo(@PathVariable cargo: Int): ResponseEntity<List<Usuario>> {
-        val usuarios = usuarioService.listarPorCargo(cargo)
+        val usuarios = usuarioService.listarUsuariosPorCargo(cargo)
         return if (usuarios.isNotEmpty()) ResponseEntity.ok(usuarios)
         else ResponseEntity.noContent().build()
     }

@@ -18,7 +18,7 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
     fun countByIsAtivo(isAtivo: Boolean): Long
 
     @Query("select u from Usuario u where u.cargo = ?1")
-    fun findByCargo(cargo: Cargo): List<Usuario>
+    fun findByCargo_IdCargo(idCargo: Int): List<Usuario>
 
     @Query("select count(u) > 0 from Usuario u where u.cpf = ?1")
     fun existsByCpf(cpf: String): Boolean
@@ -43,4 +43,11 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
         nativeQuery = true
     )
     fun getFaixaEtariaUsuariosAtivos(): List<FaixaEtariaUsuariosAtivosRequest>
-}
+
+        @Query("""
+            SELECT u
+            FROM Usuario u
+            WHERE u.cargo.idCargo = 3
+        """)
+        fun findUsuariosM2(): List<Usuario>
+    }

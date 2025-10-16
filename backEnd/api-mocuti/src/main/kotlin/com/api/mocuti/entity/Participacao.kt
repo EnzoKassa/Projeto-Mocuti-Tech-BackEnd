@@ -4,14 +4,17 @@ import jakarta.persistence.*
 
 @Entity
 data class Participacao(
-    @EmbeddedId  // Indica que `id` é uma chave composta, baseada em uma classe `@Embeddable`
+    @EmbeddedId
     val id: ParticipacaoId,
 
     @Column(columnDefinition = "tinyint")
-    val isInscrito: Boolean,
+    var isInscrito: Boolean,
 
     @Column(columnDefinition = "tinyint")
-    val isPresente: Boolean,
+    var isPresente: Boolean,
+
+    @Column(columnDefinition = "varchar(45)")
+    var statusConvite: String = "PENDENTE", // Valores: PENDENTE, ACEITO, RECUSADO
 
     @ManyToOne
     @JoinColumn(name = "fk_inscricao_participacao")

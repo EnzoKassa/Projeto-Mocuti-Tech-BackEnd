@@ -4,6 +4,7 @@ import com.api.mocuti.dto.ParticipacaoFeedbackDTO
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
 import com.api.mocuti.entity.ParticipacaoId
+import com.api.mocuti.entity.Usuario
 import com.api.mocuti.repository.ParticipacaoRepository
 import com.api.mocuti.repository.FeedbackRepository
 import com.api.mocuti.repository.EventoRepository
@@ -78,6 +79,10 @@ class ParticipacaoService(
         )
 
         participacaoRepository.save(participacao)
+
+        // Incrementar a quantidade de interessados
+        evento.qtdInteressado += 1
+        eventoRepository.save(evento)
     }
 
     fun cancelarInscricao(idEvento: Int, idUsuario: Int) {
@@ -85,10 +90,32 @@ class ParticipacaoService(
             .orElseThrow { NoSuchElementException("Participação não encontrada para o evento $idEvento e usuário $idUsuario") }
 
         participacaoRepository.delete(participacao)
+
+        val evento = eventoRepository.findById(idEvento)
+            .orElseThrow { NoSuchElementException("Evento com ID $idEvento não encontrado") }
+
+        // Decrementar a quantidade de interessados
+        if (evento.qtdInteressado > 0) {
+            evento.qtdInteressado -= 1
+            eventoRepository.save(evento)
+        }
     }
 
     fun listarEventosInscritos(idUsuario: Int): List<Evento> {
         val participacoes = participacaoRepository.findByUsuario_IdUsuarioAndIsInscritoTrue(idUsuario)
         return participacoes.map { it.evento }
+    }
+
+    fun listarInteressadosPorEvento(idEvento: Int): List<Usuario> {
+        val participacoes = participacaoRepository.findByEventoIdAndIsInscritoTrue(idEvento)
+        return participacoes.map { it.usuario }
+    }
+
+    fun marcarPresenca(idEvento: Int, idUsuario: Int) {
+        val participacao = participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
+            .orElseThrow { NoSuchElementException("Participação não encontrada para o evento $idEvento e usuário $idUsuario") }
+
+        participacao.isPresente = true
+        participacaoRepository.save(participacao)
     }
 }

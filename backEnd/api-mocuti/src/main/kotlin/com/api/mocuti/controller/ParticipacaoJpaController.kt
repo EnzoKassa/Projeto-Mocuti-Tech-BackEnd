@@ -3,18 +3,13 @@ package com.api.mocuti.controller
 import com.api.mocuti.dto.ParticipacaoFeedbackDTO
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
+import com.api.mocuti.entity.Usuario
 import com.api.mocuti.repository.ParticipacaoRepository
 import com.api.mocuti.service.ParticipacaoService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 @RestController
@@ -79,6 +74,22 @@ class ParticipacaoJpaController(
         val eventos = participacaoService.listarEventosInscritos(idUsuario)
         return if (eventos.isEmpty()) ResponseEntity.noContent().build()
         else ResponseEntity.ok(eventos)
+    }
+
+    @GetMapping("/{idEvento}/interessados")
+    fun listarInteressados(@PathVariable idEvento: Int): ResponseEntity<List<Usuario>> {
+        val interessados = participacaoService.listarInteressadosPorEvento(idEvento)
+        return if (interessados.isEmpty()) ResponseEntity.noContent().build()
+        else ResponseEntity.ok(interessados)
+    }
+
+    @PatchMapping("/{idEvento}/marcar-presenca")
+    fun marcarPresenca(
+        @PathVariable idEvento: Int,
+        @RequestParam idUsuario: Int
+    ): ResponseEntity<Void> {
+        participacaoService.marcarPresenca(idEvento, idUsuario)
+        return ResponseEntity.ok().build()
     }
 
 }

@@ -15,12 +15,6 @@ class UsuarioService(
 ) {
     fun listarTodos(): List<Usuario> = usuarioRepository.findAll()
 
-    fun listarPorCargo(cargoId: Int): List<Usuario> {
-        val cargo = cargoRepository.findById(cargoId)
-            .orElseThrow { IllegalArgumentException("Cargo não encontrado") }
-        return usuarioRepository.findByCargo(cargo)
-    }
-
     fun getRelatorioUsuarios(): UsuarioRelatorioUsuarios {
         val totalAtivos = usuarioRepository.countByIsAtivo(true)
         val totalDesativados = usuarioRepository.countByIsAtivo(false)
@@ -152,5 +146,9 @@ class UsuarioService(
 
     fun getFaixaEtariaUsuariosAtivos(): List<FaixaEtariaUsuariosAtivosRequest> {
         return usuarioRepository.getFaixaEtariaUsuariosAtivos()
+    }
+
+    fun listarUsuariosPorCargo(idCargo: Int): List<Usuario> {
+        return usuarioRepository.findByCargo_IdCargo(idCargo)
     }
 }
