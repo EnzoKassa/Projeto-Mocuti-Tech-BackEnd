@@ -1,7 +1,7 @@
-import com.api.mocuti.controller.UsuarioJpaController
+package com.api.mocuti.controller
+
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.*
-import com.api.mocuti.repository.*
 import com.api.mocuti.service.UsuarioService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -13,15 +13,8 @@ import java.util.*
 
 class UsuarioJpaControllerTest {
 
-    private val repositorio: UsuarioRepository = mock(UsuarioRepository::class.java)
-    private val cargoRepository: CargoRepository = mock(CargoRepository::class.java)
     private val usuarioService: UsuarioService = mock(UsuarioService::class.java)
-
-    private val controller = UsuarioJpaController(
-        repositorio,
-        cargoRepository,
-        usuarioService
-    )
+    private val controller = UsuarioJpaController(usuarioService)
 
     private lateinit var cargoTeste: Cargo
     private lateinit var enderecoTeste: Endereco
@@ -62,48 +55,29 @@ class UsuarioJpaControllerTest {
         )
     }
 
+    // ----------- TESTES DE LISTAGEM -----------
+
     @Test
     fun `deve listar todos os usuarios`() {
-        `when`(repositorio.findAll()).thenReturn(listOf(usuarioTeste))
+        `when`(usuarioService.listarTodos()).thenReturn(listOf(usuarioTeste))
 
         val response = controller.listarTodos()
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(listOf(usuarioTeste), response.body)
+        assertEquals(1, response.body?.size)
     }
 
     @Test
-    fun `deve retornar usuarios quando cargo existe e possui usuarios`() {
-        `when`(cargoRepository.findById(cargoTeste.idCargo)).thenReturn(Optional.of(cargoTeste))
-        `when`(repositorio.findByCargo(cargoTeste)).thenReturn(listOf(usuarioTeste))
+    fun `deve retornar no content se nao houver usuarios`() {
+        `when`(usuarioService.listarTodos()).thenReturn(emptyList())
 
-        val response = controller.listarPorCargo(cargoTeste.idCargo)
-
-        assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(listOf(usuarioTeste), response.body)
-    }
-
-    @Test
-    fun `deve retornar no content quando cargo existe mas nao possui usuarios`() {
-        `when`(cargoRepository.findById(cargoTeste.idCargo)).thenReturn(Optional.of(cargoTeste))
-        `when`(repositorio.findByCargo(cargoTeste)).thenReturn(emptyList())
-
-        val response = controller.listarPorCargo(cargoTeste.idCargo)
+        val response = controller.listarTodos()
 
         assertEquals(HttpStatus.NO_CONTENT, response.statusCode)
         assertNull(response.body)
     }
 
-    @Test
-    fun `deve retornar not found quando cargo nao existe`() {
-        val idCargoInexistente = 999
-        `when`(cargoRepository.findById(idCargoInexistente)).thenReturn(Optional.empty())
-
-        val response = controller.listarPorCargo(idCargoInexistente)
-
-        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
-        assertNull(response.body)
-    }
+    // ----------- CADASTRO -----------
 
     @Test
     fun `deve cadastrar usuario com sucesso`() {
@@ -130,16 +104,7 @@ class UsuarioJpaControllerTest {
         assertEquals(usuarioTeste, response.body)
     }
 
-    @Test
-    fun `deve redefinir senha com sucesso`() {
-        val request = UsuarioRedefinirSenhaRequest(senha = "novaSenha123")
-
-        doNothing().`when`(usuarioService).redefinirSenha(usuarioTeste.idUsuario, request)
-
-        val response = controller.redefinirSenha(usuarioTeste.idUsuario, request)
-
-        assertEquals(HttpStatus.OK, response.statusCode)
-    }
+    // ----------- LOGIN / LOGOUT -----------
 
     @Test
     fun `deve logar com sucesso`() {
@@ -149,7 +114,8 @@ class UsuarioJpaControllerTest {
         val response = controller.logar(loginRequest)
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(usuarioTeste, response.body)
+        assertEquals(usuarioTeste.email, response.body?.email)
+        assertEquals(usuarioTeste.nomeCompleto, response.body?.nomeCompleto)
     }
 
     @Test
@@ -163,6 +129,21 @@ class UsuarioJpaControllerTest {
         assertEquals(usuarioTeste, response.body)
     }
 
+    // ----------- SENHA -----------
+
+    @Test
+    fun `deve redefinir senha com sucesso`() {
+        val request = UsuarioRedefinirSenhaRequest(senha = "novaSenha123")
+        doNothing().`when`(usuarioService).redefinirSenha(usuarioTeste.idUsuario, request)
+
+        val response = controller.redefinirSenha(usuarioTeste.idUsuario, request)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        verify(usuarioService).redefinirSenha(usuarioTeste.idUsuario, request)
+    }
+
+    // ----------- ATIVAR / DESATIVAR -----------
+
     @Test
     fun `deve desativar usuario com sucesso`() {
         `when`(usuarioService.desativarUsuario(usuarioTeste.idUsuario)).thenReturn(usuarioTeste)
@@ -170,7 +151,7 @@ class UsuarioJpaControllerTest {
         val response = controller.desativarUsuario(usuarioTeste.idUsuario)
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(usuarioTeste, response.body)
+        verify(usuarioService).desativarUsuario(usuarioTeste.idUsuario)
     }
 
     @Test
@@ -180,6 +161,57 @@ class UsuarioJpaControllerTest {
         val response = controller.ativarUsuario(usuarioTeste.idUsuario)
 
         assertEquals(HttpStatus.OK, response.statusCode)
+        verify(usuarioService).ativarUsuario(usuarioTeste.idUsuario)
+    }
+
+    // ----------- BUSCAR POR ID -----------
+
+    @Test
+    fun `deve listar um usuario por id`() {
+        `when`(usuarioService.buscarUsuarioPorId(usuarioTeste.idUsuario)).thenReturn(usuarioTeste)
+
+        val response = controller.listarUmUsuario(usuarioTeste.idUsuario)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(usuarioTeste, response.body)
+    }
+
+    @Test
+    fun `deve retornar not found se usuario nao existir`() {
+        `when`(usuarioService.buscarUsuarioPorId(999)).thenThrow(NoSuchElementException())
+
+        val response = controller.listarUmUsuario(999)
+
+        assertEquals(HttpStatus.NOT_FOUND, response.statusCode)
+    }
+
+    // ----------- EDIÇÃO -----------
+
+    @Test
+    fun `deve editar usuario com sucesso`() {
+        val editarRequest = EditarUsuarioRequest(
+            nomeCompleto = "Atualizado",
+            cpf = "000.000.000-00",
+            telefone = "(11) 98888-7777",
+            email = "novo@email.com",
+            dt_nasc = "2000-01-01",
+            etnia = "Parda",
+            nacionalidade = "Brasileira",
+            genero = "Feminino"
+        )
+
+        val usuarioAtualizado = usuarioTeste.copy(
+            nomeCompleto = "Atualizado",
+            telefone = "(11) 98888-7777",
+            email = "novo@email.com"
+        )
+
+        `when`(usuarioService.editarUsuario(usuarioTeste.idUsuario.toLong(), editarRequest))
+            .thenReturn(usuarioAtualizado)
+
+        val response = controller.editarUsuario(usuarioTeste.idUsuario.toLong(), editarRequest)
+
+        assertEquals(HttpStatus.OK, response.statusCode)
+        assertEquals("Atualizado", response.body?.nomeCompleto)
     }
 }

@@ -1,19 +1,23 @@
 package com.api.mocuti.service
 
-import EventoService
 import com.api.mocuti.dto.EventoAttDiaHoraRequest
 import com.api.mocuti.dto.EventoAtualizaStatusRequest
 import com.api.mocuti.dto.EventoAtualizarRequest
 import com.api.mocuti.dto.EventoCadastroRequest
-import com.api.mocuti.entity.*
+import com.api.mocuti.entity.Categoria
+import com.api.mocuti.entity.Endereco
+import com.api.mocuti.entity.Evento
+import com.api.mocuti.entity.StatusEvento
 import com.api.mocuti.repository.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.*
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
+
 
 class EventoServiceTest {
 
@@ -21,6 +25,8 @@ class EventoServiceTest {
     private val enderecoRepository: EnderecoRepository = mock(EnderecoRepository::class.java)
     private val statusEventoRepository: StatusEventoRepository = mock(StatusEventoRepository::class.java)
     private val categoriaRepository: CategoriaRepository = mock(CategoriaRepository::class.java)
+    private val preferenciaRepository: PreferenciaRepository = mock(PreferenciaRepository::class.java)
+    private val emailService: EmailService = mock(EmailService::class.java)
 
     private lateinit var service: EventoService
 
@@ -31,7 +37,14 @@ class EventoServiceTest {
 
     @BeforeEach
     fun setup() {
-        service = EventoService(eventoRepository, enderecoRepository, statusEventoRepository, categoriaRepository)
+        service = EventoService(
+            eventoRepository,
+            enderecoRepository,
+            statusEventoRepository,
+            categoriaRepository,
+            preferenciaRepository,
+            emailService
+        )
 
         endereco = Endereco(1, "12345678", "Rua A", 100, "Ap 2", "SP", "São Paulo", "Centro")
         statusEvento = StatusEvento(1, "Ativo")
@@ -75,12 +88,19 @@ class EventoServiceTest {
         `when`(enderecoRepository.findById(1)).thenReturn(Optional.of(endereco))
         `when`(statusEventoRepository.findById(1)).thenReturn(Optional.of(statusEvento))
         `when`(categoriaRepository.findById(1)).thenReturn(Optional.of(categoria))
-        `when`(eventoRepository.save(any(Evento::class.java))).thenReturn(evento)
+        `when`(preferenciaRepository.findUsuariosByIdCategoria(1)).thenReturn(emptyList())
+        `when`(eventoRepository.save(ArgumentMatchers.any(Evento::class.java))).thenAnswer { invocation ->
+            val eventoSalvo = invocation.arguments[0] as Evento
+            eventoSalvo.copy(idEvento = 1)
+        }
 
         val result = service.criarEvento(dto)
 
-        assertEquals("Evento Teste", result.nomeEvento)
+        assertEquals("Novo Evento", result.nomeEvento)
+        assertEquals(1, result.idEvento)
+        verify(eventoRepository).save(ArgumentMatchers.any(Evento::class.java))
     }
+
 
     @Test
     fun `deve atualizar evento com sucesso`() {
@@ -109,6 +129,7 @@ class EventoServiceTest {
 
         assertEquals("Atualizado", result.nomeEvento)
         assertFalse(result.isAberto)
+        verify(eventoRepository).save(evento)
     }
 
     @Test
@@ -119,7 +140,8 @@ class EventoServiceTest {
             horaFim = LocalTime.of(16, 0)
         )
 
-        `when`(eventoRepository.findById(1)).thenReturn(Optional.of(evento)).thenReturn(Optional.of(evento))
+        `when`(eventoRepository.existsById(1)).thenReturn(true)
+        `when`(eventoRepository.findById(1)).thenReturn(Optional.of(evento))
 
         val result = service.atualizarDiaHora(1, dto)
 
@@ -139,6 +161,7 @@ class EventoServiceTest {
         val result = service.atualizarStatusEvento(1, dto)
 
         assertEquals(2, result.statusEvento.idStatusEvento)
+        verify(eventoRepository).save(evento)
     }
 
     @Test

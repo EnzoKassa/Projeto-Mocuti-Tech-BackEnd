@@ -1,118 +1,129 @@
 package com.api.mocuti.controller
 
-import com.api.mocuti.dto.FeedbackAtualizarRequest
-import com.api.mocuti.dto.FeedbackNovoRequest
-import com.api.mocuti.entity.*
-import com.api.mocuti.repository.*
+import com.api.mocuti.dto.*
+import com.api.mocuti.entity.Feedback
 import com.api.mocuti.service.FeedbackService
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
-import java.util.*
 
 class FeedbackJpaControllerTest {
 
-    private val feedbackRepository: FeedbackRepository = mock(FeedbackRepository::class.java)
-    private val usuarioRepository: UsuarioRepository = mock(UsuarioRepository::class.java)
-    private val eventoRepository: EventoRepository = mock(EventoRepository::class.java)
-    private val notaFeedbackRepository: NotaFeedbackRepository = mock(NotaFeedbackRepository::class.java)
     private val service: FeedbackService = mock(FeedbackService::class.java)
-
-    private val controller = FeedbackJpaController(
-        feedbackRepository,
-        eventoRepository,
-        usuarioRepository,
-        notaFeedbackRepository,
-        service
-    )
+    private val controller = FeedbackJpaController(service)
 
     @Test
-    fun `deve retornar 200 e lista de feedbacks quando existirem feedbacks`() {
+    fun `getFeedback deve retornar 200 e lista de feedbacks quando existirem`() {
         val feedbacks = listOf(mock(Feedback::class.java))
-        `when`(feedbackRepository.findAll()).thenReturn(feedbacks)
+        `when`(service.listarTodos()).thenReturn(feedbacks)
 
         val response = controller.getFeedback()
 
         assertEquals(200, response.statusCode.value())
         assertEquals(feedbacks, response.body)
+        verify(service, times(1)).listarTodos()
     }
 
     @Test
-    fun `deve retornar 204 quando nao houver nenhum feedback`() {
-        `when`(feedbackRepository.findAll()).thenReturn(emptyList())
+    fun `getFeedback deve retornar 204 quando lista estiver vazia`() {
+        `when`(service.listarTodos()).thenReturn(emptyList())
 
         val response = controller.getFeedback()
 
         assertEquals(204, response.statusCode.value())
         assertNull(response.body)
+        verify(service, times(1)).listarTodos()
     }
 
     @Test
-    fun `deve retornar 200 e o feedback quando o ID existir`() {
+    fun `getFeedbackPorId deve retornar 200 quando feedback existir`() {
         val feedback = mock(Feedback::class.java)
-        `when`(feedbackRepository.existsById(1)).thenReturn(true)
-        `when`(feedbackRepository.findById(1)).thenReturn(Optional.of(feedback))
+        `when`(service.buscarPorId(1)).thenReturn(feedback)
 
         val response = controller.getFeedbackPorId(1)
 
         assertEquals(200, response.statusCode.value())
         assertEquals(feedback, response.body)
+        verify(service, times(1)).buscarPorId(1)
     }
 
     @Test
-    fun `deve retornar 404 quando o ID nao existir`() {
-        `when`(feedbackRepository.existsById(1)).thenReturn(false)
+    fun `getFeedbackPorId deve retornar 404 quando feedback nao existir`() {
+        `when`(service.buscarPorId(1)).thenReturn(null)
 
         val response = controller.getFeedbackPorId(1)
 
         assertEquals(404, response.statusCode.value())
         assertNull(response.body)
+        verify(service, times(1)).buscarPorId(1)
     }
 
     @Test
-    fun `deve retornar 204 e deletar o feedback quando o ID existir`() {
-        `when`(feedbackRepository.existsById(1)).thenReturn(true)
+    fun `deleteFeedback deve retornar 204 quando feedback for deletado`() {
+        `when`(service.deletar(1)).thenReturn(true)
 
         val response = controller.deleteFeedback(1)
 
         assertEquals(204, response.statusCode.value())
-        assertNull(response.body)
-        verify(feedbackRepository).deleteById(1)
+        verify(service, times(1)).deletar(1)
     }
 
     @Test
-    fun `deve retornar 404 quando o ID nao existir ao deletar`() {
-        `when`(feedbackRepository.existsById(1)).thenReturn(false)
+    fun `deleteFeedback deve retornar 404 quando feedback nao existir`() {
+        `when`(service.deletar(1)).thenReturn(false)
 
         val response = controller.deleteFeedback(1)
 
         assertEquals(404, response.statusCode.value())
-        assertNull(response.body)
+        verify(service, times(1)).deletar(1)
     }
 
     @Test
-    fun `deve retornar 201 e o feedback criado quando os dados forem validos`() {
+    fun `postFeedback deve retornar 200 e feedback criado ou atualizado`() {
         val dto = mock(FeedbackNovoRequest::class.java)
         val feedback = mock(Feedback::class.java)
-
-        `when`(service.criar(dto)).thenReturn(feedback)
+        `when`(service.criarOuAtualizar(dto)).thenReturn(feedback)
 
         val response = controller.postFeedback(dto)
 
-        assertEquals(201, response.statusCode.value())
+        assertEquals(200, response.statusCode.value())
         assertEquals(feedback, response.body)
+        verify(service, times(1)).criarOuAtualizar(dto)
     }
 
     @Test
-    fun `deve retornar 200 e atualizar o feedback quando o ID existir`() {
-        val dto = mock(FeedbackAtualizarRequest::class.java)
-        val feedbackAtualizado = mock(Feedback::class.java)
+    fun `getFeedbackCategoria deve retornar 200 e lista de feedbacks por categoria`() {
+        val lista = listOf(mock(FeedbacksPorCategoriaRequest::class.java))
+        `when`(service.getFeedbackPorCategoria()).thenReturn(lista)
 
-        `when`(service.atualizar(1, dto)).thenReturn(feedbackAtualizado)
-
-        val response = controller.putFeedback(1, dto)
+        val response = controller.getFeedbackCategoria()
 
         assertEquals(200, response.statusCode.value())
-        assertEquals(feedbackAtualizado, response.body)
+        assertEquals(lista, response.body)
+        verify(service, times(1)).getFeedbackPorCategoria()
+    }
+
+    @Test
+    fun `getFeedbackCategoriaMesAtual deve retornar 200 e lista de feedbacks`() {
+        val lista = listOf(mock(FeedbackCategoriaMesAtualRequest::class.java))
+        `when`(service.getFeedbackCategoriaMesAtual()).thenReturn(lista)
+
+        val response = controller.getFeedbackCategoriaMesAtual()
+
+        assertEquals(200, response.statusCode.value())
+        assertEquals(lista, response.body)
+        verify(service, times(1)).getFeedbackCategoriaMesAtual()
+    }
+
+    @Test
+    fun `getFeedbackEvento deve retornar 200 e lista de feedbacks por evento`() {
+        val lista = listOf(mock(FeedbackEventoRequest::class.java))
+        `when`(service.getFeedbackEvento()).thenReturn(lista)
+
+        val response = controller.getFeedbackEvento()
+
+        assertEquals(200, response.statusCode.value())
+        assertEquals(lista, response.body)
+        verify(service, times(1)).getFeedbackEvento()
     }
 }

@@ -1,12 +1,8 @@
 package com.api.mocuti.service
 
-import com.api.mocuti.dto.FeedbackAtualizarRequest
 import com.api.mocuti.dto.FeedbackNovoRequest
 import com.api.mocuti.entity.*
-import com.api.mocuti.repository.EventoRepository
-import com.api.mocuti.repository.FeedbackRepository
-import com.api.mocuti.repository.NotaFeedbackRepository
-import com.api.mocuti.repository.UsuarioRepository
+import com.api.mocuti.repository.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,39 +20,9 @@ class FeedbackServiceTest {
     private lateinit var usuarioRepository: UsuarioRepository
     private lateinit var service: FeedbackService
 
-    // Objetos auxiliares para compor Evento e Usuario válidos
-    private val endereco = Endereco(
-        idEndereco = 1,
-        cep = "12345-678",
-        logradouro = "Rua Teste",
-        numero = 100,
-        complemento = "Complemento",
-        uf = "SP",
-        estado = "Bairro Teste",
-        bairro = "Cidade Teste",
-    )
-    private val statusEvento = StatusEvento(
-        idStatusEvento = 1,
-        situacao = "Ativo"
-    )
-
-    private val categoria = Categoria(
-        idCategoria = 1,
-        nome = "Categoria Teste",
-        descricao = "Categoria Teste"
-    )
-
-    private val cargo = Cargo(
-        idCargo = 1,
-        tipoCargo = "Analista"
-    )
-
-    private val canalComunicacao = CanalComunicacao(
-        idCanalComunicacao = 1,
-        tipoCanalComunicacao = "Email"
-    )
-
-    // Entidade Evento com todos os campos obrigatórios preenchidos
+    private val endereco = Endereco(1, "12345-678", "Rua Teste", 100, "Ap 2", "SP", "Cidade Teste", "Bairro Teste")
+    private val statusEvento = StatusEvento(1, "Ativo")
+    private val categoria = Categoria(1, "Categoria Teste", "Descrição Categoria")
     private val evento = Evento(
         idEvento = 1,
         nomeEvento = "Evento Teste",
@@ -73,28 +39,22 @@ class FeedbackServiceTest {
         statusEvento = statusEvento,
         categoria = categoria
     )
-
-    // Entidade Usuario com todos os campos obrigatórios preenchidos
     private val usuario = Usuario(
         idUsuario = 1,
         nomeCompleto = "Usuário Teste",
         cpf = "123.456.789-00",
-        telefone = "(11) 91234-5678",
+        telefone = "(11)91234-5678",
         email = "email@test.com",
         dt_nasc = LocalDate.of(1990, 1, 1),
         etnia = "Pardo",
         nacionalidade = "Brasileiro",
         genero = "Masculino",
         senha = "senha123",
-        cargo = cargo,
+        cargo = Cargo(1, "Analista"),
         endereco = endereco,
-        canalComunicacao = canalComunicacao
+        canalComunicacao = CanalComunicacao(1, "Email")
     )
-
-    private val nota = NotaFeedback(
-        idNotaFeedback = 1,
-        tipoNota = "Nota Teste"
-    )
+    private val nota = NotaFeedback(1, "Nota Teste")
 
     @BeforeEach
     fun setUp() {
@@ -106,108 +66,80 @@ class FeedbackServiceTest {
     }
 
     @Test
-    fun `criar deve salvar feedback com sucesso`() {
-        val request = FeedbackNovoRequest(
-            comentario = "Muito bom",
-            idEvento = 1,
-            idUsuario = 1
-        )
+    fun `criar novo feedback quando não existe`() {
+        val request = FeedbackNovoRequest("Muito bom", 1, 1, null)
 
         `when`(eventoRepository.findById(1)).thenReturn(Optional.of(evento))
         `when`(usuarioRepository.findById(1)).thenReturn(Optional.of(usuario))
-        val feedbackSalvo = Feedback(1, "Muito bom", LocalDate.now(), null, evento, usuario)
-        `when`(feedbackRepository.save(any(Feedback::class.java))).thenReturn(feedbackSalvo)
+        `when`(feedbackRepository.findByUsuarioAndEvento(usuario, evento)).thenReturn(null)
+        `when`(feedbackRepository.save(any(Feedback::class.java))).thenAnswer { it.arguments[0] }
 
-        val result = service.criar(request)
+        val result = service.criarOuAtualizar(request)
 
         assertEquals("Muito bom", result.comentario)
         assertEquals(evento, result.evento)
         assertEquals(usuario, result.usuario)
+        assertNull(result.nota)
         verify(feedbackRepository).save(any(Feedback::class.java))
     }
 
     @Test
-    fun `criar deve lançar exceção se evento não encontrado`() {
-        val request = FeedbackNovoRequest("Comentário", 1, 1)
-        `when`(eventoRepository.findById(1)).thenReturn(Optional.empty())
+    fun `atualizar feedback existente`() {
+        val feedbackExistente = Feedback(1, "Comentário antigo", LocalDate.now(), null, evento, usuario)
+        val request = FeedbackNovoRequest("Comentário novo", 1, 1, 1)
+
+        `when`(eventoRepository.findById(1)).thenReturn(Optional.of(evento))
+        `when`(usuarioRepository.findById(1)).thenReturn(Optional.of(usuario))
+        `when`(feedbackRepository.findByUsuarioAndEvento(usuario, evento)).thenReturn(feedbackExistente)
+        `when`(notaRepository.findById(1)).thenReturn(Optional.of(nota))
+        `when`(feedbackRepository.save(any(Feedback::class.java))).thenAnswer { it.arguments[0] }
+
+        val result = service.criarOuAtualizar(request)
+
+        assertEquals("Comentário novo", result.comentario)
+        assertEquals(nota, result.nota)
+        verify(feedbackRepository).save(feedbackExistente)
+    }
+
+    @Test
+    fun `lança exceção se evento não encontrado`() {
+        val request = FeedbackNovoRequest("Comentário", 99, 1, null)
+        `when`(eventoRepository.findById(99)).thenReturn(Optional.empty())
 
         val ex = assertThrows<IllegalArgumentException> {
-            service.criar(request)
+            service.criarOuAtualizar(request)
         }
         assertEquals("Evento não encontrado", ex.message)
         verify(feedbackRepository, never()).save(any())
     }
 
     @Test
-    fun `criar deve lançar exceção se usuário não encontrado`() {
-        val request = FeedbackNovoRequest("Comentário", 1, 1)
+    fun `lança exceção se usuário não encontrado`() {
+        val request = FeedbackNovoRequest("Comentário", 1, 99, null)
         `when`(eventoRepository.findById(1)).thenReturn(Optional.of(evento))
-        `when`(usuarioRepository.findById(1)).thenReturn(Optional.empty())
+        `when`(usuarioRepository.findById(99)).thenReturn(Optional.empty())
 
         val ex = assertThrows<IllegalArgumentException> {
-            service.criar(request)
+            service.criarOuAtualizar(request)
         }
         assertEquals("Usuário não encontrado", ex.message)
         verify(feedbackRepository, never()).save(any())
     }
 
     @Test
-    fun `atualizar deve alterar comentario e nota`() {
-        val feedbackExistente = Feedback(1, "Antigo", LocalDate.now(),null, evento, usuario)
-        val dto = FeedbackAtualizarRequest(comentario = "Novo comentário", idNota = 1)
+    fun `lança exceção se nota inválida`() {
+        val feedbackExistente = Feedback(1, "Comentário antigo", LocalDate.now(), null, evento, usuario)
+        val request = FeedbackNovoRequest("Comentário novo", 1, 1, 99)
 
-        `when`(feedbackRepository.findById(1)).thenReturn(Optional.of(feedbackExistente))
-        `when`(notaRepository.findById(1)).thenReturn(Optional.of(nota))
-        val feedbackSalvo = Feedback(1, "Novo comentário", LocalDate.now(),  nota, evento, usuario)
-        `when`(feedbackRepository.save(any(Feedback::class.java))).thenReturn(feedbackSalvo)
-
-        val result = service.atualizar(1, dto)
-
-        assertEquals("Novo comentário", result.comentario)
-        assertEquals(nota, result.nota)
-        verify(feedbackRepository).save(any(Feedback::class.java))
-    }
-
-    @Test
-    fun `atualizar deve alterar apenas comentario se idNota for null`() {
-        val feedbackExistente = Feedback(1, "Antigo", LocalDate.now(), null, evento, usuario)
-        val dto = FeedbackAtualizarRequest(comentario = "Apenas comentário", idNota = null)
-
-        `when`(feedbackRepository.findById(1)).thenReturn(Optional.of(feedbackExistente))
-        `when`(feedbackRepository.save(any(Feedback::class.java))).thenAnswer { it.arguments[0] }
-
-        val result = service.atualizar(1, dto)
-
-        assertEquals("Apenas comentário", result.comentario)
-        assertNull(result.nota)
-        verify(notaRepository, never()).findById(anyInt())
-        verify(feedbackRepository).save(any(Feedback::class.java))
-    }
-
-    @Test
-    fun `atualizar deve lançar exceção se feedback não encontrado`() {
-        val dto = FeedbackAtualizarRequest("Comentário", 1)
-        `when`(feedbackRepository.findById(1)).thenReturn(Optional.empty())
+        `when`(eventoRepository.findById(1)).thenReturn(Optional.of(evento))
+        `when`(usuarioRepository.findById(1)).thenReturn(Optional.of(usuario))
+        `when`(feedbackRepository.findByUsuarioAndEvento(usuario, evento)).thenReturn(feedbackExistente)
+        `when`(notaRepository.findById(99)).thenReturn(Optional.empty())
 
         val ex = assertThrows<IllegalArgumentException> {
-            service.atualizar(1, dto)
+            service.criarOuAtualizar(request)
         }
-        assertEquals("Feedback não encontrado", ex.message)
-        verify(feedbackRepository, never()).save(any())
-    }
-
-    @Test
-    fun `atualizar deve lançar exceção se nota não encontrada`() {
-        val feedbackExistente = Feedback(1, "Antigo", LocalDate.now(), null, evento, usuario)
-        val dto = FeedbackAtualizarRequest("Comentário", 1)
-
-        `when`(feedbackRepository.findById(1)).thenReturn(Optional.of(feedbackExistente))
-        `when`(notaRepository.findById(1)).thenReturn(Optional.empty())
-
-        val ex = assertThrows<IllegalArgumentException> {
-            service.atualizar(1, dto)
-        }
-        assertEquals("Nota não encontrada", ex.message)
+        assertEquals("Nota inválida", ex.message)
         verify(feedbackRepository, never()).save(any())
     }
 }

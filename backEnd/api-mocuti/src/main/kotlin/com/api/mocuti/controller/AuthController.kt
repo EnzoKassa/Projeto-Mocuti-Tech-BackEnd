@@ -1,11 +1,11 @@
 package com.api.mocuti.controller
 
+import com.api.mocuti.dto.RedefinirSenhaRequest
+import com.api.mocuti.dto.ResetRequest
 import com.api.mocuti.service.AuthService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-data class ResetRequest(val email: String)
-data class RedefinirSenhaRequest(val token: String, val novaSenha: String)
 
 @RestController
 @RequestMapping("/auth")
