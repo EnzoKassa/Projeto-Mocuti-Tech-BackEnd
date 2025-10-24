@@ -15,21 +15,36 @@ class EmailService(
 
     @Async // executa em outra thread para não travar a requisição
     fun enviarEmailNovoEvento(destinatario: String, nome: String, evento: Evento) {
-        val mensagem = SimpleMailMessage()
+        val mensagem = MimeMessageHelper(mailSender.createMimeMessage(), true)
         mensagem.setFrom("kevelly.oliveira@sptech.school") // precisa ser o mesmo do SMTP
         mensagem.setTo(destinatario)
         mensagem.setSubject("Novo evento: ${evento.nomeEvento}")
-        mensagem.setText(
-            """
+        val html = """
+            <html>
             Olá, $nome! 
 
             Um novo evento foi criado na sua categoria favorita: ${evento.categoria.nome}
 
             Evento: ${evento.nomeEvento}
             Descrição: ${evento.descricao}
+             <html>body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                <div style="max-width: 600px; margin: auto; background-color: #fff; padding: 20px; border-radius: 8px;">
+                    <h2 style="color: #333;">Novo Evento Criado!</h2>
+                    <p>Olá, <strong>$nome</strong>!</p>
+                    <p>Um novo evento foi criado na sua categoria favorita: <strong>${evento.categoria.nome}</strong></p>
+                    <h3 style="color: #555;">Detalhes do Evento:</h3>
+                    <ul>
+                        <li><strong>Nome do Evento:</strong> ${evento.nomeEvento}</li>
+                        <li><strong>Descrição:</strong> ${evento.descricao}</li>
+                    </ul>
+                    <p style="font-size: 12px; color: #777; margin-top: 20px;">
+                        Você está recebendo este e-mail porque se inscreveu para receber notificações sobre novos eventos.
+                    </p>
+                </div>
             """.trimIndent()
-        )
-        mailSender.send(mensagem)
+
+        mensagem.setText(html, true)
+        mailSender.send(mensagem.mimeMessage)
     }
 
     @Async
@@ -44,7 +59,10 @@ class EmailService(
                 <p>Enviado para <strong>$destinatario</strong></p>
                 <p>Insira o token abaixo para finalizar:</p>
                 <div style="margin: 20px 0; display: flex; flex-direction: column; justify-content: center; gap: 10px;">
-                    ${tokenFormatado.map { "<span style='display: inline-block; width: 40px; height: 50px; line-height: 50px; border: 2px solid #6b1b4d; border-radius: 5px; font-size: 24px; font-weight: bold;'>$it</span>" }.joinToString("")}
+                    ${
+            tokenFormatado.map { "<span style='display: inline-block; width: 40px; height: 50px; line-height: 50px; border: 2px solid #6b1b4d; border-radius: 5px; font-size: 24px; font-weight: bold;'>$it</span>" }
+                .joinToString("")
+        }
                 </div>
                 <p style="font-size: 12px; color: #777; margin-top: 20px;">
                     Se não foi você, ignore este e-mail.
