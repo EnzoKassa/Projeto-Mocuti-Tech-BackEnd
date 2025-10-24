@@ -179,6 +179,7 @@ class UsuarioService(
         return usuarioRepository.save(usuario)
     }
 
-
-
+    fun buscarPorEvento(idEvento: Long): ListaPresencaEventoDTO? {
+        return usuarioRepository.findByEventoId(idEvento)
+    }
 }

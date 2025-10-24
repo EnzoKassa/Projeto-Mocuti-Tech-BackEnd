@@ -394,6 +394,9 @@ LEFT JOIN preferencia p ON p.fk_categoria_preferencia = c.id_categoria
 GROUP BY c.id_categoria, c.nome, c.descricao
 ORDER BY total_votos DESC;
 
+select * from rank_categoria;
+select * from evento;
+
 -- 3. Feedbacks por Categoria OK
 CREATE OR REPLACE VIEW feedbacks_por_categoria AS
 SELECT  ce.nome AS categoria, COUNT(CASE WHEN nf.tipo_nota = 'Excelente' THEN 1 END) AS qtd_positivos,
@@ -403,6 +406,8 @@ LEFT JOIN evento e ON e.fk_categoria_evento = ce.id_categoria
 LEFT JOIN feedback f ON f.fk_evento_feedback = e.id_evento
 LEFT JOIN nota_feedback nf ON nf.id_nota_feedback = f.fk_nota_feedback
 GROUP BY ce.nome;
+
+select * from feedbacks_por_categoria;
 
 -- 4. Feedback por Categoria no Mês Atual
 CREATE OR REPLACE VIEW feedback_categoria_mes_atual AS
@@ -416,6 +421,8 @@ WHERE YEAR(f.data_feedback) = YEAR(CURDATE())
 AND MONTH(f.data_feedback) = MONTH(CURDATE())
 GROUP BY c.nome;
 
+select * from feedback_categoria_mes_atual;
+
 -- 5. Inscrições por Mês no Ano Atual (precisa de data na tabela usuário)
 CREATE OR REPLACE VIEW inscricoes_mes_durante_ano AS
 SELECT MONTHNAME(dt_cadastro) AS mes, MONTH(dt_cadastro) AS numero_mes, COUNT(*) AS total_cadastros
@@ -423,6 +430,8 @@ FROM usuario
 WHERE YEAR(dt_cadastro) = YEAR(CURDATE())
 GROUP BY numero_mes, mes
 ORDER BY numero_mes;
+
+select * from inscricoes_mes_durante_ano;
 
 -- 7. Dados do Usuário OK - acho que isso aq é a view do get de usuario, acho que não precisa
 CREATE OR REPLACE VIEW dados_usuario AS
@@ -435,6 +444,8 @@ FROM mocuti.usuario u
 JOIN mocuti.endereco e ON u.fk_endereco_usuario = e.id_endereco
 JOIN mocuti.cargo c ON u.fk_cargo_usuario = c.id_cargo
 JOIN mocuti.canal_comunicacao cc ON u.fk_canal_comunicacao_usuario = cc.id_canal_comunicacao;
+
+select * from dados_usuario;
 
 -- 8. Eventos por Usuário OK
 CREATE OR REPLACE VIEW eventos_usuario AS
@@ -485,3 +496,44 @@ JOIN
   mocuti.evento e ON f.fk_evento_feedback = e.id_evento
 LEFT JOIN
   mocuti.nota_feedback nf ON f.fk_nota_feedback = nf.id_nota_feedback;
+
+
+-- lista de presença em 
+CREATE OR REPLACE VIEW lista_presenca_evento AS
+SELECT 
+    e.id_evento,
+    e.nome_evento,
+    e.dia AS data_evento,
+    e.hora_inicio,
+    e.hora_fim,
+    se.situacao AS status_evento,
+
+    COUNT(DISTINCT CASE WHEN p.is_inscrito = 1 THEN p.fk_usuario_participacao END) AS total_inscritos,
+    COUNT(DISTINCT CASE WHEN p.is_presente = 1 THEN p.fk_usuario_participacao END) AS total_presentes,
+    COUNT(DISTINCT CASE WHEN p.is_inscrito = 1 AND (p.is_presente = 0 OR p.is_presente IS NULL) THEN p.fk_usuario_participacao END) AS total_ausentes,
+
+    -- porcentagem de presença
+    CASE 
+        WHEN COUNT(DISTINCT CASE WHEN p.is_inscrito = 1 THEN p.fk_usuario_participacao END) = 0 THEN 0
+        ELSE ROUND(
+            COUNT(DISTINCT CASE WHEN p.is_presente = 1 THEN p.fk_usuario_participacao END) * 100.0 /
+            COUNT(DISTINCT CASE WHEN p.is_inscrito = 1 THEN p.fk_usuario_participacao END), 
+        2)
+    END AS percentual_presenca,
+
+    -- porcentagem de ausência
+    CASE 
+        WHEN COUNT(DISTINCT CASE WHEN p.is_inscrito = 1 THEN p.fk_usuario_participacao END) = 0 THEN 0
+        ELSE ROUND(
+            COUNT(DISTINCT CASE WHEN p.is_inscrito = 1 AND (p.is_presente = 0 OR p.is_presente IS NULL) THEN p.fk_usuario_participacao END) * 100.0 /
+            COUNT(DISTINCT CASE WHEN p.is_inscrito = 1 THEN p.fk_usuario_participacao END), 
+        2)
+    END AS percentual_ausencia
+
+FROM evento e
+LEFT JOIN participacao p ON e.id_evento = p.fk_evento_participacao
+LEFT JOIN status_evento se ON e.fk_status_evento = se.id_status_evento
+GROUP BY e.id_evento, e.nome_evento, e.dia, e.hora_inicio, e.hora_fim, se.situacao
+ORDER BY e.dia DESC;
+
+select * from lista_presenca_evento where id_evento = 2;

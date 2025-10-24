@@ -43,4 +43,21 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
         nativeQuery = true
     )
     fun getFaixaEtariaUsuariosAtivos(): List<FaixaEtariaUsuariosAtivosRequest>
+
+
+    @Query(
+        value = """
+            SELECT 
+                nome_evento AS nomeEvento,
+                total_inscritos AS totalInscritos,
+                total_presentes AS totalPresentes,
+                total_ausentes AS totalAusentes,
+                percentual_presenca AS percentualPresenca,
+                percentual_ausencia AS percentualAusencia
+            FROM lista_presenca_evento
+            WHERE id_evento = :idEvento
+        """,
+        nativeQuery = true
+    )
+    fun findByEventoId(idEvento: Long): ListaPresencaEventoDTO?
 }

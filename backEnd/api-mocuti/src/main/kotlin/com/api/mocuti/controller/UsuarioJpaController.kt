@@ -139,4 +139,10 @@ class UsuarioJpaController(
         return ResponseEntity.ok(usuarioAtualizado)
     }
 
+    @GetMapping("/{id}/lista-presenca")
+    fun listarPresencaPorEvento(@PathVariable id: Long): Any {
+        val resultado = usuarioService.buscarPorEvento(id)
+        return resultado ?: mapOf("mensagem" to "Evento não encontrado ou sem participantes")
+    }
+
 }
