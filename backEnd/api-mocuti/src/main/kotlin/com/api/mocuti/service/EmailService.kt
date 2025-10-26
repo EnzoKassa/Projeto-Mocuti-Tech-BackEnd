@@ -18,29 +18,46 @@ class EmailService(
         val mensagem = MimeMessageHelper(mailSender.createMimeMessage(), true)
         mensagem.setFrom("kevelly.oliveira@sptech.school") // precisa ser o mesmo do SMTP
         mensagem.setTo(destinatario)
-        mensagem.setSubject("Novo evento: ${evento.nomeEvento}")
+        mensagem.setSubject("Mocuti - Novo Evento na sua Categoria Favorita!")
         val html = """
-            <html>
-            Olá, $nome! 
-
-            Um novo evento foi criado na sua categoria favorita: ${evento.categoria.nome}
-
-            Evento: ${evento.nomeEvento}
-            Descrição: ${evento.descricao}
-             <html>body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-                <div style="max-width: 600px; margin: auto; background-color: #fff; padding: 20px; border-radius: 8px;">
-                    <h2 style="color: #333;">Novo Evento Criado!</h2>
-                    <p>Olá, <strong>$nome</strong>!</p>
-                    <p>Um novo evento foi criado na sua categoria favorita: <strong>${evento.categoria.nome}</strong></p>
-                    <h3 style="color: #555;">Detalhes do Evento:</h3>
-                    <ul>
-                        <li><strong>Nome do Evento:</strong> ${evento.nomeEvento}</li>
-                        <li><strong>Descrição:</strong> ${evento.descricao}</li>
-                    </ul>
-                    <p style="font-size: 12px; color: #777; margin-top: 20px;">
-                        Você está recebendo este e-mail porque se inscreveu para receber notificações sobre novos eventos.
-                    </p>
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+              <meta charset="UTF-8" />
+            </head>
+            <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
+              <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+                
+                <!-- Faixa colorida no topo -->
+                <div style="height: 8px; background: linear-gradient(90deg, rgba(69, 170, 72, 1) 0%, rgba(61, 165, 225, 1) 35%, rgba(239, 231, 57, 1) 68%, rgba(255, 72, 72, 1) 100%);"></div>
+            
+                <div style="padding: 25px;">
+                  <h2 style="color: #000; text-align: center; margin-bottom: 20px;">🎉 Novo Evento Criado!</h2>
+            
+                  <p style="font-size: 16px; color: #333;">Olá, <strong style="color:#008000;">$nome</strong>! 👋</p>
+                  <p style="font-size: 15px; color: #333;">
+                    Um novo evento foi criado na sua categoria favorita: 
+                    <strong style="color: #3c9cea;">${evento.categoria.nome}</strong>
+                  </p>
+            
+                  <div style="background: #f9f9f9; border-left: 6px solid #d4c300; padding: 15px 20px; border-radius: 6px; margin-top: 15px;">
+                    <h3 style="color: #b30000; margin-top: 0;">📌 Detalhes do Evento</h3>
+                    <p style="margin: 6px 0;"><strong style="color:#000;">Nome:</strong> ${evento.nomeEvento}</p>
+                    <p style="margin: 6px 0;"><strong style="color:#000;">Descrição:</strong> ${evento.descricao}</p>
+                  </div>
+            
+                  <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;" />
+            
+                  <p style="font-size: 12px; color: #777; text-align: center;">
+                    Você está recebendo este e-mail porque se inscreveu para receber notificações sobre novos eventos.
+                  </p>
                 </div>
+            
+                <!-- Faixa colorida no rodapé -->
+                <div style="height: 6px; background: linear-gradient(90deg, rgba(69, 170, 72, 1) 0%, rgba(61, 165, 225, 1) 35%, rgba(239, 231, 57, 1) 68%, rgba(255, 72, 72, 1) 100%);"></div>
+              </div>
+            </body>
+            </html>
             """.trimIndent()
 
         mensagem.setText(html, true)
@@ -52,25 +69,42 @@ class EmailService(
         val tokenFormatado = token.padStart(6, '0')
 
         val html = """
-        <html>
-        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-            <div style="max-width: 500px; margin: auto; background-color: #fff; padding: 20px; border-radius: 8px; text-align: center;">
-                <h2 style="color: #333;">Token de autenticação</h2>
-                <p>Enviado para <strong>$destinatario</strong></p>
-                <p>Insira o token abaixo para finalizar:</p>
-                <div style="margin: 20px 0; display: flex; flex-direction: column; justify-content: center; gap: 10px;">
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+              <meta charset="UTF-8" />
+            </head>
+            <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
+              <div style="max-width: 500px; margin: auto; background-color: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+              
+                <!-- Faixa colorida no topo -->
+                <div style="height: 8px; background: linear-gradient(90deg, rgba(69, 170, 72, 1) 0%, rgba(61, 165, 225, 1) 35%, rgba(239, 231, 57, 1) 68%, rgba(255, 72, 72, 1) 100%);"></div>
+              
+                <div style="padding: 25px; text-align: center;">
+                  <h2 style="color:#000; margin-bottom: 10px;">🔐 Token de Autenticação</h2>
+                  <p style="color: #333;">Enviado para <strong style="color: rgba(61, 165, 225, 1);">$destinatario</strong></p>
+                  <p style="margin-top: 10px; color: #333;">Insira o token abaixo para finalizar:</p>
+              
+                  <!-- container dos números -->
+                  <div style="margin: 25px 0; text-align: center;">
                     ${
-            tokenFormatado.map { "<span style='display: inline-block; width: 40px; height: 50px; line-height: 50px; border: 2px solid #6b1b4d; border-radius: 5px; font-size: 24px; font-weight: bold;'>$it</span>" }
-                .joinToString("")
-        }
-                </div>
-                <p style="font-size: 12px; color: #777; margin-top: 20px;">
+                        tokenFormatado.map {
+                            "<span style='display: inline-block; width: 45px; height: 55px; margin: 0 6px; background-color: #fff; border: 3px solid rgba(61, 165, 225, 1); color: #000; border-radius: 8px; font-size: 22px; font-weight: bold; line-height: 55px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>$it</span>"
+                        }.joinToString("")
+                    }
+                  </div>
+              
+                  <p style="font-size: 12px; color: #777; margin-top: 25px;">
                     Se não foi você, ignore este e-mail.
-                </p>
-            </div>
-        </body>
-        </html>
-    """.trimIndent()
+                  </p>
+                </div>
+              
+                <!-- Faixa colorida no rodapé -->
+                <div style="height: 6px; background: linear-gradient(90deg, rgba(69, 170, 72, 1) 0%, rgba(61, 165, 225, 1) 35%, rgba(239, 231, 57, 1) 68%, rgba(255, 72, 72, 1) 100%);"></div>
+              </div>
+            </body>
+            </html>
+            """.trimIndent()
 
         val message = MimeMessageHelper(mailSender.createMimeMessage(), true)
         message.setFrom("kevelly.oliveira@sptech.school")
