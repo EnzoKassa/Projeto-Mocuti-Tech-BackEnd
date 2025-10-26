@@ -43,7 +43,7 @@ class EmailService(
                 <h2 style="color: #333;">Token de autenticação</h2>
                 <p>Enviado para <strong>$destinatario</strong></p>
                 <p>Insira o token abaixo para finalizar:</p>
-                <div style="margin: 20px 0; display: flex; flex-direction: column; justify-content: center; gap: 10px;">
+                <div style="margin: 20px 0; display: flex; justify-content: center; gap: 10px;">
                     ${tokenFormatado.map { "<span style='display: inline-block; width: 40px; height: 50px; line-height: 50px; border: 2px solid #6b1b4d; border-radius: 5px; font-size: 24px; font-weight: bold;'>$it</span>" }.joinToString("")}
                 </div>
                 <p style="font-size: 12px; color: #777; margin-top: 20px;">
