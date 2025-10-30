@@ -35,9 +35,12 @@ class EventoJpaController(
     }
 
     @Operation(summary = "Cadastrar novo evento")
-    @PostMapping
-    fun postEvento(@RequestBody @Valid dto: EventoCadastroRequest): ResponseEntity<Evento> {
-        val evento = eventoService.criarEvento(dto)
+    @PostMapping("/cadastrar", consumes = ["multipart/form-data"])
+    fun postEvento(
+        @RequestPart("dados") @Valid dto: EventoCadastroRequest,
+        @RequestPart("foto", required = false) foto: MultipartFile?
+    ): ResponseEntity<Evento> {
+        val evento = eventoService.criarEvento(dto, foto)
         return ResponseEntity.status(201).body(evento)
     }
 

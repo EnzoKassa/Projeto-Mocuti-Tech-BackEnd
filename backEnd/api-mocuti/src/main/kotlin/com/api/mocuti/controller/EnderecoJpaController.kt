@@ -1,12 +1,13 @@
 package com.api.mocuti.controller
 
 import com.api.mocuti.entity.Endereco
-import jakarta.validation.Valid
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
 import com.api.mocuti.repository.EnderecoRepository
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+
 
 @RestController
 @Tag(name = "Endereço", description = "Operações relacionadas a endereços de usuários e eventos")
@@ -81,4 +82,10 @@ class EnderecoJpaController(val repositorio: EnderecoRepository) {
             ResponseEntity.status(200).body(endereco)
         }
     }
+
+    @GetMapping("/enderecos-eventos")
+    fun getEnderecosUsadosEmEventos(): List<Endereco?>? {
+        return repositorio.findDistinctEnderecosComEventos()
+    }
+
 }

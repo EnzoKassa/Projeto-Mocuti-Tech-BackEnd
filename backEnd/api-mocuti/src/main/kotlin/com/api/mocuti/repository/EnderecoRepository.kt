@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
+
 interface EnderecoRepository : JpaRepository<Endereco, Int> {
 
     @Query(
@@ -22,4 +23,11 @@ interface EnderecoRepository : JpaRepository<Endereco, Int> {
         nativeQuery = true
     )
     fun findEnderecoByEventoId(@Param("idEvento") idEvento: Int): Endereco?
+
+    @Query(
+        value = "SELECT DISTINCT e.* FROM Endereco e JOIN Evento ev ON e.id_endereco = ev.fk_endereco_evento;",
+        nativeQuery = true
+    )
+    fun findDistinctEnderecosComEventos(): List<Endereco?>?
+
 }

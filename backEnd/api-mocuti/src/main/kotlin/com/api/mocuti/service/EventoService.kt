@@ -6,6 +6,7 @@ import com.api.mocuti.repository.*
 import com.api.mocuti.specification.EventoSpecification
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
 
 @Service
@@ -31,7 +32,7 @@ class EventoService(
         } else false
     }
 
-    fun criarEvento(dto: EventoCadastroRequest): Evento {
+    fun criarEvento(dto: EventoCadastroRequest, foto: MultipartFile?): Evento {
         val endereco = enderecoRepository.findById(dto.enderecoId)
             .orElseThrow { IllegalArgumentException("Endereço não encontrado") }
 
@@ -52,13 +53,13 @@ class EventoService(
             qtdVaga = dto.qtdVaga,
             publicoAlvo = dto.publicoAlvo,
             qtdInteressado = dto.qtdInteressado,
-            foto = ByteArray(0),
+            foto = foto?.bytes ?: ByteArray(0), // se não vier imagem, salva vazio
             endereco = endereco,
             statusEvento = status,
             categoria = categoria
         )
 
-        // pega todos os usuários que têm essa categoria como favorita
+        // Envia email para usuários interessados
         val usuarios = preferenciaRepository.findUsuariosByIdCategoria(evento.categoria.idCategoria!!)
         usuarios.forEach { usuario ->
             emailService.enviarEmailNovoEvento(usuario.email, usuario.nomeCompleto, evento)
@@ -66,6 +67,7 @@ class EventoService(
 
         return eventoRepository.save(evento)
     }
+
 
     fun atualizarEvento(id: Int, dto: EventoAtualizarRequest): Evento {
         val eventoExistente = eventoRepository.findById(id)
