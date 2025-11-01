@@ -20,8 +20,9 @@ class WebConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**") // libera para todas as rotas
             .allowedOrigins("http://localhost:5173") // endereço do frontend Vite
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Lista os métodos HTTP permitidos.
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Lista os métodos HTTP permitidos.
             .allowedHeaders("*") // Permite qualquer cabeçalho HTTP.
             .allowCredentials(true) // se precisar enviar cookies/autenticação
+            .maxAge(3600)
     }
 }

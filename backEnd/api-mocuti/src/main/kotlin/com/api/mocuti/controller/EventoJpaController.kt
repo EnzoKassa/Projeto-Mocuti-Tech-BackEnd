@@ -122,4 +122,12 @@ class EventoJpaController(
     @GetMapping("/status")
     fun listarEventosPorStatus(@RequestParam statusEventoId: Int): List<EventoDTO> =
         eventoService.buscarPorStatus(statusEventoId)
+
+    @Operation(summary = "Listar todos os valores de público alvo dos eventos")
+    @GetMapping("/publico-alvo")
+    fun listarPublicoAlvo(): ResponseEntity<List<String>> {
+        val publicosAlvo = eventoService.listarPublicoAlvo()
+        return if (publicosAlvo.isEmpty()) ResponseEntity.noContent().build()
+        else ResponseEntity.ok(publicosAlvo)
+    }
 }

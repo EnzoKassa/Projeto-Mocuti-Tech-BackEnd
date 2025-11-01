@@ -1,6 +1,8 @@
 package com.api.mocuti.controller
 
+import com.api.mocuti.dto.BulkPresencaRequest
 import com.api.mocuti.dto.ParticipacaoFeedbackDTO
+import com.api.mocuti.dto.UsuariosInscritosCargo2DTO
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
 import com.api.mocuti.repository.ParticipacaoRepository
@@ -8,13 +10,7 @@ import com.api.mocuti.service.ParticipacaoService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 @RestController
@@ -81,4 +77,45 @@ class ParticipacaoJpaController(
         else ResponseEntity.ok(eventos)
     }
 
+    @Operation(
+        summary = "Listar usuários inscritos com cargo 2 (Usuário) e inscrição pendente",
+        description = "Retorna lista de usuários na view 'usuarios_inscritos_cargo2' para um evento específico."
+    )
+    @GetMapping("/inscritos/cargo2/pendente/{idEvento}")
+    fun listarInscritosRestrito(@PathVariable idEvento: Int): ResponseEntity<List<UsuariosInscritosCargo2DTO>> {
+        val usuarios = participacaoService.listarUsuariosInscritosRestrito(idEvento)
+
+        return if (usuarios.isEmpty()) {
+            ResponseEntity.noContent().build()
+        } else {
+            ResponseEntity.ok(usuarios)
+        }
+    }
+
+    @Operation(
+        summary = "Registrar ou remover a presença de vários usuários em um evento",
+        description = "Recebe uma lista de {idUsuario, presente} e atualiza as participações em massa para o evento."
+    )
+    @PutMapping("/{idEvento}/presenca/bulk")
+    fun registrarPresenca(
+        @PathVariable idEvento: Int,
+        @RequestBody request: BulkPresencaRequest
+    ): ResponseEntity<Map<String, Int>> {
+        val totalAtualizado = participacaoService.registrarPresenca(
+            idEvento,
+            request.listaPresenca
+        )
+        return ResponseEntity.ok(mapOf("totalAtualizado" to totalAtualizado))
+    }
+
+    @Operation(
+        summary = "Contar usuários inscritos com cargo 2 (Usuário)",
+        description = "Retorna a quantidade de usuários inscritos com cargo 2 para um evento específico."
+    )
+    @GetMapping("/inscritos/cargo2/contagem/{idEvento}")
+    fun contarInscritosCargo2(@PathVariable idEvento: Int): ResponseEntity<Map<String, Long>> {
+        val count = participacaoService.contarUsuariosInscritosCargo2(idEvento)
+        return ResponseEntity.ok(mapOf("quantidade" to count))
+    }
 }
+

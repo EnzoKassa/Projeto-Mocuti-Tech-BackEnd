@@ -19,3 +19,14 @@ data class EventoDTO(
     val statusEvento: StatusEvento?,
     val categoria: Categoria?
 )
+
+// PresencaDTO.kt
+data class PresencaDTO(
+    val idUsuario: Int,
+    val presente: Boolean
+)
+
+// BulkPresencaRequest.kt
+data class BulkPresencaRequest(
+    val listaPresenca: List<PresencaDTO>
+)

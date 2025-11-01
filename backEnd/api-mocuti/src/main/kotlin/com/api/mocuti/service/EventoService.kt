@@ -203,4 +203,8 @@ class EventoService(
                     categoria = it.categoria
                 )
             }
+
+    fun listarPublicoAlvo(): List<String> {
+        return eventoRepository.findAll().mapNotNull { it.publicoAlvo }.distinct()
+    }
 }

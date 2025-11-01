@@ -1,6 +1,8 @@
 package com.api.mocuti.service
 
 import com.api.mocuti.dto.ParticipacaoFeedbackDTO
+import com.api.mocuti.dto.PresencaDTO
+import com.api.mocuti.dto.UsuariosInscritosCargo2DTO
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
 import com.api.mocuti.entity.ParticipacaoId
@@ -91,4 +93,66 @@ class ParticipacaoService(
         val participacoes = participacaoRepository.findByUsuario_IdUsuarioAndIsInscritoTrue(idUsuario)
         return participacoes.map { it.evento }
     }
+
+    fun listarUsuariosInscritosRestrito(idEvento: Int): List<UsuariosInscritosCargo2DTO> {
+        val resultados = participacaoRepository.listarUsuariosInscritosCargo2PorEvento(idEvento)
+
+        return resultados.map { array ->
+            UsuariosInscritosCargo2DTO(
+                idEvento = (array[0] as Number).toInt(),
+                idUsuario = (array[1] as Number).toInt(),
+                nomeCompleto = array[2] as String,
+                email = array[3] as String?,       // NOVO CAMPO (Índice 3)
+                telefone = array[4] as String?,    // NOVO CAMPO (Índice 4)
+                tipoCargo = array[5] as String,    // Índice ajustado de 3 para 5
+                nomeEvento = array[6] as String,   // Índice ajustado de 4 para 6
+                isInscrito = (array[7] as Number).toInt() == 1, // Índice ajustado de 5 para 7
+                isPresente = (array[8] as Number?)?.toInt() == 1, // Índice ajustado de 6 para 8
+                tipoInscricao = array[9] as String // Índice ajustado de 7 para 9
+            )
+        }
+    }
+
+    fun registrarPresenca(idEvento: Int, listaPresenca: List<PresencaDTO>): Int {
+        // Separa os usuários que terão a presença MARCADA (true)
+        val usuariosPresentes = listaPresenca
+            .filter { it.presente }
+            .map { it.idUsuario }
+            .distinct()
+
+        // Separa os usuários que terão a presença REMOVIDA (false)
+        val usuariosAusentes = listaPresenca
+            .filter { !it.presente }
+            .map { it.idUsuario }
+            .distinct()
+
+        var totalAtualizados = 0
+
+        // 1. Atualiza quem está presente
+        if (usuariosPresentes.isNotEmpty()) {
+            totalAtualizados += participacaoRepository.bulkUpdatePresenca(
+                idEvento = idEvento,
+                idsUsuarios = usuariosPresentes,
+                presenca = true
+            )
+        }
+
+        // 2. Atualiza quem está ausente
+        if (usuariosAusentes.isNotEmpty()) {
+            totalAtualizados += participacaoRepository.bulkUpdatePresenca(
+                idEvento = idEvento,
+                idsUsuarios = usuariosAusentes,
+                presenca = false
+            )
+        }
+
+        return totalAtualizados
+    }
+
+    fun contarUsuariosInscritosCargo2(idEvento: Int): Long {
+        return participacaoRepository.countUsuariosInscritosCargo2PorEvento(idEvento)
+    }
 }
+
+
+
