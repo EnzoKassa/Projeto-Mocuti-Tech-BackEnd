@@ -87,7 +87,8 @@ class ParticipacaoService(
         val participacao = participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
             .orElseThrow { NoSuchElementException("Participação não encontrada para o evento $idEvento e usuário $idUsuario") }
 
-        if (!participacao.evento.statusEvento.equals(1)) {
+        val idStatus = participacao.evento.statusEvento.idStatusEvento
+        if (idStatus == 2 || idStatus == 3) {
             throw IllegalStateException("Não é possível cancelar a inscrição de um evento que já está acontecendo ou encerrado.")
         }
 
@@ -95,7 +96,8 @@ class ParticipacaoService(
     }
 
     fun listarEventosInscritos(idUsuario: Int): List<Evento> {
-        val participacoes = participacaoRepository.findByUsuario_IdUsuarioAndIsInscritoTrue(idUsuario)
+        val participacoes =
+            participacaoRepository.findByUsuario_IdUsuarioAndIsInscritoTrueAndEventoStatusAberto(idUsuario)
         return participacoes.map { it.evento }
     }
 

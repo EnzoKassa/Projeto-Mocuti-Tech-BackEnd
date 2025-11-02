@@ -41,7 +41,17 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
 
     fun findByUsuarioAndEvento(usuario: Usuario, evento: Evento): Participacao?
 
-    fun findByUsuario_IdUsuarioAndIsInscritoTrue(usuarioId: Int): List<Participacao>
+    @Query("""
+        SELECT p
+        FROM Participacao p
+        JOIN p.evento e
+        WHERE p.usuario.idUsuario = :usuarioId
+          AND p.isInscrito = true
+          AND e.statusEvento.idStatusEvento = 1
+""")
+    fun findByUsuario_IdUsuarioAndIsInscritoTrueAndEventoStatusAberto(
+        @Param("usuarioId") usuarioId: Int
+    ): List<Participacao>
 
     @Query(value = "SELECT * FROM usuarios_inscritos_cargo2 WHERE id_evento = :idEvento", nativeQuery = true)
     fun listarUsuariosInscritosCargo2PorEvento(@Param("idEvento") idEvento: Int): List<Array<Any>>
