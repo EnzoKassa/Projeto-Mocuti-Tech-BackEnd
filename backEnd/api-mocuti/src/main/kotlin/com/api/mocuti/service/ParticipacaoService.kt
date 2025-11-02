@@ -56,7 +56,8 @@ class ParticipacaoService(
     }
 
     fun inscreverUsuario(idEvento: Int, idUsuario: Int, idStatusInscricao: Int) {
-        val participacaoExistente = participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
+        val participacaoExistente =
+            participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
         if (participacaoExistente.isPresent) {
             throw IllegalStateException("Usuário já está inscrito neste evento.")
         }
@@ -85,6 +86,10 @@ class ParticipacaoService(
     fun cancelarInscricao(idEvento: Int, idUsuario: Int) {
         val participacao = participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
             .orElseThrow { NoSuchElementException("Participação não encontrada para o evento $idEvento e usuário $idUsuario") }
+
+        if (!participacao.evento.statusEvento.equals(1)) {
+            throw IllegalStateException("Não é possível cancelar a inscrição de um evento que já está acontecendo ou encerrado.")
+        }
 
         participacaoRepository.delete(participacao)
     }
