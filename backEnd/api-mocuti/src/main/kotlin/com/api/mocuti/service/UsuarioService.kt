@@ -45,6 +45,7 @@ class UsuarioService(
     }
 
     fun cadastrarUsuario(request: UsuarioCadastroRequest): Usuario {
+        // 🔹 Verificações de e-mail e CPF duplicados
         if (usuarioRepository.existsByEmail(request.email)) {
             throw IllegalArgumentException("Email já cadastrado")
         }
@@ -53,6 +54,7 @@ class UsuarioService(
             throw IllegalArgumentException("CPF já cadastrado")
         }
 
+        // 🔹 Busca do cargo (padrão caso não informado)
         val cargo = if (request.cargo != null) {
             cargoRepository.findById(request.cargo)
                 .orElseThrow { IllegalArgumentException("Cargo não encontrado") }
@@ -62,11 +64,14 @@ class UsuarioService(
                 .orElseThrow { IllegalArgumentException("Cargo não encontrado") }
         }
 
+        // 🔹 Canal de comunicação
         val canalComunicacao = canalComunicacaoRepository.findById(request.canalComunicacao)
             .orElseThrow { IllegalArgumentException("Canal de comunicação não encontrado") }
 
+        // 🔹 Endereço
         val endereco = enderecoRepository.save(request.endereco)
 
+        // 🔹 Criação do usuário
         val novoUsuario = Usuario(
             idUsuario = 0,
             nomeCompleto = request.nomeCompleto,
@@ -88,18 +93,19 @@ class UsuarioService(
 
         val usuarioSalvo = usuarioRepository.save(novoUsuario)
 
-        // 🔹 Salvar preferências, se vieram no request
-        request.preferencias?.forEach { idCategoria ->
-            val categoria = categoriaRepository.findById(idCategoria)
-                .orElseThrow { IllegalArgumentException("Categoria não encontrada") }
+        // 2️⃣ Localiza a categoria (já cadastrada no banco)
+        val categoria = categoriaRepository.findById(request.idCategoriaPreferida)
+            .orElseThrow { RuntimeException("Categoria não encontrada") }
 
-            val preferencia = Preferencia(
-                usuario = usuarioSalvo,
-                categoria = categoria
-            )
-            preferenciaRepository.save(preferencia)
-        }
+        // 3️⃣ Cria e salva a preferência
+        val preferencia = Preferencia(
+            usuario = usuarioSalvo,
+            categoria = categoria
+        )
 
+        preferenciaRepository.save(preferencia)
+
+        // 4️⃣ Retorna resposta formatada
         return usuarioSalvo
     }
 

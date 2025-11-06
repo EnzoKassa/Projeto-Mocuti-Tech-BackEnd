@@ -65,8 +65,4 @@ data class Usuario(
     @ManyToOne
     @JoinColumn(name = "fk_canal_comunicacao_usuario")
     var canalComunicacao: CanalComunicacao,
-
-    @OneToMany (mappedBy = "usuario", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var preferencias: MutableList<Preferencia> = mutableListOf()
-
 )
