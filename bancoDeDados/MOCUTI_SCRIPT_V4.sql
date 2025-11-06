@@ -276,18 +276,6 @@ use mocuti;
 	('Usuário'),
 	('Moderador');
 
-	-- usuario
-	INSERT INTO usuario (nome_completo, CPF, telefone, email, dt_nasc, etnia, nacionalidade, genero, senha, is_ativo, dt_cadastro, dt_desativacao,
-	is_autenticado,fk_cargo_usuario, fk_endereco_usuario, fk_canal_comunicacao_usuario) VALUES
-	-- Mulheres
-	('Beatriz Oliveira', '111.222.333-44', '(71) 91234-5678', 'beatriz.oliveira@email.com', '1990-02-20', 'amarelo', 'Brasileiro', 'Prefiro não identificar', 'senha015', TRUE, '2025-08-25', NULL, FALSE, 1, 1, 1),
-	('Camila Santos', '222.333.444-55', '(81) 98765-4321', 'camila.santos@email.com', '1994-08-15', 'Pardo', 'Boliviano', 'Feminino', 'senha016', TRUE, '2025-08-25', NULL, FALSE, 2, 2, 2),
-	('Juliana Costa', '333.444.555-66', '(91) 99876-5432', 'juliana.costa@email.com', '1996-12-05', 'Indígena', 'Bransileiro','Feminino', 'senha017', TRUE, '2025-08-25', NULL, FALSE, 3, 2, 3),
-
-	-- Homens
-	('Lucas Almeida', '444.555.666-77', '(61) 91234 6789', 'lucas.almeida@email.com', '1987-03-10', 'Negro', 'Bransileiro', 'Masculino', 'senha018', TRUE, '2025-08-25', NULL, FALSE, 1, 1, 1),
-	('Gabriel Souza', '555.666.777-88', '(71) 98765-1234', 'gabriel.souza@email.com', '1992-06-25', 'Branco', 'Bransileiro', 'Prefiro não identificar', 'senha019', TRUE, '2025-08-25', NULL, FALSE, 2, 2, 2);
-
 	-- status_evento
 	INSERT INTO status_evento (situacao) VALUES
 	('Aberto'),
@@ -299,39 +287,147 @@ use mocuti;
 	('Palestra', 'Palestras tematicas com power point'),
 	('Doação', 'Evento de doação de roupas e/ou brinquedos'),
 	('Carnaval', 'Comemoração carnaval'),
-	('Apadrinhamento', 'Doação de brinquedos e roupas para crianças');
-
-	-- evento
-	INSERT INTO evento (nome_evento, descricao, dia, hora_inicio, hora_fim, is_aberto, qtd_vaga,
-	 qtd_interessado, publico_alvo, foto, fk_endereco_evento, fk_status_evento, fk_categoria_evento) VALUES
-	('Oficina de Pintura', 'Aprenda técnicas básicas de pintura.', '2025-06-15', '14:00:00', '17:00:00', 1, 30, 10, 'Jovens', NULL, 1, 1, 1),
-	('Torneio de Futsal', 'Competição entre equipes locais.', '2025-06-20', '09:00:00', '12:00:00', 1, 20, 5 , 'Crianças', NULL, 2, 1, 2),
-	('Palestra sobre Meio Ambiente', 'Discussão sobre sustentabilidade.', '2025-07-10', '10:00:00', '12:00:00', 1, 50, 20, 'Mulheres Negras', NULL, 2, 1, 3);
-
+	('Natal', 'Comemoração Natal'),
+	('Pintura', 'Eventos relacionados a artes');
+    
 	-- status_inscricao
 	INSERT INTO status_inscricao (tipo_inscricao) VALUES
 	('Pendente'),
 	('Confirmada'),
 	('Cancelada');
-
-	-- participacao
-	INSERT INTO participacao (fk_usuario_participacao, fk_evento_participacao, is_inscrito, is_presente, fk_inscricao_participacao) VALUES
-	(1, 1, 1, 1, 1),
-	(2, 1, 1, 0, 3),
-	(3, 2, 1, 1, 1),
-	(4, 3, 1, 0, 3),
-	(5, 3, 1, 1, 1);
-
-	-- nota
+    
+    	-- nota
 	INSERT INTO nota_feedback (tipo_nota) VALUES
 	('like'),
 	('dislike');
 
-	-- feedback
-	INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
-	(null, '2025-07-10', 1, 1, 1),
-	('Gostei bastante da palestra.', '2025-07-10', 3, 2, 2),
-	('Achei que poderia ter mais tempo.', '2025-07-10', 3, 3, null);
+-- ==================================================
+-- usuario
+INSERT INTO usuario (nome_completo, CPF, telefone, email, dt_nasc, etnia, nacionalidade, genero, senha, is_ativo, dt_cadastro, dt_desativacao,
+is_autenticado,fk_cargo_usuario, fk_endereco_usuario, fk_canal_comunicacao_usuario) VALUES
+-- Mulheres
+('Beatriz Oliveira', '111.222.333-44', '(71) 91234-5678', 'beatriz.oliveira@email.com', '1990-02-20', 'Amarela', 'Chile', 'Prefiro não identificar', 'Senha@15', TRUE, '2025-08-25', NULL, FALSE, 1, 1, 1),
+('Camila Santos', '222.333.444-55', '(81) 98765-4321', 'camila.santos@email.com', '1994-08-15', 'Parda', 'Bolívia', 'Feminino', 'Senha@16', TRUE, '2025-08-25', NULL, FALSE, 2, 2, 2),
+('Juliana Costa', '333.444.555-66', '(91) 99876-5432', 'juliana.costa@email.com', '1996-12-05', 'Preta', 'Brasil','Feminino', 'Senha@17', TRUE, '2025-08-25', NULL, FALSE, 3, 2, 3),
+('Marina Ribeiro', '666.777.888-99', '(11) 90000-0006', 'marina.ribeiro@email.com', '1993-05-12', 'Parda', 'Brasil', 'Feminino', 'Senha@20', 1, '2000-11-01', NULL, 0, 2, 1, 1),
+('Ana Lima', '888.999.000-11', '(21) 90000-0008', 'ana.lima@email.com', '1995-02-27', 'Negra', 'Brasil', 'Feminino', 'Senha@22', 1, '2000-11-01', NULL, 0, 3, 1, 3),
+-- Homens
+('Lucas Almeida', '444.555.666-77', '(61) 91234 6789', 'lucas.almeida@email.com', '1987-03-10', 'Preta', 'Brasil', 'Masculino', 'Senha@18', TRUE, '2025-08-25', NULL, FALSE, 1, 1, 1),
+('Gabriel Souza', '555.666.777-88', '(71) 98765-1234', 'gabriel.souza@email.com', '1992-06-25', 'Branca', 'Brasil', 'Prefiro não identificar', 'Senha@19', TRUE, '2025-08-25', NULL, FALSE, 2, 2, 2),
+('Pedro Martins', '777.888.999-00', '(11) 90000-0007', 'pedro.martins@email.com', '1989-10-03', 'Branca', 'Brasil', 'Masculino', 'Senha@21', 1, '2000-11-01', NULL, 0, 2, 2, 2);
+
+-- evento
+INSERT INTO evento (nome_evento, descricao, dia, hora_inicio, hora_fim, is_aberto, qtd_vaga,
+qtd_interessado, publico_alvo, foto, fk_endereco_evento, fk_status_evento, fk_categoria_evento) VALUES
+('Oficina de Pintura', 'Aprenda técnicas básicas de pintura.', '2025-06-15', '14:00:00', '17:00:00', 1, 30, 10, 'Jovens', NULL, 1, 1, 1),
+('Torneio de Futsal', 'Competição entre equipes locais.', '2025-06-20', '09:00:00', '12:00:00', 1, 20, 5 , 'Crianças', NULL, 2, 1, 2),
+('Palestra sobre Meio Ambiente', 'Discussão sobre sustentabilidade.', '2025-07-10', '10:00:00', '12:00:00', 1, 50, 20, 'Mulheres Negras', NULL, 2, 1, 3);
+
+
+-- participacao
+INSERT INTO participacao (fk_usuario_participacao, fk_evento_participacao, is_inscrito, is_presente, fk_inscricao_participacao) VALUES
+(1, 1, 1, 1, 1),
+(2, 1, 1, 0, 3),
+(3, 2, 1, 1, 1),
+(4, 3, 1, 0, 3),
+(5, 3, 1, 1, 1); 
+
+-- EVENTO 1 (Oficina de Pintura) → KPIs distintos (inscritos ↑, presentes ↑)
+INSERT INTO participacao (fk_usuario_participacao, fk_evento_participacao, is_inscrito, is_presente, fk_inscricao_participacao) VALUES
+(6, 1, 1, 1, 2),
+(7, 1, 1, 1, 2);
+	
+-- EVENTO 2 (Torneio de Futsal) → mistura presença/ausência para variar KPI
+INSERT INTO participacao (fk_usuario_participacao, fk_evento_participacao, is_inscrito, is_presente, fk_inscricao_participacao) VALUES
+(6, 2, 1, 1, 2),
+(7, 2, 1, 0, 2),
+(8, 2, 1, 1, 2);
+
+-- EVENTO 3 (Palestra Meio Ambiente) → padrão diferente dos demais
+INSERT INTO participacao (fk_usuario_participacao, fk_evento_participacao, is_inscrito, is_presente, fk_inscricao_participacao) VALUES
+(6, 3, 1, 1, 2),
+(7, 3, 1, 0, 2),
+(8, 3, 1, 1, 2);
+
+
+-- FEEDBACKS NOV/2025 para gráficos bem coloridos (likes/dislikes variados)
+-- EVENTO 1 (id 1)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Cores do material e exemplos muito bons.', '2025-11-05', 1, 6, 1),
+('Gostei, mas o tempo poderia ser menor.', '2025-11-05', 1, 7, 2);
+
+-- EVENTO 2 (id 2)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Clima competitivo e organização pontual, excelente.', '2025-11-06', 2, 6, 1),
+('Faltou hidratação para as equipes.', '2025-11-06', 2, 7, 2),
+('Arbitragem firme e placar bem controlado.', '2025-11-06', 2, 8, 1);
+
+-- EVENTO 3 (id 3)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Conteúdo atual e aplicações práticas claras.', '2025-11-07', 3, 6, 1),
+('Slides longos em alguns trechos, cansou um pouco.', '2025-11-07', 3, 7, 2),
+('Perguntas bem conduzidas, ótima mediação.', '2025-11-07', 3, 8, 1);
+
+-- feedback
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+(null, '2025-07-10', 1, 1, 1),
+('Gostei bastante da palestra.', '2025-07-10', 3, 2, 2),
+('Achei que poderia ter mais tempo.', '2025-07-10', 3, 3, null);   
+  -- =============================================================
+-- 📅 EVENTOS ADICIONAIS (Encerrados e Recentes)
+-- =============================================================
+
+-- 🔸 EVENTOS ENCERRADOS (criados há 10 dias)
+INSERT INTO evento (
+    nome_evento, descricao, dia, hora_inicio, hora_fim, 
+    is_aberto, qtd_vaga, qtd_interessado, publico_alvo, 
+    foto, fk_endereco_evento, fk_status_evento, fk_categoria_evento
+)
+VALUES
+('Oficina de Reciclagem', 
+ 'Aprenda a criar arte com materiais recicláveis.',
+ DATE_SUB(CURDATE(), INTERVAL 10 DAY), '14:00:00', '17:00:00', 
+ 0, 25, 12, 'Jovens e Adultos', NULL, 1, 2, 1),
+
+('Palestra sobre Tecnologia Verde', 
+ 'Soluções sustentáveis com inovação.',
+ DATE_SUB(CURDATE(), INTERVAL 10 DAY), '09:00:00', '11:00:00', 
+ 0, 40, 18, 'Estudantes de TI', NULL, 2, 2, 3);
+
+-- 🔸 EVENTOS FUTUROS (abertos)
+INSERT INTO evento (
+    nome_evento, descricao, dia, hora_inicio, hora_fim, 
+    is_aberto, qtd_vaga, qtd_interessado, publico_alvo, 
+    foto, fk_endereco_evento, fk_status_evento, fk_categoria_evento
+)
+VALUES
+('Campanha de Natal Solidário', 
+ 'Doação de brinquedos e alimentos.',
+ DATE_ADD(CURDATE(), INTERVAL 5 DAY), '10:00:00', '15:00:00', 
+ 1, 60, 20, 'Famílias e Voluntários', NULL, 2, 1, 4),
+
+('Oficina de Crochê Criativo', 
+ 'Técnicas básicas de crochê para iniciantes.',
+ DATE_ADD(CURDATE(), INTERVAL 2 DAY), '13:00:00', '16:00:00', 
+ 1, 20, 8, 'Mulheres e Jovens', NULL, 1, 1, 5);
+
+-- =============================================================
+-- 👥 PARTICIPAÇÕES (Encerradas e Futuras)
+
+-- =============================================================
+-- 💬 FEEDBACKS (Encerrados e Antigos)
+-- =============================================================
+
+
+INSERT INTO preferencia (fk_usuario_preferencia, fk_categoria_preferencia)
+VALUES
+(6, 5), -- Novo usuário interessado em crochê
+(7, 3), -- Interesse em sustentabilidade
+(8, 1), -- Interesse em reciclagem
+(5, 4), -- Interesse em campanhas solidárias
+(3, 2); -- Interesse em tecnologia e inovação
+
+-- =============================================================
 
 -- preferencia
 INSERT INTO preferencia (fk_usuario_preferencia, fk_categoria_preferencia) VALUES
@@ -341,22 +437,39 @@ INSERT INTO preferencia (fk_usuario_preferencia, fk_categoria_preferencia) VALUE
 (3, 4),
 (4, 2);
 
-SELECT id_usuario, nome_completo, id_cargo, tipo_cargo FROM usuario
-inner join cargo
-on fk_cargo_usuario = id_cargo
-where id_cargo = 1;
 
+-- =============================================================
+-- 💬 FEEDBACKS PARA CAMILA SANTOS (usuario id 2)
+-- =============================================================
 
-select * from usuario;
-SELECT * FROM cargo;
-SELECT * FROM endereco;
-SELECT * FROM canal_comunicacao;
-SELECT * FROM categoria;
-SELECT * FROM preferencia;
-SELECT * FROM evento;
-SELECT * FROM status_evento;
-SELECT * FROM nota_feedback;
-SELECT * FROM feedback;
+-- EVENTO 1 (Oficina de Pintura, id 1)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Amei a oficina, aprendi bastante com os exemplos.', '2025-11-05', 4, 2, 1);
+
+-- EVENTO 2 (Torneio de Futsal, id 2)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Organização boa, mas senti falta de instruções iniciais para iniciantes.', '2025-11-06', 2, 2, 2);
+
+-- EVENTO 3 (Palestra sobre Meio Ambiente, id 3)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Conteúdo relevante, mas alguns slides poderiam ser mais resumidos.', '2025-11-07', 3, 2, 2);
+
+-- EVENTO 4 (Oficina de Reciclagem, id 4)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Achei a oficina prática e interessante, recomendo para iniciantes.', '2025-10-28', 4, 2, 1);
+
+-- EVENTO 5 (Palestra sobre Tecnologia Verde, id 5)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Boas ideias apresentadas, mas poderia ter mais interação com o público.', '2025-10-28', 5, 2, 2);
+
+-- EVENTO 6 (Campanha de Natal Solidário, id 6)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Estou animada para participar e ajudar as famílias.', '2025-11-06', 6, 2, 1);
+
+-- EVENTO 7 (Oficina de Crochê Criativo, id 7)
+INSERT INTO feedback (comentario, data_feedback, fk_evento_feedback, fk_usuario_feedback, fk_nota_feedback) VALUES
+('Ótima oportunidade para aprender novas técnicas!', '2025-11-06', 7, 2, 1);
+
 
 -- VIEWS --
 -- 1. Visão Geral de Usuários OK
@@ -372,17 +485,16 @@ JOIN cargo c ON u.fk_cargo_usuario = c.id_cargo
 WHERE u.is_ativo = 0 AND c.tipo_cargo = 'Administrador') AS total_m1_inativos,
 (SELECT COUNT(*) FROM usuario u
 JOIN cargo c ON u.fk_cargo_usuario = c.id_cargo
-WHERE u.is_ativo = 1 AND c.tipo_cargo = 'Colaborador') AS total_m2_ativos,
+WHERE u.is_ativo = 1 AND c.tipo_cargo = 'Moderador') AS total_m2_ativos,
 (SELECT COUNT(*) FROM usuario u
 JOIN cargo c ON u.fk_cargo_usuario = c.id_cargo
-WHERE u.is_ativo = 0 AND c.tipo_cargo = 'Colaborador') AS total_m2_inativos,
+WHERE u.is_ativo = 0 AND c.tipo_cargo = 'Moderador') AS total_m2_inativos,
 (SELECT COUNT(*) FROM usuario u
 JOIN cargo c ON u.fk_cargo_usuario = c.id_cargo
-WHERE u.is_ativo = 1 AND c.tipo_cargo = 'Participante') AS total_beneficiarios_ativos,
+WHERE u.is_ativo = 1 AND c.tipo_cargo = 'Usuário') AS total_beneficiarios_ativos,
 (SELECT COUNT(*) FROM usuario u
 JOIN cargo c ON u.fk_cargo_usuario = c.id_cargo
-WHERE u.is_ativo = 0 AND c.tipo_cargo = 'Participante') AS total_beneficiarios_inativos;
-
+WHERE u.is_ativo = 0 AND c.tipo_cargo = 'Usuário') AS total_beneficiarios_inativos;
 select * from visao_geral_usuarios;
 
 
@@ -394,20 +506,16 @@ LEFT JOIN preferencia p ON p.fk_categoria_preferencia = c.id_categoria
 GROUP BY c.id_categoria, c.nome, c.descricao
 ORDER BY total_votos DESC;
 
-select * from rank_categoria;
-select * from evento;
-
 -- 3. Feedbacks por Categoria OK
 CREATE OR REPLACE VIEW feedbacks_por_categoria AS
-SELECT  ce.nome AS categoria, COUNT(CASE WHEN nf.tipo_nota = 'Excelente' THEN 1 END) AS qtd_positivos,
-COUNT(CASE WHEN nf.tipo_nota = 'Ruim' THEN 1 END) AS qtd_negativos, COUNT(f.id_feedback) AS qtd_total
+SELECT  ce.nome AS categoria, COUNT(CASE WHEN nf.tipo_nota = 'like' THEN 1 END) AS qtd_positivos,
+COUNT(CASE WHEN nf.tipo_nota = 'dislike' THEN 1 END) AS qtd_negativos, COUNT(f.id_feedback) AS qtd_total
 FROM categoria ce
 LEFT JOIN evento e ON e.fk_categoria_evento = ce.id_categoria
 LEFT JOIN feedback f ON f.fk_evento_feedback = e.id_evento
 LEFT JOIN nota_feedback nf ON nf.id_nota_feedback = f.fk_nota_feedback
 GROUP BY ce.nome;
 
-select * from feedbacks_por_categoria;
 
 -- 4. Feedback por Categoria no Mês Atual
 CREATE OR REPLACE VIEW feedback_categoria_mes_atual AS
@@ -421,17 +529,14 @@ WHERE YEAR(f.data_feedback) = YEAR(CURDATE())
 AND MONTH(f.data_feedback) = MONTH(CURDATE())
 GROUP BY c.nome;
 
-select * from feedback_categoria_mes_atual;
 
--- 5. Inscrições por Mês no Ano Atual (precisa de data na tabela usuário)
+-- 5. Inscrições por Mês no Ano Atual (OK)
 CREATE OR REPLACE VIEW inscricoes_mes_durante_ano AS
 SELECT MONTHNAME(dt_cadastro) AS mes, MONTH(dt_cadastro) AS numero_mes, COUNT(*) AS total_cadastros
 FROM usuario
 WHERE YEAR(dt_cadastro) = YEAR(CURDATE())
 GROUP BY numero_mes, mes
 ORDER BY numero_mes;
-
-select * from inscricoes_mes_durante_ano;
 
 -- 7. Dados do Usuário OK - acho que isso aq é a view do get de usuario, acho que não precisa
 CREATE OR REPLACE VIEW dados_usuario AS
@@ -445,7 +550,6 @@ JOIN mocuti.endereco e ON u.fk_endereco_usuario = e.id_endereco
 JOIN mocuti.cargo c ON u.fk_cargo_usuario = c.id_cargo
 JOIN mocuti.canal_comunicacao cc ON u.fk_canal_comunicacao_usuario = cc.id_canal_comunicacao;
 
-select * from dados_usuario;
 
 -- 8. Eventos por Usuário OK
 CREATE OR REPLACE VIEW eventos_usuario AS
@@ -536,4 +640,53 @@ LEFT JOIN status_evento se ON e.fk_status_evento = se.id_status_evento
 GROUP BY e.id_evento, e.nome_evento, e.dia, e.hora_inicio, e.hora_fim, se.situacao
 ORDER BY e.dia DESC;
 
-select * from lista_presenca_evento where id_evento = 2;
+
+-- Criar um evento com status 2 (Encerrado)
+INSERT INTO evento (
+    nome_evento,
+    descricao,
+    dia,
+    hora_inicio,
+    hora_fim,
+    is_aberto,
+    qtd_vaga,
+    qtd_interessado,
+    publico_alvo,
+    foto,
+    fk_endereco_evento,
+    fk_status_evento,
+    fk_categoria_evento
+) VALUES (
+    'teste KEV',
+    'Adoção',
+    '2025-11-01',
+    '10:00:00',
+    '12:00:00',
+    1,
+    20,
+    5,
+    'Todos',
+    NULL,
+    1,   -- endereço existente
+    2,   -- status_evento = 2 (Encerrado)
+    4    -- categoria existente
+);
+
+-- Supondo que o ID do evento criado seja 4 (ajuste conforme seu AUTO_INCREMENT)
+SET @novo_evento_id = LAST_INSERT_ID();
+
+-- Criar participação do usuário 3 no evento criado, presente
+INSERT INTO participacao (
+    fk_usuario_participacao,
+    fk_evento_participacao,
+    is_inscrito,
+    is_presente,
+    fk_inscricao_participacao
+) VALUES (
+    2,             -- id do usuário
+    @novo_evento_id,
+    1,             -- inscrito
+    1,             -- presente
+    2              -- status_inscricao, por exemplo "Confirmada"
+);
+
