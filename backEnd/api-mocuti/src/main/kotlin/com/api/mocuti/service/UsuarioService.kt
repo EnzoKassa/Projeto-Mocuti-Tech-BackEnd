@@ -1,6 +1,7 @@
 package com.api.mocuti.service
 
 import com.api.mocuti.dto.*
+import com.api.mocuti.entity.Preferencia
 import com.api.mocuti.entity.Usuario
 import com.api.mocuti.repository.*
 import org.springframework.stereotype.Service
@@ -12,7 +13,9 @@ class UsuarioService(
     private val usuarioRepository: UsuarioRepository,
     private val cargoRepository: CargoRepository,
     private val enderecoRepository: EnderecoRepository,
-    private val canalComunicacaoRepository: CanalComunicacaoRepository
+    private val canalComunicacaoRepository: CanalComunicacaoRepository,
+    private val categoriaRepository: CategoriaRepository,
+    private val preferenciaRepository: PreferenciaRepository
 ) {
     fun listarTodos(): List<Usuario> = usuarioRepository.findAll()
 
@@ -40,7 +43,7 @@ class UsuarioService(
             "Prefiro não identificar" to totalNaoIdentificado
         )
     }
-    
+
     fun cadastrarUsuario(request: UsuarioCadastroRequest): Usuario {
         if (usuarioRepository.existsByEmail(request.email)) {
             throw IllegalArgumentException("Email já cadastrado")
@@ -54,7 +57,6 @@ class UsuarioService(
             cargoRepository.findById(request.cargo)
                 .orElseThrow { IllegalArgumentException("Cargo não encontrado") }
         } else {
-            // Defina aqui o ID do cargo padrão
             val cargoPadraoId = 2
             cargoRepository.findById(cargoPadraoId)
                 .orElseThrow { IllegalArgumentException("Cargo não encontrado") }
@@ -84,8 +86,23 @@ class UsuarioService(
             canalComunicacao = canalComunicacao
         )
 
-        return usuarioRepository.save(novoUsuario)
+        val usuarioSalvo = usuarioRepository.save(novoUsuario)
+
+        // 🔹 Salvar preferências, se vieram no request
+        request.preferencias?.forEach { idCategoria ->
+            val categoria = categoriaRepository.findById(idCategoria)
+                .orElseThrow { IllegalArgumentException("Categoria não encontrada") }
+
+            val preferencia = Preferencia(
+                usuario = usuarioSalvo,
+                categoria = categoria
+            )
+            preferenciaRepository.save(preferencia)
+        }
+
+        return usuarioSalvo
     }
+
 
     fun autenticarUsuario(usuarioLoginRequest: UsuarioLoginRequest): Usuario {
         val usuario = usuarioRepository.findByEmail(usuarioLoginRequest.email)

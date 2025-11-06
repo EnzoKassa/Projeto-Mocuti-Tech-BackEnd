@@ -17,4 +17,6 @@ data class UsuarioCadastroRequest(
     val cargo: Int?,
     val endereco: Endereco,
     val canalComunicacao: Int,
+    val preferencias: List<Int>? = null // <-- lista de categorias
+
 )
