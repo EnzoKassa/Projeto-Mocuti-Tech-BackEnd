@@ -1,5 +1,6 @@
 package com.api.mocuti.repository
 
+import com.api.mocuti.dto.ConvidadoEventoDTO
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
 import com.api.mocuti.entity.ParticipacaoId
@@ -79,4 +80,26 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
     """)
     fun countUsuariosInscritosCargo2PorEvento(@Param("idEvento") idEvento: Int): Long
 
+
+    @Query("""
+        SELECT 
+            p.fk_evento_participacao AS idEvento,
+            u.id_usuario AS idUsuario,
+            u.nome_completo AS nomeConvidado,
+            si.tipo_inscricao AS statusConvite
+        FROM participacao p
+        JOIN usuario u ON u.id_usuario = p.fk_usuario_participacao
+        JOIN status_inscricao si ON si.id_status_inscricao = p.fk_inscricao_participacao
+        WHERE u.fk_cargo_usuario = 3
+          AND p.fk_evento_participacao = :idEvento
+    """, nativeQuery = true)
+    fun listarConvidadosPorEvento(@Param("idEvento") idEvento: Int): List<Array<Any>>
+
+
+    @Query("""
+        SELECT u.email
+        FROM Usuario u
+        WHERE u.cargo.idCargo = 3
+    """)
+    fun findEmailsByCargo3(): List<String>
 }

@@ -1,6 +1,7 @@
 package com.api.mocuti.controller
 
 import com.api.mocuti.dto.BulkPresencaRequest
+import com.api.mocuti.dto.ConvidadoEventoDTO
 import com.api.mocuti.dto.ParticipacaoFeedbackDTO
 import com.api.mocuti.dto.UsuariosInscritosCargo2DTO
 import com.api.mocuti.entity.Evento
@@ -117,5 +118,20 @@ class ParticipacaoJpaController(
         val count = participacaoService.contarUsuariosInscritosCargo2(idEvento)
         return ResponseEntity.ok(mapOf("quantidade" to count))
     }
+
+    @Operation(
+        summary = "Listar convidados de um evento",
+        description = "Retorna a lista de convidados (cargo 3) para um evento específico."
+    )
+    @GetMapping("/convidados/{idEvento}")
+    fun listarConvidadosPorEvento(@PathVariable idEvento: Int): ResponseEntity<List<ConvidadoEventoDTO>> {
+        val convidados = participacaoService.listarConvidadosPorEvento(idEvento)
+        return if (convidados.isEmpty()) {
+            ResponseEntity.noContent().build()
+        } else {
+            ResponseEntity.ok(convidados)
+        }
+    }
+
 }
 
