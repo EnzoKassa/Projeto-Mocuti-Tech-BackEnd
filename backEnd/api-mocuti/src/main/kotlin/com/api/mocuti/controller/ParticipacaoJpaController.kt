@@ -1,5 +1,6 @@
 package com.api.mocuti.controller
 
+import com.api.mocuti.dto.AtualizarPresencaRequest
 import com.api.mocuti.dto.BulkPresencaRequest
 import com.api.mocuti.dto.ParticipacaoFeedbackDTO
 import com.api.mocuti.dto.UsuariosInscritosCargo2DTO
@@ -117,5 +118,21 @@ class ParticipacaoJpaController(
         val count = participacaoService.contarUsuariosInscritosCargo2(idEvento)
         return ResponseEntity.ok(mapOf("quantidade" to count))
     }
+
+    @GetMapping("/usuario/{usuarioId}")
+    fun getEventosPresentes(@PathVariable usuarioId: Int) = participacaoService.listarEventosConfirmados(usuarioId)
+
+    @PatchMapping("/atualizar")
+    fun atualizarPresenca(@RequestBody request: AtualizarPresencaRequest): ResponseEntity<String> {
+        val atualizado = participacaoService.atualizarStatusParticipacao(request)
+
+        return if (atualizado) {
+            ResponseEntity.ok("Status atualizado com sucesso.")
+        } else {
+            ResponseEntity.status(404).body("Participação não encontrada.")
+        }
+    }
+
+
 }
 

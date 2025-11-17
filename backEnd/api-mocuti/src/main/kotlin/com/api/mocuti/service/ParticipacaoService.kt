@@ -1,8 +1,6 @@
 package com.api.mocuti.service
 
-import com.api.mocuti.dto.ParticipacaoFeedbackDTO
-import com.api.mocuti.dto.PresencaDTO
-import com.api.mocuti.dto.UsuariosInscritosCargo2DTO
+import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
 import com.api.mocuti.entity.ParticipacaoId
@@ -11,6 +9,7 @@ import com.api.mocuti.repository.FeedbackRepository
 import com.api.mocuti.repository.EventoRepository
 import com.api.mocuti.repository.UsuarioRepository
 import com.api.mocuti.repository.StatusInscricaoRepository
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -159,7 +158,20 @@ class ParticipacaoService(
     fun contarUsuariosInscritosCargo2(idEvento: Int): Long {
         return participacaoRepository.countUsuariosInscritosCargo2PorEvento(idEvento)
     }
+
+    fun listarEventosConfirmados(usuarioId: Int): List<ParticipacaoResponse> {
+        return participacaoRepository.findEventosPresentesPorUsuario(usuarioId)
+    }
+
+    @Transactional
+    fun atualizarStatusParticipacao(request: AtualizarPresencaRequest): Boolean {
+
+        val linhas = participacaoRepository.atualizarStatusParticipacao(
+            usuarioId = request.usuarioId,
+            eventoId = request.eventoId,
+            statusInscricaoId = request.statusInscricaoId
+        )
+
+        return linhas > 0
+    }
 }
-
-
-

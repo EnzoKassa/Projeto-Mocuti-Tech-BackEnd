@@ -24,4 +24,4 @@ class AuthController(
         authService.redefinirSenha(request.token, request.novaSenha)
         return ResponseEntity.ok("Senha redefinida com sucesso")
     }
-}
+}   
