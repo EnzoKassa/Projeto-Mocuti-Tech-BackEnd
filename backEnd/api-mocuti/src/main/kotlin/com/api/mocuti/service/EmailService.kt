@@ -115,4 +115,54 @@ class EmailService(
         mailSender.send(message.mimeMessage)
     }
 
+    @Async
+    fun enviarEmailStatusParticipacao(destinatario: String, nome: String, status: String, evento: Evento) {
+
+        val mensagem = MimeMessageHelper(mailSender.createMimeMessage(), true)
+        mensagem.setFrom("kevelly.oliveira@sptech.school")
+        mensagem.setTo("kevellyoliveira2@gmail.com")
+        mensagem.setSubject("Atualização do seu status no evento – ${evento.nomeEvento}")
+
+        val html = """
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8" />
+        </head>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
+          <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+
+            <div style="height: 8px; background: linear-gradient(90deg, rgba(69, 170, 72, 1) 0%, rgba(61, 165, 225, 1) 35%, rgba(239, 231, 57, 1) 68%, rgba(255, 72, 72, 1) 100%);"></div>
+
+            <div style="padding: 25px;">
+              <h2 style="color: #000; text-align: center; margin-bottom: 20px;">📩 Status Atualizado!</h2>
+
+              <p style="font-size: 16px; color: #333;">Olá👋</p>
+              <p style="font-size: 15px; color: #333;"><strong style="color:#008000;">$nome</strong> atualizou o status no evento <strong style="color:#3c9cea;">${evento.nomeEvento}</strong> para:</p>
+
+              <div style="margin: 25px auto; width: fit-content; font-size: 22px; font-weight: bold; padding: 12px 22px; border-radius: 10px; background-color: #f9f9f9; border-left: 6px solid #3c9cea;">
+                $status
+              </div>
+
+              <p style="font-size: 14px; color:#555; margin-top: 20px;">
+                Caso tenha sido um engano, você pode alterar seu status novamente no sistema.
+              </p>
+
+              <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;" />
+
+              <p style="font-size: 12px; color: #777; text-align: center;">
+                Você recebeu este e-mail porque está inscrito no evento.
+              </p>
+            </div>
+
+            <div style="height: 6px; background: linear-gradient(90deg, rgba(69, 170, 72, 1) 0%, rgba(61, 165, 225, 1) 35%, rgba(239, 231, 57, 1) 68%, rgba(255, 72, 72, 1) 100%);"></div>
+          </div>
+        </body>
+        </html>
+    """.trimIndent()
+
+        mensagem.setText(html, true)
+        mailSender.send(mensagem.mimeMessage)
+    }
+
 }

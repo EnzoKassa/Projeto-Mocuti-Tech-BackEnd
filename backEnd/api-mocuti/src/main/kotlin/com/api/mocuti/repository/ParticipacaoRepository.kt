@@ -124,4 +124,6 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
         @Param("statusInscricaoId") statusInscricaoId: Int
     ): Int
 
+    fun findByUsuario_IdUsuarioAndEvento_IdEvento(usuarioId: Int, eventoId: Int): Participacao?
+
 }

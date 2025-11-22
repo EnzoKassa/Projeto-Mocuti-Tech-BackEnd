@@ -19,7 +19,8 @@ class ParticipacaoService(
     val feedbackRepository: FeedbackRepository,
     val eventoRepository: EventoRepository,
     val usuarioRepository: UsuarioRepository,
-    val statusInscricaoRepository: StatusInscricaoRepository
+    val statusInscricaoRepository: StatusInscricaoRepository,
+    val emailService: EmailService
 ) {
 
     fun listarParticipacoesFiltradasPorUsuario(idUsuario: Int, dia: LocalDate): List<ParticipacaoFeedbackDTO> {
@@ -166,12 +167,34 @@ class ParticipacaoService(
     @Transactional
     fun atualizarStatusParticipacao(request: AtualizarPresencaRequest): Boolean {
 
-        val linhas = participacaoRepository.atualizarStatusParticipacao(
+        val linhasAfetadas = participacaoRepository.atualizarStatusParticipacao(
             usuarioId = request.usuarioId,
             eventoId = request.eventoId,
             statusInscricaoId = request.statusInscricaoId
         )
 
-        return linhas > 0
+        // Se não atualizou nenhuma linha, nada a fazer
+        if (linhasAfetadas <= 0) {
+            return false
+        }
+
+        // Buscar participação atualizada com JOIN (pra ter usuario, evento e status)
+        val participacaoAtualizada = participacaoRepository.findByUsuario_IdUsuarioAndEvento_IdEvento(
+            request.usuarioId,
+            request.eventoId
+        )
+
+        // Agora sim conseguimos enviar o e-mail
+        participacaoAtualizada?.let { participacao ->
+            emailService.enviarEmailStatusParticipacao(
+                participacao.usuario.email,
+                participacao.usuario.nomeCompleto,
+                participacao.statusInscricao.tipoInscricao,
+                participacao.evento
+            )
+        }
+
+        return true
     }
+
 }
