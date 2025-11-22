@@ -1,6 +1,5 @@
 package com.api.mocuti.service
 
-import com.api.mocuti.dto.ConvidadoEventoDTO
 import com.api.mocuti.dto.ParticipacaoFeedbackDTO
 import com.api.mocuti.dto.PresencaDTO
 import com.api.mocuti.dto.UsuariosInscritosCargo2DTO
@@ -12,6 +11,7 @@ import com.api.mocuti.repository.FeedbackRepository
 import com.api.mocuti.repository.EventoRepository
 import com.api.mocuti.repository.UsuarioRepository
 import com.api.mocuti.repository.StatusInscricaoRepository
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -26,7 +26,7 @@ class ParticipacaoService(
     val eventoRepository: EventoRepository,
     val usuarioRepository: UsuarioRepository,
     val statusInscricaoRepository: StatusInscricaoRepository,
-    private val emailService: EmailService // Injete o EmailService aqui
+    val emailService: EmailService
 ) {
 
     fun listarParticipacoesFiltradasPorUsuario(idUsuario: Int, dia: LocalDate): List<ParticipacaoFeedbackDTO> {
@@ -61,91 +61,6 @@ class ParticipacaoService(
         }
     }
 
-    fun cancelarInscricao(idEvento: Int, idUsuario: Int) {
-        val participacao = participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
-            .orElseThrow { NoSuchElementException("Participação não encontrada para o evento $idEvento e usuário $idUsuario") }
-
-        val idStatus = participacao.evento.statusEvento.idStatusEvento
-        if (idStatus == 2 || idStatus == 3) {
-            throw IllegalStateException("Não é possível cancelar a inscrição de um evento que já está acontecendo ou encerrado.")
-        }
-
-        participacaoRepository.delete(participacao)
-    }
-
-    fun listarEventosInscritos(idUsuario: Int): List<Evento> {
-        val participacoes =
-            participacaoRepository.findByUsuario_IdUsuarioAndIsInscritoTrueAndEventoStatusAberto(idUsuario)
-        return participacoes.map { it.evento }
-    }
-
-    fun listarUsuariosInscritosRestrito(idEvento: Int): List<UsuariosInscritosCargo2DTO> {
-        val resultados = participacaoRepository.listarUsuariosInscritosCargo2PorEvento(idEvento)
-
-        return resultados.map { array ->
-            UsuariosInscritosCargo2DTO(
-                idEvento = (array[0] as Number).toInt(),
-                idUsuario = (array[1] as Number).toInt(),
-                nomeCompleto = array[2] as String,
-                email = array[3] as String?,
-                telefone = array[4] as String?,
-                tipoCargo = array[5] as String,
-                nomeEvento = array[6] as String,
-                isInscrito = (array[7] as Number).toInt() == 1,
-                isPresente = (array[8] as Number?)?.toInt() == 1,
-                tipoInscricao = array[9] as String
-            )
-        }
-    }
-
-    fun registrarPresenca(idEvento: Int, listaPresenca: List<PresencaDTO>): Int {
-        val usuariosPresentes = listaPresenca
-            .filter { it.presente }
-            .map { it.idUsuario }
-            .distinct()
-
-        val usuariosAusentes = listaPresenca
-            .filter { !it.presente }
-            .map { it.idUsuario }
-            .distinct()
-
-        var totalAtualizados = 0
-
-        if (usuariosPresentes.isNotEmpty()) {
-            totalAtualizados += participacaoRepository.bulkUpdatePresenca(
-                idEvento = idEvento,
-                idsUsuarios = usuariosPresentes,
-                presenca = true
-            )
-        }
-
-        if (usuariosAusentes.isNotEmpty()) {
-            totalAtualizados += participacaoRepository.bulkUpdatePresenca(
-                idEvento = idEvento,
-                idsUsuarios = usuariosAusentes,
-                presenca = false
-            )
-        }
-
-        return totalAtualizados
-    }
-
-    fun contarUsuariosInscritosCargo2(idEvento: Int): Long {
-        return participacaoRepository.countUsuariosInscritosCargo2PorEvento(idEvento)
-    }
-
-    fun listarConvidadosPorEvento(idEvento: Int): List<ConvidadoEventoDTO> {
-        val resultados = participacaoRepository.listarConvidadosPorEvento(idEvento)
-        return resultados.map { array ->
-            ConvidadoEventoDTO(
-                idEvento = (array[0] as Number).toInt(),
-                idUsuario = (array[1] as Number).toInt(),
-                nomeConvidado = array[2] as String,
-                statusConvite = array[3] as String
-            )
-        }
-    }
-
     fun inscreverUsuario(idEvento: Int, idUsuario: Int, idStatusInscricao: Int) {
         val participacaoExistente =
             participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
@@ -172,23 +87,120 @@ class ParticipacaoService(
         )
 
         participacaoRepository.save(participacao)
+    }
 
-        // Declaração das variáveis fora do bloco if
-        val destinatarioEmail: String?
-        val nomeUsuario: String?
+    fun cancelarInscricao(idEvento: Int, idUsuario: Int) {
+        val participacao = participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
+            .orElseThrow { NoSuchElementException("Participação não encontrada para o evento $idEvento e usuário $idUsuario") }
 
-        if (usuario.cargo?.idCargo == 3) {
-            destinatarioEmail = usuario.email
-            nomeUsuario = usuario.nomeCompleto
-        } else {
-            throw IllegalStateException("Usuário não possui o cargo necessário para receber o e-mail.")
+        val idStatus = participacao.evento.statusEvento.idStatusEvento
+        if (idStatus == 2 || idStatus == 3) {
+            throw IllegalStateException("Não é possível cancelar a inscrição de um evento que já está acontecendo ou encerrado.")
         }
 
-        // Chama o método 'enviarEmailConviteEvento' do EmailService
-        emailService.enviarEmailConviteEvento(
-            destinatarioEmail,
-            nomeUsuario ?: throw IllegalStateException("Nome do usuário não pode ser nulo."),
-            evento
-        )
+        participacaoRepository.delete(participacao)
     }
+
+    fun listarEventosInscritos(idUsuario: Int): List<Evento> {
+        val participacoes =
+            participacaoRepository.findByUsuario_IdUsuarioAndIsInscritoTrueAndEventoStatusAberto(idUsuario)
+        return participacoes.map { it.evento }
+    }
+
+    fun listarUsuariosInscritosRestrito(idEvento: Int): List<UsuariosInscritosCargo2DTO> {
+        val resultados = participacaoRepository.listarUsuariosInscritosCargo2PorEvento(idEvento)
+
+        return resultados.map { array ->
+            UsuariosInscritosCargo2DTO(
+                idEvento = (array[0] as Number).toInt(),
+                idUsuario = (array[1] as Number).toInt(),
+                nomeCompleto = array[2] as String,
+                email = array[3] as String?,       // NOVO CAMPO (Índice 3)
+                telefone = array[4] as String?,    // NOVO CAMPO (Índice 4)
+                tipoCargo = array[5] as String,    // Índice ajustado de 3 para 5
+                nomeEvento = array[6] as String,   // Índice ajustado de 4 para 6
+                isInscrito = (array[7] as Number).toInt() == 1, // Índice ajustado de 5 para 7
+                isPresente = (array[8] as Number?)?.toInt() == 1, // Índice ajustado de 6 para 8
+                tipoInscricao = array[9] as String // Índice ajustado de 7 para 9
+            )
+        }
+    }
+
+    fun registrarPresenca(idEvento: Int, listaPresenca: List<PresencaDTO>): Int {
+        // Separa os usuários que terão a presença MARCADA (true)
+        val usuariosPresentes = listaPresenca
+            .filter { it.presente }
+            .map { it.idUsuario }
+            .distinct()
+
+        // Separa os usuários que terão a presença REMOVIDA (false)
+        val usuariosAusentes = listaPresenca
+            .filter { !it.presente }
+            .map { it.idUsuario }
+            .distinct()
+
+        var totalAtualizados = 0
+
+        // 1. Atualiza quem está presente
+        if (usuariosPresentes.isNotEmpty()) {
+            totalAtualizados += participacaoRepository.bulkUpdatePresenca(
+                idEvento = idEvento,
+                idsUsuarios = usuariosPresentes,
+                presenca = true
+            )
+        }
+
+        // 2. Atualiza quem está ausente
+        if (usuariosAusentes.isNotEmpty()) {
+            totalAtualizados += participacaoRepository.bulkUpdatePresenca(
+                idEvento = idEvento,
+                idsUsuarios = usuariosAusentes,
+                presenca = false
+            )
+        }
+
+        return totalAtualizados
+    }
+
+    fun contarUsuariosInscritosCargo2(idEvento: Int): Long {
+        return participacaoRepository.countUsuariosInscritosCargo2PorEvento(idEvento)
+    }
+
+    fun listarEventosConfirmados(usuarioId: Int): List<ParticipacaoResponse> {
+        return participacaoRepository.findEventosPresentesPorUsuario(usuarioId)
+    }
+
+    @Transactional
+    fun atualizarStatusParticipacao(request: AtualizarPresencaRequest): Boolean {
+
+        val linhasAfetadas = participacaoRepository.atualizarStatusParticipacao(
+            usuarioId = request.usuarioId,
+            eventoId = request.eventoId,
+            statusInscricaoId = request.statusInscricaoId
+        )
+
+        // Se não atualizou nenhuma linha, nada a fazer
+        if (linhasAfetadas <= 0) {
+            return false
+        }
+
+        // Buscar participação atualizada com JOIN (pra ter usuario, evento e status)
+        val participacaoAtualizada = participacaoRepository.findByUsuario_IdUsuarioAndEvento_IdEvento(
+            request.usuarioId,
+            request.eventoId
+        )
+
+        // Agora sim conseguimos enviar o e-mail
+        participacaoAtualizada?.let { participacao ->
+            emailService.enviarEmailStatusParticipacao(
+                participacao.usuario.email,
+                participacao.usuario.nomeCompleto,
+                participacao.statusInscricao.tipoInscricao,
+                participacao.evento
+            )
+        }
+
+        return true
+    }
+
 }

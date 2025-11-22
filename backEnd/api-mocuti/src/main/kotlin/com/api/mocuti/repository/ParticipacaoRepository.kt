@@ -1,5 +1,7 @@
 package com.api.mocuti.repository
 
+import com.api.mocuti.dto.ParticipacaoResponse
+import com.api.mocuti.entity.*
 import com.api.mocuti.dto.ConvidadoEventoDTO
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
@@ -77,29 +79,45 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
         JOIN p.usuario u
         WHERE p.evento.idEvento = :idEvento
           AND u.cargo.idCargo = 2
-    """)
+    """
+    )
     fun countUsuariosInscritosCargo2PorEvento(@Param("idEvento") idEvento: Int): Long
 
-
     @Query("""
-        SELECT 
-            p.fk_evento_participacao AS idEvento,
-            u.id_usuario AS idUsuario,
-            u.nome_completo AS nomeConvidado,
-            si.tipo_inscricao AS statusConvite
-        FROM participacao p
-        JOIN usuario u ON u.id_usuario = p.fk_usuario_participacao
-        JOIN status_inscricao si ON si.id_status_inscricao = p.fk_inscricao_participacao
-        WHERE u.fk_cargo_usuario = 3
-          AND p.fk_evento_participacao = :idEvento
-    """, nativeQuery = true)
-    fun listarConvidadosPorEvento(@Param("idEvento") idEvento: Int): List<Array<Any>>
+    SELECT new com.api.mocuti.dto.ParticipacaoResponse(
+        p.evento.idEvento,
+        p.evento.nomeEvento,
+        p.evento.dia,
+        p.statusInscricao.idStatusInscricao
+    )
+    FROM Participacao p
+    WHERE p.usuario.idUsuario = :usuarioId
+      AND p.evento.statusEvento.idStatusEvento = 1
+    ORDER BY p.evento.dia DESC
+""")
+    fun findEventosPresentesPorUsuario(@Param("usuarioId") usuarioId: Int): List<ParticipacaoResponse>
 
 
-    @Query("""
-        SELECT u.email
-        FROM Usuario u
-        WHERE u.cargo.idCargo = 3
-    """)
-    fun findEmailsByCargo3(): List<String>
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query(
+        """
+        UPDATE participacao
+        SET fk_inscricao_participacao = :statusInscricaoId,
+        is_inscrito = CASE 
+            WHEN :statusInscricaoId = 2 THEN 1
+            ELSE 0
+        END
+        WHERE fk_usuario_participacao = :usuarioId
+          AND fk_evento_participacao = :eventoId
+""", nativeQuery = true
+    )
+    fun atualizarStatusParticipacao(
+        @Param("usuarioId") usuarioId: Int,
+        @Param("eventoId") eventoId: Int,
+        @Param("statusInscricaoId") statusInscricaoId: Int
+    ): Int
+
+    fun findByUsuario_IdUsuarioAndEvento_IdEvento(usuarioId: Int, eventoId: Int): Participacao?
+
 }

@@ -1,5 +1,6 @@
 package com.api.mocuti.controller
 
+import com.api.mocuti.dto.AtualizarPresencaRequest
 import com.api.mocuti.dto.BulkPresencaRequest
 import com.api.mocuti.dto.ConvidadoEventoDTO
 import com.api.mocuti.dto.ParticipacaoFeedbackDTO
@@ -119,19 +120,20 @@ class ParticipacaoJpaController(
         return ResponseEntity.ok(mapOf("quantidade" to count))
     }
 
-    @Operation(
-        summary = "Listar convidados de um evento",
-        description = "Retorna a lista de convidados (cargo 3) para um evento específico."
-    )
-    @GetMapping("/convidados/{idEvento}")
-    fun listarConvidadosPorEvento(@PathVariable idEvento: Int): ResponseEntity<List<ConvidadoEventoDTO>> {
-        val convidados = participacaoService.listarConvidadosPorEvento(idEvento)
-        return if (convidados.isEmpty()) {
-            ResponseEntity.noContent().build()
+    @GetMapping("/usuario/{usuarioId}")
+    fun getEventosPresentes(@PathVariable usuarioId: Int) = participacaoService.listarEventosConfirmados(usuarioId)
+
+    @PatchMapping("/atualizar")
+    fun atualizarPresenca(@RequestBody request: AtualizarPresencaRequest): ResponseEntity<String> {
+        val atualizado = participacaoService.atualizarStatusParticipacao(request)
+
+        return if (atualizado) {
+            ResponseEntity.ok("Status atualizado com sucesso.")
         } else {
-            ResponseEntity.ok(convidados)
+            ResponseEntity.status(404).body("Participação não encontrada.")
         }
     }
+
 
 }
 
