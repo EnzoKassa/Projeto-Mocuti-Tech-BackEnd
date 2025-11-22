@@ -1,8 +1,6 @@
 package com.api.mocuti.service
 
-import com.api.mocuti.dto.ParticipacaoFeedbackDTO
-import com.api.mocuti.dto.PresencaDTO
-import com.api.mocuti.dto.UsuariosInscritosCargo2DTO
+import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
 import com.api.mocuti.entity.ParticipacaoId
