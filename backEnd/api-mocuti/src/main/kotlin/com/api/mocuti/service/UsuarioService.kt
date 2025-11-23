@@ -116,13 +116,16 @@ class UsuarioService(
 
 
     fun autenticarUsuario(usuarioLoginRequest: UsuarioLoginRequest): Usuario {
-
         val usuario = usuarioRepository.findByEmail(usuarioLoginRequest.email)
             ?: throw EmailNaoEncontradoException("Usuário não encontrado com este e-mail")
 
-        if (!passwordEncoder.matches(usuarioLoginRequest.senha, usuario.senha)) {
-            throw SenhaIncorretaException("Senha incorreta")
+        val senhaInput = usuarioLoginRequest.senha
+        val senhaCorreta = when {
+            usuario.senha.startsWith("{bcrypt}") -> passwordEncoder.matches(senhaInput, usuario.senha)
+            else -> usuario.senha == senhaInput
         }
+
+        if (!senhaCorreta) throw SenhaIncorretaException("Senha incorreta")
 
         usuario.isAutenticado = true
         return usuarioRepository.save(usuario)
