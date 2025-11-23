@@ -33,10 +33,17 @@ class AuthService(
         val usuario = usuarioRepository.findByEmail(email)
             ?: throw IllegalArgumentException("Usuário não encontrado")
 
+        // Verifica se a nova senha é igual à senha atual
+        if (passwordEncoder.matches(novaSenha, usuario.senha)) {
+            throw IllegalArgumentException("A nova senha não pode ser igual à anterior.")
+        }
+
+        // Atualiza com senha nova criptografada
         usuario.senha = passwordEncoder.encode(novaSenha)
-//        usuario.senha = novaSenha
         usuarioRepository.save(usuario)
 
+        // Remove token após uso
         tokensResetSenha.remove(tokenLimpo)
     }
+
 }

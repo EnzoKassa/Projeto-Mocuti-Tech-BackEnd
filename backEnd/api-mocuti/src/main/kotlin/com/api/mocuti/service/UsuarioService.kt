@@ -4,6 +4,7 @@ import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Preferencia
 import com.api.mocuti.entity.Usuario
 import com.api.mocuti.repository.*
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
@@ -15,7 +16,8 @@ class UsuarioService(
     private val enderecoRepository: EnderecoRepository,
     private val canalComunicacaoRepository: CanalComunicacaoRepository,
     private val categoriaRepository: CategoriaRepository,
-    private val preferenciaRepository: PreferenciaRepository
+    private val preferenciaRepository: PreferenciaRepository,
+    private val passwordEncoder: PasswordEncoder
 ) {
     fun listarTodos(): List<Usuario> = usuarioRepository.findAll()
 
@@ -109,13 +111,17 @@ class UsuarioService(
         return usuarioSalvo
     }
 
+    class EmailNaoEncontradoException(message: String) : RuntimeException(message)
+    class SenhaIncorretaException(message: String) : RuntimeException(message)
+
 
     fun autenticarUsuario(usuarioLoginRequest: UsuarioLoginRequest): Usuario {
-        val usuario = usuarioRepository.findByEmail(usuarioLoginRequest.email)
-            ?: throw IllegalArgumentException("Usuário não encontrado com este e-mail")
 
-        if (usuario.senha != usuarioLoginRequest.senha) {
-            throw IllegalArgumentException("Senha incorreta")
+        val usuario = usuarioRepository.findByEmail(usuarioLoginRequest.email)
+            ?: throw EmailNaoEncontradoException("Usuário não encontrado com este e-mail")
+
+        if (!passwordEncoder.matches(usuarioLoginRequest.senha, usuario.senha)) {
+            throw SenhaIncorretaException("Senha incorreta")
         }
 
         usuario.isAutenticado = true
@@ -138,9 +144,16 @@ class UsuarioService(
         val usuario = usuarioRepository.findById(idUsuario)
             .orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        usuario.senha = request.senha
+        // Verifica se a senha atual bate
+        if (!usuario.senha.equals(request.senhaAtual)) { // ideal usar hash
+            throw IllegalArgumentException("Senha atual incorreta")
+        }
+
+        // Atualiza para a nova senha
+        usuario.senha = request.novaSenha
         usuarioRepository.save(usuario)
     }
+
 
     fun desativarUsuario(idUsuario: Int): Usuario {
         val usuario = usuarioRepository.findById(idUsuario)
