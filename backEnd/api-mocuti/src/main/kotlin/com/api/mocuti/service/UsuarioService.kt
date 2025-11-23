@@ -120,15 +120,18 @@ class UsuarioService(
             ?: throw EmailNaoEncontradoException("Usuário não encontrado com este e-mail")
 
         val senhaInput = usuarioLoginRequest.senha
-        val senhaCorreta = when {
-            usuario.senha.startsWith("{bcrypt}") -> passwordEncoder.matches(senhaInput, usuario.senha)
-            else -> usuario.senha == senhaInput
+        val senhaCorreta = if (usuario.senha.startsWith("\$2a\$") || usuario.senha.startsWith("\$2b\$") || usuario.senha.startsWith("\$2y\$")) {
+            // Se começa com prefixo típico do bcrypt, valida com o encoder
+            passwordEncoder.matches(senhaInput, usuario.senha)
+        } else {
+            // Senha sem criptografia
+            usuario.senha == senhaInput
         }
 
         if (!senhaCorreta) throw SenhaIncorretaException("Senha incorreta")
 
         usuario.isAutenticado = true
-        return usuarioRepository.save(usuario)
+        return usuarioRepository.save(usuario) // se quiser salvar isAutenticado
     }
 
     fun desautenticarUsuario(usuarioLoginRequest: UsuarioLoginRequest): Usuario {
