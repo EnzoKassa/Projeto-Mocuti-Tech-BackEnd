@@ -1,5 +1,6 @@
 package com.api.mocuti.service
 
+import com.api.mocuti.dto.ConvidadoEventoDTO
 import com.api.mocuti.dto.*
 import com.api.mocuti.entity.Evento
 import com.api.mocuti.entity.Participacao
@@ -12,6 +13,7 @@ import com.api.mocuti.repository.StatusInscricaoRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+
 
 // Importações adicionais para o EmailService
 import org.springframework.mail.javamail.JavaMailSender // Pode remover se EmailService já estiver injetado
@@ -59,33 +61,7 @@ class ParticipacaoService(
         }
     }
 
-    fun inscreverUsuario(idEvento: Int, idUsuario: Int, idStatusInscricao: Int) {
-        val participacaoExistente =
-            participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
-        if (participacaoExistente.isPresent) {
-            throw IllegalStateException("Usuário já está inscrito neste evento.")
-        }
 
-        val evento = eventoRepository.findById(idEvento)
-            .orElseThrow { NoSuchElementException("Evento com ID $idEvento não encontrado") }
-
-        val usuario = usuarioRepository.findById(idUsuario)
-            .orElseThrow { NoSuchElementException("Usuário com ID $idUsuario não encontrado") }
-
-        val statusInscricao = statusInscricaoRepository.findById(idStatusInscricao)
-            .orElseThrow { NoSuchElementException("StatusInscricao com ID $idStatusInscricao não encontrado") }
-
-        val participacao = Participacao(
-            id = ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento),
-            isInscrito = true,
-            isPresente = false,
-            statusInscricao = statusInscricao,
-            usuario = usuario,
-            evento = evento
-        )
-
-        participacaoRepository.save(participacao)
-    }
 
     fun cancelarInscricao(idEvento: Int, idUsuario: Int) {
         val participacao = participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
@@ -103,6 +79,10 @@ class ParticipacaoService(
         val participacoes =
             participacaoRepository.findByUsuario_IdUsuarioAndIsInscritoTrueAndEventoStatusAberto(idUsuario)
         return participacoes.map { it.evento }
+    }
+
+    fun listarConvidadosPorEvento(idEvento: Int): List<ConvidadoEventoDTO> {
+        return participacaoRepository.listarConvidadosPorEvento(idEvento)
     }
 
     fun listarUsuariosInscritosRestrito(idEvento: Int): List<UsuariosInscritosCargo2DTO> {
@@ -201,4 +181,44 @@ class ParticipacaoService(
         return true
     }
 
+    fun inscreverUsuario(idEvento: Int, idUsuario: Int, idStatusInscricao: Int) {
+        val participacaoExistente =
+            participacaoRepository.findById(ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento))
+        if (participacaoExistente.isPresent) {
+            throw IllegalStateException("Usuário já está inscrito neste evento.")
+        }
+
+        val evento = eventoRepository.findById(idEvento)
+            .orElseThrow { NoSuchElementException("Evento com ID $idEvento não encontrado") }
+
+        val usuario = usuarioRepository.findById(idUsuario)
+            .orElseThrow { NoSuchElementException("Usuário com ID $idUsuario não encontrado") }
+
+        val statusInscricao = statusInscricaoRepository.findById(idStatusInscricao)
+            .orElseThrow { NoSuchElementException("StatusInscricao com ID $idStatusInscricao não encontrado") }
+
+        val participacao = Participacao(
+            id = ParticipacaoId(usuarioId = idUsuario, eventoId = idEvento),
+            isInscrito = true,
+            isPresente = false,
+            statusInscricao = statusInscricao,
+            usuario = usuario,
+            evento = evento
+        )
+
+        participacaoRepository.save(participacao)
+
+        // Envia o e-mail apenas para usuários com cargo == 3
+        if (usuario.cargo?.idCargo == 3) {
+            val destinatarioEmail = usuario.email
+            val nomeUsuario = usuario.nomeCompleto
+
+            emailService.enviarEmailConviteEvento(
+                destinatarioEmail,
+                nomeUsuario ?: throw IllegalStateException("Nome do usuário não pode ser nulo."),
+                evento
+            )
+        }
+    }
 }
+

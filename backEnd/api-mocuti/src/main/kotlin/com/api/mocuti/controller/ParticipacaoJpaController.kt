@@ -120,6 +120,21 @@ class ParticipacaoJpaController(
         return ResponseEntity.ok(mapOf("quantidade" to count))
     }
 
+
+    @Operation(
+        summary = "Listar convidados de um evento",
+        description = "Retorna a lista de convidados (cargo 3) para um evento específico."
+    )
+    @GetMapping("/convidados/{idEvento}")
+    fun listarConvidadosPorEvento(@PathVariable idEvento: Int): ResponseEntity<List<ConvidadoEventoDTO>> {
+        val convidados = participacaoService.listarConvidadosPorEvento(idEvento)
+        return if (convidados.isEmpty()) {
+            ResponseEntity.noContent().build()
+        } else {
+            ResponseEntity.ok(convidados)
+        }
+    }
+
     @GetMapping("/usuario/{usuarioId}")
     fun getEventosPresentes(@PathVariable usuarioId: Int) = participacaoService.listarEventosConfirmados(usuarioId)
 

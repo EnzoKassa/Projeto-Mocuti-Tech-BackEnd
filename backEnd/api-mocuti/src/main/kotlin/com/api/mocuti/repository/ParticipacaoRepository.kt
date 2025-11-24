@@ -16,7 +16,8 @@ import java.time.LocalDate
 
 interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
 
-    @Query("""
+    @Query(
+        """
     SELECT p
     FROM Participacao p
     JOIN p.usuario u
@@ -25,11 +26,14 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
       AND p.isPresente = true
       AND e.statusEvento.idStatusEvento = 2
           AND e.dia >= :dia
-""")
-    fun listarParticipacoesComFeedback(@Param("usuarioId") usuarioId: Int, @Param("dia") dia: LocalDate
+"""
+    )
+    fun listarParticipacoesComFeedback(
+        @Param("usuarioId") usuarioId: Int, @Param("dia") dia: LocalDate
     ): List<Participacao>
 
-    @Query("""
+    @Query(
+        """
     SELECT p
     FROM Participacao p
     JOIN p.usuario u
@@ -38,20 +42,24 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
       AND p.isPresente = true
       AND e.statusEvento.idStatusEvento = 2
       AND e.dia < :diaLimite
-""")
-    fun listarParticipacoesPassadas(@Param("usuarioId") usuarioId: Int, @Param("diaLimite") diaLimite: LocalDate
+"""
+    )
+    fun listarParticipacoesPassadas(
+        @Param("usuarioId") usuarioId: Int, @Param("diaLimite") diaLimite: LocalDate
     ): List<Participacao>
 
     fun findByUsuarioAndEvento(usuario: Usuario, evento: Evento): Participacao?
 
-    @Query("""
+    @Query(
+        """
         SELECT p
         FROM Participacao p
         JOIN p.evento e
         WHERE p.usuario.idUsuario = :usuarioId
           AND p.isInscrito = true
           AND e.statusEvento.idStatusEvento = 1
-""")
+"""
+    )
     fun findByUsuario_IdUsuarioAndIsInscritoTrueAndEventoStatusAberto(
         @Param("usuarioId") usuarioId: Int
     ): List<Participacao>
@@ -61,19 +69,22 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
 
     @Modifying // Indica que esta query é para modificação (UPDATE, DELETE, INSERT)
     @Transactional // É obrigatório para queries @Modifying
-    @Query("""
+    @Query(
+        """
         UPDATE Participacao p
         SET p.isPresente = :presenca
         WHERE p.id.eventoId = :idEvento
         AND p.id.usuarioId IN :idsUsuarios
-    """)
+    """
+    )
     fun bulkUpdatePresenca(
         @Param("idEvento") idEvento: Int,
         @Param("idsUsuarios") idsUsuarios: List<Int>,
         @Param("presenca") presenca: Boolean
     ): Int // Retorna o número de registros atualizados
 
-    @Query("""
+    @Query(
+        """
         SELECT COUNT(p)
         FROM Participacao p
         JOIN p.usuario u
@@ -82,6 +93,9 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
     """
     )
     fun countUsuariosInscritosCargo2PorEvento(@Param("idEvento") idEvento: Int): Long
+
+
+
 
     @Query("""
     SELECT new com.api.mocuti.dto.ParticipacaoResponse(
@@ -119,5 +133,27 @@ interface ParticipacaoRepository : JpaRepository<Participacao, ParticipacaoId> {
     ): Int
 
     fun findByUsuario_IdUsuarioAndEvento_IdEvento(usuarioId: Int, eventoId: Int): Participacao?
+
+
+    @Query(
+        """
+        SELECT new com.api.mocuti.dto.ConvidadoEventoDTO(
+            u.idUsuario, u.nomeCompleto, si.tipoInscricao
+        )
+        FROM Participacao p
+        JOIN p.usuario u
+        JOIN p.statusInscricao si
+        WHERE p.evento.idEvento = :idEvento
+          AND u.cargo.idCargo = 3
+    """
+    )
+    fun listarConvidadosPorEvento(@Param("idEvento") idEvento: Int): List<ConvidadoEventoDTO>
+
+    @Query("""
+        SELECT u.email
+        FROM Usuario u
+        WHERE u.cargo.idCargo = 3
+    """)
+    fun findEmailsByCargo3(): List<String>
 
 }
