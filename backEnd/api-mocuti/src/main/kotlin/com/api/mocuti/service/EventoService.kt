@@ -207,4 +207,9 @@ class EventoService(
     fun listarPublicoAlvo(): List<String> {
         return eventoRepository.findAll().mapNotNull { it.publicoAlvo }.distinct()
     }
+
+    fun atualizarStatusEventos() {
+        val eventosAtualizados = eventoRepository.atualizarStatusEventos()
+        println("$eventosAtualizados eventos tiveram seus status atualizados.")
+    }
 }

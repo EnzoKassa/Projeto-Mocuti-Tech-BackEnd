@@ -28,9 +28,11 @@ data class Evento(
     var dia: LocalDate,
 
     @field:NotNull
+    @Column(name = "hora_inicio")
     var horaInicio: LocalTime,
 
     @field:NotNull
+    @Column(name = "hora_fim")
     var horaFim: LocalTime,
 
     @field:NotNull

@@ -35,4 +35,31 @@ interface EventoRepository : JpaRepository<Evento, Int>, JpaSpecificationExecuto
 
     fun findByStatusEvento_IdStatusEvento(statusEventoId: Int): List<Evento>
 
+
+    @Modifying
+    @Transactional
+    @Query(
+        """
+        UPDATE mocuti.evento
+        SET fk_status_evento =
+            CASE
+                WHEN TIMESTAMP(dia, hora_inicio) <= CURRENT_TIMESTAMP() AND TIMESTAMP(dia, hora_fim) > CURRENT_TIMESTAMP() THEN 3
+                WHEN TIMESTAMP(dia, hora_fim) <= CURRENT_TIMESTAMP() THEN 2
+                WHEN TIMESTAMP(dia, hora_inicio) > CURRENT_TIMESTAMP() THEN 1
+                ELSE fk_status_evento
+            END
+        WHERE hora_inicio IS NOT NULL
+          AND hora_fim IS NOT NULL
+          AND dia IS NOT NULL
+          AND fk_status_evento != 
+            CASE
+                WHEN TIMESTAMP(dia, hora_inicio) <= CURRENT_TIMESTAMP() AND TIMESTAMP(dia, hora_fim) > CURRENT_TIMESTAMP() THEN 3
+                WHEN TIMESTAMP(dia, hora_fim) <= CURRENT_TIMESTAMP() THEN 2
+                WHEN TIMESTAMP(dia, hora_inicio) > CURRENT_TIMESTAMP() THEN 1
+                ELSE fk_status_evento
+            END
+        """,
+        nativeQuery = true
+    )
+    fun atualizarStatusEventos(): Int
 }
