@@ -8,6 +8,7 @@ import com.api.mocuti.service.UsuarioService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 
 
 @RestController
@@ -17,6 +18,10 @@ import jakarta.validation.Valid
 class UsuarioJpaController(
     private val usuarioService: UsuarioService
 ) {
+
+    class EmailNaoEncontradoException(message: String) : RuntimeException(message)
+    class SenhaIncorretaException(message: String) : RuntimeException(message)
+
 
     @Operation(summary = "Listar todos os usuários")
     @GetMapping("/listar")
@@ -43,15 +48,32 @@ class UsuarioJpaController(
 
     @Operation(summary = "Login do usuário")
     @PatchMapping("/login")
-    fun logar(@RequestBody usuarioLoginRequest: UsuarioLoginRequest): ResponseEntity<UsuarioLoginDTO> {
-        val usuarioAtualizado = usuarioService.autenticarUsuario(usuarioLoginRequest)
-        val response = UsuarioLoginDTO(
-            idUsuario = usuarioAtualizado.idUsuario.toLong(),
-            nomeCompleto = usuarioAtualizado.nomeCompleto,
-            email = usuarioAtualizado.email,
-            cargo = usuarioAtualizado.cargo
-        )
-        return ResponseEntity.ok(response)
+    fun logar(@RequestBody usuarioLoginRequest: UsuarioLoginRequest): ResponseEntity<Any> {
+        return try {
+            val usuarioAtualizado = usuarioService.autenticarUsuario(usuarioLoginRequest)
+
+            val response = UsuarioLoginDTO(
+                idUsuario = usuarioAtualizado.idUsuario.toLong(),
+                nomeCompleto = usuarioAtualizado.nomeCompleto,
+                email = usuarioAtualizado.email,
+                cargo = usuarioAtualizado.cargo
+            )
+
+            ResponseEntity.ok(response)
+
+        } catch (e: UsuarioService.EmailNaoEncontradoException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(mapOf("erro" to e.message)) // 404 -> email não cadastrado
+
+        } catch (e: UsuarioService.SenhaIncorretaException) {
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(mapOf("erro" to e.message)) // 401 -> senha incorreta
+
+        } catch (e: Exception) {
+            e.printStackTrace() // Mostra erro completo no console
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(mapOf("erro" to "Erro inesperado: ${e.message}"))
+        }
     }
 
     @Operation(summary = "Logout do usuário")
@@ -139,10 +161,28 @@ class UsuarioJpaController(
         return ResponseEntity.ok(usuarioAtualizado)
     }
 
+    @GetMapping("/existeEmail")
+    fun existeEmail(@RequestParam email: String): ResponseEntity<Boolean> {
+        val existe = usuarioService.existeEmail(email)
+        return ResponseEntity.ok(existe)
+    }
+
+
     @GetMapping("/{id}/lista-presenca")
     fun listarPresencaPorEvento(@PathVariable id: Long): Any {
         val resultado = usuarioService.buscarPorEvento(id)
         return resultado ?: mapOf("mensagem" to "Evento não encontrado ou sem participantes")
     }
+
+    @Operation(summary = "Atualizar cargo do usuário")
+    @PatchMapping("/{idUsuario}/cargo/{idCargo}")
+    fun atualizarCargo(
+        @PathVariable idUsuario: Int,
+        @PathVariable idCargo: Int
+    ): ResponseEntity<Usuario> {
+        val usuarioAtualizado = usuarioService.atualizarCargo(idUsuario, idCargo)
+        return ResponseEntity.ok(usuarioAtualizado)
+    }
+
 
 }
