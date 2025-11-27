@@ -56,6 +56,15 @@ class UsuarioService(
             throw IllegalArgumentException("CPF já cadastrado")
         }
 
+        // 🔹 Validação de idade mínima (5 anos)
+        val hoje = LocalDate.now()
+        val nascimento = request.dataNascimento
+        val idade = hoje.year - nascimento.year - if (hoje < nascimento.plusYears((hoje.year - nascimento.year).toLong())) 1 else 0
+
+        if (idade < 5) {
+            throw IllegalArgumentException("Data de aniversário inválida: usuário deve ter pelo menos 5 anos")
+        }
+
         // 🔹 Busca do cargo (padrão caso não informado)
         val cargo = if (request.cargo != null) {
             cargoRepository.findById(request.cargo)
@@ -117,21 +126,26 @@ class UsuarioService(
 
     fun autenticarUsuario(usuarioLoginRequest: UsuarioLoginRequest): Usuario {
         val usuario = usuarioRepository.findByEmail(usuarioLoginRequest.email)
-            ?: throw EmailNaoEncontradoException("Usuário não encontrado com este e-mail")
+            ?: throw EmailNaoEncontradoException("E-mail não cadastrado") // Mensagem mais clara
 
         val senhaInput = usuarioLoginRequest.senha
         val senhaCorreta = if (usuario.senha.startsWith("\$2a\$") || usuario.senha.startsWith("\$2b\$") || usuario.senha.startsWith("\$2y\$")) {
-            // Se começa com prefixo típico do bcrypt, valida com o encoder
             passwordEncoder.matches(senhaInput, usuario.senha)
         } else {
-            // Senha sem criptografia
             usuario.senha == senhaInput
         }
 
-        if (!senhaCorreta) throw SenhaIncorretaException("Senha incorreta")
+        if (!senhaCorreta) throw SenhaIncorretaException("Senha incorreta") // Mensagem clara
 
         usuario.isAutenticado = true
-        return usuarioRepository.save(usuario) // se quiser salvar isAutenticado
+
+        // 🔹 Tente salvar, mas se falhar, não bloqueia login
+        return try {
+            usuarioRepository.save(usuario)
+        } catch (e: Exception) {
+            println("⚠️ Erro ao salvar isAutenticado: ${e.message}")
+            usuario
+        }
     }
 
     fun desautenticarUsuario(usuarioLoginRequest: UsuarioLoginRequest): Usuario {
@@ -150,16 +164,37 @@ class UsuarioService(
         val usuario = usuarioRepository.findById(idUsuario)
             .orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Verifica se a senha atual bate
-        if (!usuario.senha.equals(request.senhaAtual)) { // ideal usar hash
-            throw IllegalArgumentException("Senha atual incorreta")
+        val senhaBanco = usuario.senha
+
+        val senhaConfere = if (senhaBanco.startsWith("\$2a\$") || senhaBanco.startsWith("\$2b\$") || senhaBanco.startsWith("\$2y\$")) {
+            // Senha já criptografada
+            passwordEncoder.matches(request.senhaAtual, senhaBanco)
+        } else {
+            // Senha salva em texto puro
+            request.senhaAtual == senhaBanco
         }
 
-        // Atualiza para a nova senha
-        usuario.senha = request.novaSenha
+        if (!senhaConfere) {
+            throw IllegalArgumentException("Senha atual incorreta.")
+        }
+
+        // Evita reutilizar senha antiga (funciona tanto com hash quanto texto)
+        if (senhaBanco.startsWith("\$2a\$") || senhaBanco.startsWith("\$2b\$") || senhaBanco.startsWith("\$2y\$")) {
+            // Já é criptografada → comparar com matches
+            if (passwordEncoder.matches(request.novaSenha, senhaBanco)) {
+                throw IllegalArgumentException("A nova senha não pode ser igual à anterior.")
+            }
+        } else {
+            // Era texto puro → comparar diretamente
+            if (request.novaSenha == senhaBanco) {
+                throw IllegalArgumentException("A nova senha não pode ser igual à anterior.")
+            }
+        }
+
+        // **Sempre criptografa ao salvar**
+        usuario.senha = passwordEncoder.encode(request.novaSenha)
         usuarioRepository.save(usuario)
     }
-
 
     fun desativarUsuario(idUsuario: Int): Usuario {
         val usuario = usuarioRepository.findById(idUsuario)
@@ -201,27 +236,52 @@ class UsuarioService(
             .orElseThrow { NoSuchElementException("Usuário com ID $idUsuario não encontrado") }
     }
 
-    fun editarUsuario(id: Long, usuarioRequest: EditarUsuarioRequest): Usuario {
-        val usuario = usuarioRepository.findById(id.toInt())
-            .orElseThrow { NoSuchElementException("Usuário não encontrado com ID: $id") }
+        fun editarUsuario(id: Long, usuarioRequest: EditarUsuarioRequest): Usuario {
+            val usuario = usuarioRepository.findById(id.toInt())
+                .orElseThrow { NoSuchElementException("Usuário não encontrado com ID: $id") }
 
-        usuario.nomeCompleto = usuarioRequest.nomeCompleto
-        usuario.cpf = usuarioRequest.cpf
-        usuario.telefone = usuarioRequest.telefone
-        usuario.email = usuarioRequest.email
-        usuario.dt_nasc = try {
-            LocalDate.parse(usuarioRequest.dt_nasc)
-        } catch (e: DateTimeParseException) {
-            throw IllegalArgumentException("Data de nascimento inválida. Use o formato yyyy-MM-dd.")
+            // Verifica se já existe outro usuário com o mesmo e-mail
+            usuarioRepository.findByEmail(usuarioRequest.email)?.let {
+                if (it.idUsuario != id.toInt()) {
+                    throw IllegalArgumentException("Já existe um usuário com este e-mail.")
+                }
+            }
+
+            usuario.nomeCompleto = usuarioRequest.nomeCompleto
+            usuario.cpf = usuarioRequest.cpf
+            usuario.telefone = usuarioRequest.telefone
+
+            usuario.email = usuarioRequest.email
+            usuario.dt_nasc = try {
+                LocalDate.parse(usuarioRequest.dt_nasc)
+            } catch (e: DateTimeParseException) {
+                throw IllegalArgumentException("Data de nascimento inválida. Use o formato yyyy-MM-dd.")
+            }
+            usuario.etnia = usuarioRequest.etnia
+            usuario.nacionalidade = usuarioRequest.nacionalidade
+            usuario.genero = usuarioRequest.genero
+
+            return usuarioRepository.save(usuario)
         }
-        usuario.etnia = usuarioRequest.etnia
-        usuario.nacionalidade = usuarioRequest.nacionalidade
-        usuario.genero = usuarioRequest.genero
 
-        return usuarioRepository.save(usuario)
+    fun existeEmail(email: String): Boolean {
+        return usuarioRepository.findByEmail(email) != null
     }
+
 
     fun buscarPorEvento(idEvento: Long): ListaPresencaEventoDTO? {
         return usuarioRepository.findByEventoId(idEvento)
     }
+
+    fun atualizarCargo(idUsuario: Int, idCargo: Int): Usuario {
+        val usuario = usuarioRepository.findById(idUsuario)
+            .orElseThrow { NoSuchElementException("Usuário com ID $idUsuario não encontrado") }
+
+        val cargo = cargoRepository.findById(idCargo)
+            .orElseThrow { NoSuchElementException("Cargo com ID $idCargo não encontrado") }
+
+        usuario.cargo = cargo
+        return usuarioRepository.save(usuario)
+    }
+
 }
