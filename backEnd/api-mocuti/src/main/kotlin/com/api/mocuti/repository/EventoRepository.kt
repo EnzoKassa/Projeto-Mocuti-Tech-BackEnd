@@ -42,22 +42,35 @@ interface EventoRepository : JpaRepository<Evento, Int>, JpaSpecificationExecuto
         """
         UPDATE mocuti.evento
         SET fk_status_evento =
-            CASE
-                WHEN TIMESTAMP(dia, hora_inicio) <= CURRENT_TIMESTAMP() AND TIMESTAMP(dia, hora_fim) > CURRENT_TIMESTAMP() THEN 3
-                WHEN TIMESTAMP(dia, hora_fim) <= CURRENT_TIMESTAMP() THEN 2
-                WHEN TIMESTAMP(dia, hora_inicio) > CURRENT_TIMESTAMP() THEN 1
-                ELSE fk_status_evento
-            END
+            ( -- Subconsulta ou expressão CASE para o NOVO STATUS
+                CASE
+                    -- Prioridade 1: Em Andamento (3)
+                    WHEN TIMESTAMP(dia, hora_inicio) <= CURRENT_TIMESTAMP() AND TIMESTAMP(dia, hora_fim) > CURRENT_TIMESTAMP() THEN 3
+                    
+                    -- Prioridade 2: Encerrado (2) - Pelo tempo
+                    WHEN TIMESTAMP(dia, hora_fim) <= CURRENT_TIMESTAMP() THEN 2
+                    
+                    -- Prioridade 3: Aberto (1) - Se o tempo de início ainda não chegou
+                    WHEN TIMESTAMP(dia, hora_inicio) > CURRENT_TIMESTAMP() THEN 1
+                    
+                    -- Fallback: Se nenhuma das condições acima for atendida, mantém o status atual (segurança)
+                    ELSE fk_status_evento 
+                END
+            )
         WHERE hora_inicio IS NOT NULL
           AND hora_fim IS NOT NULL
           AND dia IS NOT NULL
-          AND fk_status_evento != 
-            CASE
-                WHEN TIMESTAMP(dia, hora_inicio) <= CURRENT_TIMESTAMP() AND TIMESTAMP(dia, hora_fim) > CURRENT_TIMESTAMP() THEN 3
-                WHEN TIMESTAMP(dia, hora_fim) <= CURRENT_TIMESTAMP() THEN 2
-                WHEN TIMESTAMP(dia, hora_inicio) > CURRENT_TIMESTAMP() THEN 1
-                ELSE fk_status_evento
-            END
+          -- Garante que eventos já encerrados manualmente não sejam reabertos
+          AND fk_status_evento != 2 
+          -- ATUALIZAÇÃO SÓ OCORRE SE O STATUS CALCULADO FOR DIFERENTE DO STATUS ATUAL
+          AND fk_status_evento != ( -- Recalcula o status esperado para comparação
+                CASE
+                    WHEN TIMESTAMP(dia, hora_inicio) <= CURRENT_TIMESTAMP() AND TIMESTAMP(dia, hora_fim) > CURRENT_TIMESTAMP() THEN 3
+                    WHEN TIMESTAMP(dia, hora_fim) <= CURRENT_TIMESTAMP() THEN 2
+                    WHEN TIMESTAMP(dia, hora_inicio) > CURRENT_TIMESTAMP() THEN 1
+                    ELSE fk_status_evento
+                END
+            )
         """,
         nativeQuery = true
     )
