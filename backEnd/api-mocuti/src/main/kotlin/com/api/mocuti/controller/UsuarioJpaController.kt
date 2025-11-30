@@ -184,5 +184,10 @@ class UsuarioJpaController(
         return ResponseEntity.ok(usuarioAtualizado)
     }
 
+    @GetMapping("/inativos-por-cargo/{cargoId}")
+    fun listarUsuariosInativosPorCargo(@PathVariable cargoId: Int): ResponseEntity<List<Usuario>> {
+        val usuarios = usuarioService.listarUsuariosInativosPorCargo(cargoId)
+        return ResponseEntity.ok(usuarios)
+    }
 
 }

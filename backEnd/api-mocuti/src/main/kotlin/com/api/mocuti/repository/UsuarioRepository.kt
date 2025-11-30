@@ -60,4 +60,11 @@ interface UsuarioRepository : JpaRepository<Usuario, Int> {
         nativeQuery = true
     )
     fun findByEventoId(idEvento: Long): ListaPresencaEventoDTO?
+
+    @Query("""
+        SELECT u FROM Usuario u
+        WHERE u.isAtivo = true
+        AND u.cargo.idCargo = :cargoId
+    """)
+    fun findInativosPorCargo(cargoId: Int): List<Usuario>
 }

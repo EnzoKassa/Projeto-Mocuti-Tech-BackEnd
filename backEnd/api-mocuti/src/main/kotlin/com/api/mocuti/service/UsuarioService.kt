@@ -284,4 +284,8 @@ class UsuarioService(
         return usuarioRepository.save(usuario)
     }
 
+    fun listarUsuariosInativosPorCargo(cargoId: Int): List<Usuario> {
+        return usuarioRepository.findInativosPorCargo(cargoId)
+    }
+
 }
