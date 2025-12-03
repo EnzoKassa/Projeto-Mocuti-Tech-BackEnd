@@ -16,7 +16,7 @@ class EmailService(
     @Async // executa em outra thread para não travar a requisição
     fun enviarEmailNovoEvento(destinatario: String, nome: String, evento: Evento) {
         val mensagem = MimeMessageHelper(mailSender.createMimeMessage(), true)
-        mensagem.setFrom("kevelly.oliveira@sptech.school") // precisa ser o mesmo do SMTP
+        mensagem.setFrom("sitemocuti@gmail.com") // precisa ser o mesmo do SMTP
         mensagem.setTo(destinatario)
         mensagem.setSubject("Mocuti - Novo Evento na sua Categoria Favorita!")
         val html = """
@@ -107,7 +107,7 @@ class EmailService(
             """.trimIndent()
 
         val message = MimeMessageHelper(mailSender.createMimeMessage(), true)
-        message.setFrom("kevelly.oliveira@sptech.school")
+        message.setFrom("sitemocuti@gmail.com")
         message.setTo(destinatario)
         message.setSubject("Recuperação de Senha")
         message.setText(html, true) // true indica que é HTML
@@ -118,7 +118,7 @@ class EmailService(
     @Async
     fun enviarEmailConviteEvento(destinatario: String, nome: String, evento: Evento) {
         val mensagem = MimeMessageHelper(mailSender.createMimeMessage(), true)
-        mensagem.setFrom("kevelly.oliveira@sptech.school")
+        mensagem.setFrom("sitemocuti@gmail.com")
         mensagem.setTo(destinatario)
         mensagem.setSubject("Mocuti - Você foi Convidado para um Evento!")
         val html = """
@@ -172,8 +172,8 @@ class EmailService(
     fun enviarEmailStatusParticipacao(destinatario: String, nome: String, status: String, evento: Evento) {
 
         val mensagem = MimeMessageHelper(mailSender.createMimeMessage(), true)
-        mensagem.setFrom("kevelly.oliveira@sptech.school")
-        mensagem.setTo("kevellyoliveira2@gmail.com")
+        mensagem.setFrom("sitemocuti@gmail.com")
+        mensagem.setTo("sitemocuti@gmail.com")
         mensagem.setSubject("Atualização do seu status no evento – ${evento.nomeEvento}")
 
         val html = """
