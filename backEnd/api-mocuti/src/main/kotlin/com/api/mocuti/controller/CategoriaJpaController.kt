@@ -16,7 +16,10 @@ class CategoriaJpaController(
     private val categoriaService: CategoriaService
 ) {
 
-    @Operation(summary = "Listar todas as categorias")
+    @Operation(
+        summary = "Listar todas as categorias",
+        description = "Retorna uma lista de todas as categorias cadastradas no sistema"
+    )
     @GetMapping
     fun get(): ResponseEntity<List<Categoria>> {
         val categorias = categoriaService.listarTodos()
@@ -24,7 +27,10 @@ class CategoriaJpaController(
         else ResponseEntity.ok(categorias)
     }
 
-    @Operation(summary = "Buscar categoria por ID")
+    @Operation(
+        summary = "Buscar categoria por ID",
+        description = "Retorna a categoria correspondente ao ID fornecido"
+    )
     @GetMapping("/{id}")
     fun get(@PathVariable id: Int): ResponseEntity<Categoria> {
         val categoria = categoriaService.buscarPorId(id)
@@ -32,21 +38,30 @@ class CategoriaJpaController(
         else ResponseEntity.notFound().build()
     }
 
-    @Operation(summary = "Deletar categoria por ID")
+    @Operation(
+        summary = "Deletar categoria por ID",
+        description = "Exclui a categoria correspondente ao ID fornecido"
+    )
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Int): ResponseEntity<Void> {
         return if (categoriaService.deletar(id)) ResponseEntity.noContent().build()
         else ResponseEntity.notFound().build()
     }
 
-    @Operation(summary = "Criar uma nova categoria")
+    @Operation(
+        summary = "Criar uma nova categoria",
+        description = "Cria e persiste uma nova categoria no banco de dados"
+    )
     @PostMapping
     fun post(@RequestBody @Valid novaCategoria: Categoria): ResponseEntity<Categoria> {
         val categoria = categoriaService.salvar(novaCategoria)
         return ResponseEntity.status(201).body(categoria)
     }
 
-    @Operation(summary = "Atualizar uma categoria")
+    @Operation(
+        summary = "Atualizar uma categoria",
+        description = "Atualiza os dados de uma categoria existente a partir do ID"
+    )
     @PutMapping("/{id}")
     fun put(@PathVariable id: Int, @RequestBody categoriaAtualizada: Categoria): ResponseEntity<Categoria> {
         val categoria = categoriaService.atualizar(id, categoriaAtualizada)
@@ -54,7 +69,10 @@ class CategoriaJpaController(
         else ResponseEntity.notFound().build()
     }
 
-    @Operation(summary = "Rank Categoria")
+    @Operation(
+        summary = "Rank Categoria",
+        description = "Retorna o ranking das categorias com base na quantidade de eventos associados a cada uma"
+    )
     @GetMapping("/view/ranking")
     fun getRanking(): ResponseEntity<List<RankCategoriaRequest>> {
         val ranking = categoriaService.getRanking()

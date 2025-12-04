@@ -83,6 +83,10 @@ class EnderecoJpaController(val repositorio: EnderecoRepository) {
         }
     }
 
+    @Operation(
+        summary = "Listar endereços usados em eventos",
+        description = "Retorna uma lista de endereços distintos que estão associados a eventos cadastrados"
+    )
     @GetMapping("/enderecos-eventos")
     fun getEnderecosUsadosEmEventos(): List<Endereco?>? {
         return repositorio.findDistinctEnderecosComEventos()

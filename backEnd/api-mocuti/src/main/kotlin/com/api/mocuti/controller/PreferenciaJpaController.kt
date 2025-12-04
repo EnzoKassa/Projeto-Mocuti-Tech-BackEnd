@@ -16,6 +16,10 @@ class PreferenciaJpaController(
     var repositorioPreferencia: PreferenciaRepository,
     var preferenciaService: PreferenciaService
 ) {
+    @Operation(
+        summary = "Salvar uma nova preferência",
+        description = "Cria e persiste uma nova preferência no banco de dados"
+    )
     @PostMapping
     fun salvarPreferencia(@RequestBody req: PreferenciaRequest): ResponseEntity<Preferencia> {
         val preferencia = preferenciaService.salvar(req)

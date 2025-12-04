@@ -15,7 +15,8 @@ class FeedbackJpaController(
     private val feedbackService: FeedbackService
 ) {
 
-    @Operation(summary = "Listar todos os feedbacks")
+    @Operation(summary = "Listar todos os feedbacks",
+        description = "Retorna uma lista de todos os feedbacks cadastrados no sistema")
     @GetMapping
     fun getFeedback(): ResponseEntity<List<Feedback>> {
         val feedbacks = feedbackService.listarTodos()
@@ -23,7 +24,8 @@ class FeedbackJpaController(
         else ResponseEntity.ok(feedbacks)
     }
 
-    @Operation(summary = "Buscar feedback por ID")
+    @Operation(summary = "Buscar feedback por ID",
+        description = "Retorna o feedback correspondente ao ID fornecido")
     @GetMapping("/{id}")
     fun getFeedbackPorId(@PathVariable id: Int): ResponseEntity<Feedback> {
         val feedback = feedbackService.buscarPorId(id)
@@ -31,33 +33,38 @@ class FeedbackJpaController(
         else ResponseEntity.notFound().build()
     }
 
-    @Operation(summary = "Deletar um feedback")
+    @Operation(summary = "Deletar um feedback",
+        description = "Exclui o feedback correspondente ao ID fornecido")
     @DeleteMapping("/{id}")
     fun deleteFeedback(@PathVariable id: Int): ResponseEntity<Void> {
         return if (feedbackService.deletar(id)) ResponseEntity.noContent().build()
         else ResponseEntity.notFound().build()
     }
 
-    @Operation(summary = "Criar ou atualizar feedback")
+    @Operation(summary = "Criar ou atualizar feedback",
+        description = "Cria um novo feedback ou atualiza um existente com base nos dados fornecidos")
     @PostMapping
     fun postFeedback(@RequestBody novoFeedback: FeedbackNovoRequest): ResponseEntity<Feedback> {
         val feedback = feedbackService.criarOuAtualizar(novoFeedback)
         return ResponseEntity.ok(feedback)
     }
 
-    @Operation(summary = "Feedbacks por categoria")
+    @Operation(summary = "Feedbacks por categoria",
+        description = "Retorna a quantidade de feedbacks agrupados por categoria")
     @GetMapping("/view/feedbacks-por-categoria")
     fun getFeedbackCategoria(): ResponseEntity<List<FeedbacksPorCategoriaRequest>> {
         return ResponseEntity.ok(feedbackService.getFeedbackPorCategoria())
     }
 
-    @Operation(summary = "Feedbacks por categoria no mês atual")
+    @Operation(summary = "Feedbacks por categoria no mês atual",
+        description = "Retorna a quantidade de feedbacks agrupados por categoria no mês atual")
     @GetMapping("/view/feedback-categoria-mes-atual")
     fun getFeedbackCategoriaMesAtual(): ResponseEntity<List<FeedbackCategoriaMesAtualRequest>> {
         return ResponseEntity.ok(feedbackService.getFeedbackCategoriaMesAtual())
     }
 
-    @Operation(summary = "Feedbacks por evento")
+    @Operation(summary = "Feedbacks por evento",
+        description = "Retorna a quantidade de feedbacks agrupados por evento")
     @GetMapping("/view/feedback-evento")
     fun getFeedbackEvento(): ResponseEntity<List<FeedbackEventoRequest>> {
         return ResponseEntity.ok(feedbackService.getFeedbackEvento())

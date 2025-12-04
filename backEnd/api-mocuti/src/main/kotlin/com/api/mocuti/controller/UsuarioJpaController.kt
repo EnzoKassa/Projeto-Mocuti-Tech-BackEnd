@@ -23,7 +23,10 @@ class UsuarioJpaController(
     class SenhaIncorretaException(message: String) : RuntimeException(message)
 
 
-    @Operation(summary = "Listar todos os usuários")
+    @Operation(
+        summary = "Listar todos os usuários",
+        description = "Retorna uma lista de todos os usuários cadastrados no sistema"
+    )
     @GetMapping("/listar")
     fun listarTodos(): ResponseEntity<List<Usuario>> {
         val usuarios = usuarioService.listarTodos()
@@ -31,7 +34,10 @@ class UsuarioJpaController(
         else ResponseEntity.noContent().build()
     }
 
-    @Operation(summary = "Listar usuários por cargo")
+    @Operation(
+        summary = "Listar usuários por cargo",
+        description = "Retorna uma lista de usuários filtrados pelo cargo informado"
+    )
     @GetMapping("/listar-por-cargo/{cargo}")
     fun listarPorCargo(@PathVariable cargo: Int): ResponseEntity<List<Usuario>> {
         val usuarios = usuarioService.listarPorCargo(cargo)
@@ -39,14 +45,20 @@ class UsuarioJpaController(
         else ResponseEntity.noContent().build()
     }
 
-    @Operation(summary = "Cadastrar um novo usuário")
+    @Operation(
+        summary = "Cadastrar um novo usuário",
+        description = "Cria e persiste um novo usuário no banco de dados"
+    )
     @PostMapping("/cadastrar")
     fun cadastrar(@RequestBody request: UsuarioCadastroRequest): ResponseEntity<Usuario> {
         val usuario = usuarioService.cadastrarUsuario(request)
         return ResponseEntity.status(201).body(usuario)
     }
 
-    @Operation(summary = "Login do usuário")
+    @Operation(
+        summary = "Login do usuário",
+        description = "Autentica um usuário com email e senha fornecidos"
+    )
     @PatchMapping("/login")
     fun logar(@RequestBody usuarioLoginRequest: UsuarioLoginRequest): ResponseEntity<Any> {
         return try {
@@ -76,26 +88,38 @@ class UsuarioJpaController(
         }
     }
 
-    @Operation(summary = "Logout do usuário")
+    @Operation(
+        summary = "Logout do usuário",
+        description = "Desautentica um usuário com base nas informações fornecidas"
+    )
     @PatchMapping("/deslogar/{idUsuario}")
     fun deslogar(@RequestBody usuarioLoginRequest: UsuarioLoginRequest): ResponseEntity<Usuario> {
         val usuarioAtualizado = usuarioService.desautenticarUsuario(usuarioLoginRequest)
         return ResponseEntity.ok(usuarioAtualizado)
     }
 
-    @Operation(summary = "Relatório de usuários")
+    @Operation(
+        summary = "Relatório de usuários",
+        description = "Gera um relatório detalhado de usuários cadastrados no sistema"
+    )
     @GetMapping("/relatorioUsuarios")
     fun getRelatorioUsuarios(): ResponseEntity<UsuarioRelatorioUsuarios> {
         return ResponseEntity.ok(usuarioService.getRelatorioUsuarios())
     }
 
-    @Operation(summary = "Relatório por gênero")
+    @Operation(
+        summary = "Relatório por gênero",
+        description = "Gera um relatório com a contagem de usuários por gênero"
+    )
     @GetMapping("/relatorioGenero")
     fun relatorioGenero(): ResponseEntity<Map<String, Long>> {
         return ResponseEntity.ok(usuarioService.relatorioGenero())
     }
 
-    @Operation(summary = "Redefinir senha do usuário")
+    @Operation(
+        summary = "Redefinir senha do usuário",
+        description = "Permite a redefinição da senha de um usuário com base no ID fornecido"
+    )
     @PatchMapping("/redefinirSenha/{idUsuario}")
     fun redefinirSenha(
         @PathVariable idUsuario: Int,
@@ -105,43 +129,64 @@ class UsuarioJpaController(
         return ResponseEntity.ok().build()
     }
 
-    @Operation(summary = "Desativar usuário")
+    @Operation(
+        summary = "Desativar usuário",
+        description = "Desativa a conta do usuário com base no ID fornecido"
+    )
     @PatchMapping("/desativar/{idUsuario}")
     fun desativarUsuario(@PathVariable idUsuario: Int): ResponseEntity<Usuario> {
         return ResponseEntity.ok(usuarioService.desativarUsuario(idUsuario))
     }
 
-    @Operation(summary = "Ativar usuário")
+    @Operation(
+        summary = "Ativar usuário",
+        description = "Ativa a conta do usuário com base no ID fornecido"
+    )
     @PatchMapping("/ativar/{idUsuario}")
     fun ativarUsuario(@PathVariable idUsuario: Int): ResponseEntity<Usuario> {
         return ResponseEntity.ok(usuarioService.ativarUsuario(idUsuario))
     }
 
-    @Operation(summary = "Listar visão geral de usuários")
+    @Operation(
+        summary = "Listar visão geral de usuários",
+        description = "Fornece uma visão geral dos usuários cadastrados no sistema"
+    )
     @GetMapping("/view/visao-geral")
     fun getVisaoGeral(): ResponseEntity<VisaoGeralUsuariosRequest> {
         return ResponseEntity.ok(usuarioService.getVisaoGeralUsuarios())
     }
 
-    @Operation(summary = "Listar inscrições por mês durante o ano")
+    @Operation(
+        summary = "Listar inscrições por mês durante o ano",
+        description = "Fornece o número de inscrições de usuários por mês ao longo do ano"
+    )
     @GetMapping("/view/inscricoes-mes-durante-ano")
     fun getInscricoes(): ResponseEntity<List<InscricoesMesDuranteAnoRequest>> {
         return ResponseEntity.ok(usuarioService.getIncricoesMesDuranteAno())
     }
 
-    @Operation(summary = "Listar público alvo por gênero")
+    @Operation(
+        summary = "Listar público alvo por gênero",
+        description = "Fornece a distribuição do público alvo dos usuários por gênero"
+    )
     @GetMapping("/view/publico-alvo-genero")
     fun getPublicoAlvo(): ResponseEntity<List<PublicoAlvoGeneroRequest>> {
         return ResponseEntity.ok(usuarioService.getPublicoAlvoGenero())
     }
 
-    @Operation(summary = "Listar faixa etária dos usuários ativos")
+    @Operation(
+        summary = "Listar faixa etária dos usuários ativos",
+        description = "Fornece a distribuição da faixa etária dos usuários que estão ativos no sistema"
+    )
     @GetMapping("/view/faixa-etaria-usuarios-ativos")
     fun getFaixaEtariaUsuariosAtivos(): ResponseEntity<List<FaixaEtariaUsuariosAtivosRequest>> {
         return ResponseEntity.ok(usuarioService.getFaixaEtariaUsuariosAtivos())
     }
 
-    @Operation(summary = "Listar um usuário por ID")
+    @Operation(
+        summary = "Listar um usuário por ID",
+        description = "Retorna os detalhes de um usuário específico com base no ID fornecido"
+    )
     @GetMapping("/listar/{idUsuario}")
     fun listarUmUsuario(@PathVariable idUsuario: Int): ResponseEntity<Usuario> {
         return try {
@@ -152,6 +197,10 @@ class UsuarioJpaController(
         }
     }
 
+    @Operation(
+        summary = "Editar usuário por ID",
+        description = "Atualiza as informações de um usuário existente com base no ID fornecido"
+    )
     @PutMapping("/editar/{id}")
     fun editarUsuario(
         @PathVariable id: Long,
@@ -161,20 +210,30 @@ class UsuarioJpaController(
         return ResponseEntity.ok(usuarioAtualizado)
     }
 
+    @Operation(
+        summary = "Verificar existência de email",
+        description = "Verifica se um email já está cadastrado no sistema"
+    )
     @GetMapping("/existeEmail")
     fun existeEmail(@RequestParam email: String): ResponseEntity<Boolean> {
         val existe = usuarioService.existeEmail(email)
         return ResponseEntity.ok(existe)
     }
 
-
+    @Operation(
+        summary = "Listar lista de presença por evento",
+        description = "Retorna a lista de presença dos usuários para um evento específico"
+    )
     @GetMapping("/{id}/lista-presenca")
     fun listarPresencaPorEvento(@PathVariable id: Long): Any {
         val resultado = usuarioService.buscarPorEvento(id)
         return resultado ?: mapOf("mensagem" to "Evento não encontrado ou sem participantes")
     }
 
-    @Operation(summary = "Atualizar cargo do usuário")
+    @Operation(
+        summary = "Atualizar cargo do usuário",
+        description = "Atualiza o cargo de um usuário específico com base nos IDs fornecidos"
+    )
     @PatchMapping("/{idUsuario}/cargo/{idCargo}")
     fun atualizarCargo(
         @PathVariable idUsuario: Int,
@@ -184,6 +243,10 @@ class UsuarioJpaController(
         return ResponseEntity.ok(usuarioAtualizado)
     }
 
+    @Operation(
+        summary = "Listar usuários inativos por cargo",
+        description = "Retorna uma lista de usuários inativos filtrados pelo cargo informado"
+    )
     @GetMapping("/inativos-por-cargo/{cargoId}")
     fun listarUsuariosInativosPorCargo(@PathVariable cargoId: Int): ResponseEntity<List<Usuario>> {
         val usuarios = usuarioService.listarUsuariosInativosPorCargo(cargoId)
